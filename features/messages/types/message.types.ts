@@ -21,3 +21,13 @@ export type Message = {
   sentAt: string;
   readAt?: string | null;
 };
+
+// Résultat de recherche pour démarrer une nouvelle conversation (voir use-search-contacts.ts) —
+// restreint aux comptes propriétaire/agent/agence, jamais locataire (choix explicite).
+export type Contact = {
+  id: string;
+  fullName: string;
+  avatarUrl?: string;
+  role: 'owner' | 'agent' | 'agency';
+  agencyName?: string;
+};

@@ -12,6 +12,8 @@ import {
   Building2,
   Landmark,
   CheckCircle2,
+  LayoutGrid,
+  Scissors,
   type LucideIcon,
 } from 'lucide-react';
 import type { Translations } from '@/lib/i18n/translations';
@@ -64,12 +66,22 @@ export function getPropertyDetailStats(
     if (property.hasComfort) amenities.push({ icon: Sparkles, text: t.search.comfort });
     if (property.hasCaretakerAnnex) amenities.push({ icon: Building2, text: t.search.hasCaretakerAnnex });
   } else {
+    stats.push({ icon: Ruler, value: `${property.surfaceM2} m²`, label: t.propertyDetail.areaLabel });
     amenities.push({ icon: Landmark, text: t.search[LEGAL_STATUS_LABEL_KEY[property.legalStatus]] });
     if (property.hasCarAccess) amenities.push({ icon: Car, text: t.search.carAccess });
     if (property.isResidentialArea) amenities.push({ icon: Home, text: t.search.isResidentialArea });
     if (property.hasWaterAvailable) amenities.push({ icon: Droplet, text: t.search.hasWaterAvailable });
     if (property.hasElectricityAvailable) amenities.push({ icon: Zap, text: t.search.hasElectricityAvailable });
     if (property.isBuildReady) amenities.push({ icon: CheckCircle2, text: t.search.isBuildReady });
+    if (property.isLotissement) amenities.push({ icon: LayoutGrid, text: t.search.isLotissement });
+    if (property.isSubdivisible) {
+      amenities.push({
+        icon: Scissors,
+        text: property.minSubdivisionM2
+          ? `${t.search.isSubdivisible} (min ${property.minSubdivisionM2} m²)`
+          : t.search.isSubdivisible,
+      });
+    }
   }
 
   return { stats, amenities };

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
-import { formatPrice } from '@/features/search/utils/format-price';
+import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import { useDeleteProperty } from '@/features/search/hooks/use-delete-property';
 import { STATUS_LABEL_KEY, STATUS_BADGE_CLASS } from '../utils/status-badge';
 import type { Property } from '@/features/search/types/listing.types';
@@ -71,7 +71,7 @@ export function MyPropertyCard({ property }: { property: Property }) {
         <p className="text-xs text-content-muted truncate">{property.location}</p>
         <p className="text-sm font-bold text-brand-secondary-text mt-0.5">
           {formatPrice(property.price)}
-          {property.propertyType === 'land' && <span className="font-normal text-content-muted"> / m²</span>}
+          {getPriceSuffix(property) && <span className="font-normal text-content-muted">{getPriceSuffix(property)}</span>}
         </p>
         {property.moderationStatus === 'rejected' && property.rejectionReason && (
           <p className="text-xs text-danger mt-0.5 truncate">

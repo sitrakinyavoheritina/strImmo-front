@@ -5,7 +5,7 @@ import { MapPin } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { PROPERTY_TYPE_LABEL_KEY } from '@/features/search/utils/get-key-features';
 import { getPropertyDetailStats } from '@/features/search/utils/get-property-detail-stats';
-import { formatPrice } from '@/features/search/utils/format-price';
+import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import type { PropertyFormValues } from '@/features/search/types/listing.types';
 
 /** Aperçu fidèle de l'annonce telle qu'elle apparaîtra une fois publiée, avant validation finale —
@@ -67,12 +67,12 @@ export function ListingPreview({ values, photos }: { values: PropertyFormValues;
         <p className="text-brand-primary text-xs font-bold uppercase">{t.search[PROPERTY_TYPE_LABEL_KEY[values.propertyType]]}</p>
         <h2 className="text-xl font-bold text-content-main">{values.title || t.listing.formTitlePlaceholder}</h2>
         <p className="flex items-center gap-1 text-sm text-content-muted">
-          <MapPin size={13} />
+          <MapPin size={13} className="text-brand-primary" />
           {values.location || '—'}
         </p>
         <p className="text-2xl font-bold text-brand-secondary-text mt-1">
           {formatPrice(values.price)}
-          {values.propertyType === 'land' && <span className="text-sm font-normal"> / m²</span>}
+          {getPriceSuffix(values) && <span className="text-sm font-normal">{getPriceSuffix(values)}</span>}
         </p>
       </div>
 

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslation } from '@/lib/i18n/use-translation';
-import { formatPrice } from '@/features/search/utils/format-price';
+import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import { STATUS_LABEL_KEY, STATUS_BADGE_CLASS } from '../utils/status-badge';
 import type { Property } from '@/features/search/types/listing.types';
 
@@ -33,7 +33,7 @@ export function AdminPropertyListItem({ property }: { property: Property }) {
         <p className="text-xs text-content-muted truncate">{property.location}</p>
         <p className="text-sm font-bold text-brand-secondary-text mt-0.5">
           {formatPrice(property.price)}
-          {property.propertyType === 'land' && <span className="font-normal text-content-muted"> / m²</span>}
+          {getPriceSuffix(property) && <span className="font-normal text-content-muted">{getPriceSuffix(property)}</span>}
         </p>
         {property.moderatorName && (
           <p className="text-[11px] text-content-muted mt-0.5">

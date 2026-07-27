@@ -15,7 +15,8 @@ import { useApproveProperty, useRejectProperty } from '@/features/search/hooks/u
 import { useDeleteProperty } from '@/features/search/hooks/use-delete-property';
 import { PROPERTY_TYPE_LABEL_KEY } from '@/features/search/utils/get-key-features';
 import { getPropertyDetailStats } from '@/features/search/utils/get-property-detail-stats';
-import { formatPrice } from '@/features/search/utils/format-price';
+import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
+import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { RightRail } from '@/features/feed/components/right-rail';
 import { InlineChatPanel } from '@/features/property-detail/components/inline-chat-panel';
@@ -261,6 +262,21 @@ export default function AnnoncePage() {
             </div>
           )}
 
+          {/* Nom/avatar du vendeur, cliquable vers son profil public (voir app/profil/[id]/page.tsx)
+              — même lien que sur les cartes du fil (feed-property-card.tsx), absent ailleurs sur
+              cette page (le bouton "Discuter avec X" juste en dessous ouvre la discussion, pas le
+              profil). Visible pour tout le monde, y compris un admin (consultation neutre, pas une
+              action de type j'aime/discuter/contacter). */}
+          {property.authorName && (
+            <Link
+              href={`/profil/${property.ownerId}`}
+              className="flex items-center gap-2 mt-3 hover:underline w-fit"
+            >
+              <Avatar name={property.authorName} imageUrl={property.authorAvatarUrl} size={32} />
+              <span className="text-sm font-semibold text-content-main truncate">{property.authorName}</span>
+            </Link>
+          )}
+
           {/* Discuter : bouton juste sous la photo, ouvre la discussion directement ici (pas de
               modal, pas d'autre page) — remplit l'espace disponible sous les vignettes. Absent
               pour un admin : il ne discute pas avec le vendeur, il modère (voir plus bas). En
@@ -307,7 +323,7 @@ export default function AnnoncePage() {
             </span>
             <h1 className="text-lg sm:text-2xl font-bold text-content-main mt-0.5">{property.title}</h1>
             <p className="text-content-muted text-xs sm:text-sm mt-1 flex items-center gap-1">
-              <MapPin size={14} />
+              <MapPin size={14} className="text-brand-primary" />
               {property.location}
             </p>
             {/* Remonté ici (pas tout en bas, groupé avec "Contacter") : c'est l'info n°1 pour
@@ -316,7 +332,9 @@ export default function AnnoncePage() {
                 description avant de le voir. */}
             <div className="flex items-baseline gap-1.5 mt-1.5">
               <span className="text-xl sm:text-2xl font-bold text-brand-secondary-text">{formatPrice(property.price)}</span>
-              {property.propertyType === 'land' && <span className="text-content-muted text-xs sm:text-sm"> / m²</span>}
+              {getPriceSuffix(property) && (
+                <span className="text-content-muted text-xs sm:text-sm">{getPriceSuffix(property)}</span>
+              )}
             </div>
 
             {/* Motif de refus — visible par le propriétaire sur sa propre fiche, pas seulement
@@ -445,7 +463,7 @@ export default function AnnoncePage() {
               )}
               {property.address && (
                 <p className="mt-2 flex items-start gap-1.5 text-sm text-content-main">
-                  <MapPin size={14} className="shrink-0 mt-0.5 text-content-muted" />
+                  <MapPin size={14} className="shrink-0 mt-0.5 text-brand-primary" />
                   {property.address}
                 </p>
               )}

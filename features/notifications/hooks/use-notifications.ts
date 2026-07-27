@@ -6,9 +6,11 @@ import { notificationApi } from '../services/notification-api';
 export const notificationsQueryKey = ['notifications'] as const;
 
 export function useNotifications() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   return useQuery({
     queryKey: notificationsQueryKey,
     queryFn: notificationApi.list,
+    enabled: isAuthenticated,
   });
 }
 

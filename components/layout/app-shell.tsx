@@ -3,6 +3,7 @@ import { Sidebar } from './sidebar';
 import { MobileNavStrip } from './mobile-nav-strip';
 import { RealtimeProvider } from './realtime-provider';
 import { AdminRouteGuard } from './admin-route-guard';
+import { OfflineBanner } from './offline-banner';
 
 /** Habillage global du site : topbar + sidebar gauche (desktop) / bande d'icônes en bas d'écran
  * (mobile, comme l'app mobile — demandé explicitement). `MobileNavStrip` est fixée en bas ; la
@@ -13,6 +14,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen flex flex-col bg-surface-app text-content-main">
       <RealtimeProvider />
       <AdminRouteGuard />
+      <OfflineBanner />
       <Topbar />
       <div className="flex-1 flex w-full">
         <Sidebar />

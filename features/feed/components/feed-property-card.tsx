@@ -11,7 +11,7 @@ import { useLikesStore } from '@/lib/state/use-likes-store';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useLikeProperty } from '@/features/search/hooks/use-like-property';
-import { formatPrice } from '@/features/search/utils/format-price';
+import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import { formatRelativeTime } from '@/features/search/utils/format-relative-time';
 import type { Property } from '@/features/search/types/listing.types';
 
@@ -77,9 +77,9 @@ export function FeedPropertyCard({ property }: { property: Property }) {
           <span className="text-white text-[10px] font-bold uppercase truncate">
             {property.kind === 'rent' ? t.property.forRent : t.property.forSale}
           </span>
-          <span className="text-white text-xs font-bold shrink-0">
+          <span className="text-white text-[15px] font-bold shrink-0">
             {formatPrice(property.price)}
-            {property.propertyType === 'land' && <span className="font-normal text-white/75"> / m²</span>}
+            {getPriceSuffix(property) && <span className="text-xs font-normal text-white/75">{getPriceSuffix(property)}</span>}
           </span>
         </div>
       </Link>
@@ -90,7 +90,7 @@ export function FeedPropertyCard({ property }: { property: Property }) {
               l'annonce, pas un simple détail secondaire — demandé explicitement après un retour
               sur sa lisibilité en thème sombre. */}
           <p className="text-xs text-content-main flex items-center gap-1 min-w-0">
-            <MapPin size={12} className="shrink-0" />
+            <MapPin size={12} className="shrink-0 text-brand-primary" />
             <span className="truncate">{property.location}</span>
           </p>
           <span className="text-xs text-content-muted shrink-0">{formatRelativeTime(property.createdAt)}</span>
@@ -100,10 +100,10 @@ export function FeedPropertyCard({ property }: { property: Property }) {
 
       <div className="flex items-center justify-between gap-2 px-3 py-2 border-t border-stroke-default">
         {property.authorName ? (
-          <div className="flex items-center gap-1.5 min-w-0">
+          <Link href={`/profil/${property.ownerId}`} className="flex items-center gap-1.5 min-w-0 hover:underline">
             <Avatar name={property.authorName} imageUrl={property.authorAvatarUrl} size={22} />
             <span className="text-xs font-semibold text-content-main truncate">@{property.authorName}</span>
-          </div>
+          </Link>
         ) : (
           <span />
         )}

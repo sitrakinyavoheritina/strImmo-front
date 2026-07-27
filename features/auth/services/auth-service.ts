@@ -52,6 +52,8 @@ export const authService = {
     if (payload.cinVerso) form.append('cinVerso', payload.cinVerso);
     if (payload.nif) form.append('nif', payload.nif);
     if (payload.stat) form.append('stat', payload.stat);
+    if (payload.nifNumber) form.append('nifNumber', payload.nifNumber);
+    if (payload.statNumber) form.append('statNumber', payload.statNumber);
     const res = await authApi.completeProfile(form);
     return { user: toUser(res.user), token: res.access_token };
   },
@@ -91,6 +93,8 @@ export const authService = {
     form.append('address', payload.address);
     if (payload.nif) form.append('nif', payload.nif);
     if (payload.stat) form.append('stat', payload.stat);
+    if (payload.nifNumber) form.append('nifNumber', payload.nifNumber);
+    if (payload.statNumber) form.append('statNumber', payload.statNumber);
     await authApi.registerAgency(form);
     return { status: 'pending' };
   },

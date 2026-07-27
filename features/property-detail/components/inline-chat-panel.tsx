@@ -42,7 +42,7 @@ export function InlineChatPanel({
   useEffect(() => {
     if (startedForRef.current === propertyId) return;
     startedForRef.current = propertyId;
-    startConversation(propertyId);
+    startConversation({ propertyId });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [propertyId]);
 

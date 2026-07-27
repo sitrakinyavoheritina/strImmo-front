@@ -11,7 +11,7 @@ import { useLikesStore } from '@/lib/state/use-likes-store';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useLikeProperty } from '@/features/search/hooks/use-like-property';
-import { formatPrice } from '@/features/search/utils/format-price';
+import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import { formatRelativeTime } from '@/features/search/utils/format-relative-time';
 import type { Property } from '@/features/search/types/listing.types';
 
@@ -98,13 +98,13 @@ export function FeedPropertyRow({ property }: { property: Property }) {
         </Link>
 
         <p className="text-xs text-content-main flex items-start gap-1 mt-0.5 min-w-0">
-          <MapPin size={11} className="shrink-0 mt-0.5" />
+          <MapPin size={11} className="shrink-0 mt-0.5 text-brand-primary" />
           <span className="line-clamp-2">{property.location}</span>
         </p>
 
         <p className="text-sm font-bold text-brand-secondary-text mt-0.5">
           {formatPrice(property.price)}
-          {property.propertyType === 'land' && <span className="font-normal text-content-muted"> / m²</span>}
+          {getPriceSuffix(property) && <span className="font-normal text-content-muted">{getPriceSuffix(property)}</span>}
         </p>
 
         {/* Auteur à gauche, j'aime/discuter/"..." regroupés à droite sur la même ligne — ordre
@@ -112,10 +112,10 @@ export function FeedPropertyRow({ property }: { property: Property }) {
             du cœur/message par un vide). */}
         <div className="mt-auto pt-1.5 flex items-center justify-between gap-2">
           {property.authorName ? (
-            <div className="flex items-center gap-1.5 min-w-0">
+            <Link href={`/profil/${property.ownerId}`} className="flex items-center gap-1.5 min-w-0 hover:underline">
               <Avatar name={property.authorName} imageUrl={property.authorAvatarUrl} size={18} />
               <span className="text-xs font-semibold text-content-main truncate">@{property.authorName}</span>
-            </div>
+            </Link>
           ) : (
             <span />
           )}

@@ -11,6 +11,8 @@ import { setStoredTheme } from '@/lib/theme/use-theme-preference';
 import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
 import { AuthPageShell } from '@/features/auth/components/auth-page-shell';
 import { FileInput } from '@/features/auth/components/file-input';
+import { EMPTY_NIF_STAT, NifStatFields, toNifStatPayload, type NifStatValue } from '@/features/auth/components/nif-stat-fields';
+import { SHOW_CIN_UPLOAD } from '@/features/auth/config';
 import { FieldLabel, FormInput, Chip } from '@/components/ui/form-controls';
 import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
@@ -18,10 +20,10 @@ import { FormErrorBanner } from '@/components/ui/form-error-banner';
 type Role = 'owner' | 'tenant' | 'agent' | 'agency';
 type FormErrors = Partial<Record<'phone' | 'agencyName' | 'address', string>>;
 
-const ROLES: { value: Role; icon: typeof Home; titleKey: 'roleOwner' | 'roleTenant' | 'roleAgent' | 'roleAgency' }[] = [
+const ROLES: { value: Role; icon: typeof Home; titleKey: 'roleOwner' | 'roleTenant' | 'roleAgentChoice' | 'roleAgency' }[] = [
   { value: 'owner', icon: Home, titleKey: 'roleOwner' },
   { value: 'tenant', icon: Key, titleKey: 'roleTenant' },
-  { value: 'agent', icon: Handshake, titleKey: 'roleAgent' },
+  { value: 'agent', icon: Handshake, titleKey: 'roleAgentChoice' },
   { value: 'agency', icon: Building2, titleKey: 'roleAgency' },
 ];
 
@@ -44,8 +46,7 @@ export default function CompleterProfilPage() {
   const [address, setAddress] = useState('');
   const [cinRecto, setCinRecto] = useState<File | null>(null);
   const [cinVerso, setCinVerso] = useState<File | null>(null);
-  const [nif, setNif] = useState<File | null>(null);
-  const [stat, setStat] = useState<File | null>(null);
+  const [nifStat, setNifStat] = useState<NifStatValue>(EMPTY_NIF_STAT);
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -96,8 +97,7 @@ export default function CompleterProfilPage() {
         address: role === 'agency' ? address : undefined,
         cinRecto,
         cinVerso,
-        nif,
-        stat,
+        ...(role === 'agency' ? toNifStatPayload(nifStat) : {}),
       });
       setSession(updatedUser, token);
       setStoredTheme(updatedUser.themePreference);
@@ -141,7 +141,7 @@ export default function CompleterProfilPage() {
             error={errors.phone}
           />
 
-          {role === 'agent' && (
+          {role === 'agent' && SHOW_CIN_UPLOAD && (
             <>
               <FileInput label={t.auth.cinRecto} file={cinRecto} onChange={setCinRecto} />
               <FileInput label={t.auth.cinVerso} file={cinVerso} onChange={setCinVerso} />
@@ -170,8 +170,7 @@ export default function CompleterProfilPage() {
                 placeholder={t.auth.addressPlaceholder}
                 error={errors.address}
               />
-              <FileInput label={t.auth.nifDocument} file={nif} onChange={setNif} />
-              <FileInput label={t.auth.statDocument} file={stat} onChange={setStat} />
+              <NifStatFields value={nifStat} onChange={setNifStat} />
             </>
           )}
 

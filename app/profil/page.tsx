@@ -29,10 +29,28 @@ export default function ProfilPage() {
     return (
       <div className="flex px-3 sm:px-6 lg:px-0">
         <div className="flex-1 min-w-0 max-w-md mx-auto px-4 py-16 text-center">
-          <p className="text-content-main font-semibold">{t.profile.notLoggedIn}</p>
-          <Link href="/connexion" className="inline-block mt-4">
-            <Button size="sm">{t.profile.login}</Button>
-          </Link>
+          {/* eslint-disable-next-line @next/next/no-img-element -- logo décoratif (SVG statique dans /public), pas besoin de l'optimiseur next/image */}
+          <img src="/logo.svg" alt="Onina" className="h-14 w-auto mx-auto" />
+          <p className="mt-2 font-extrabold tracking-tight">
+            <span className="text-xl text-brand-secondary-text">Onina</span>
+            <span className="text-base text-brand-primary">.mg</span>
+          </p>
+          <p className="mt-5 text-lg text-content-main font-semibold">{t.profile.notLoggedIn}</p>
+          <p className="mt-1 text-sm text-content-muted">{t.profile.notLoggedInHint}</p>
+          <div className="mt-5 flex flex-col gap-2.5 max-w-xs mx-auto">
+            <Link
+              href="/connexion"
+              className="block py-2.5 px-4 text-sm font-semibold rounded-xl bg-brand-primary hover:bg-brand-primary-hover text-white shadow-md shadow-brand-primary/20 transition active:scale-[0.98]"
+            >
+              {t.profile.login}
+            </Link>
+            <Link
+              href="/inscription"
+              className="block py-2.5 px-4 text-sm font-semibold rounded-xl bg-surface-app hover:bg-stroke-default border border-stroke-default text-content-main transition active:scale-[0.98]"
+            >
+              {t.auth.signUp}
+            </Link>
+          </div>
         </div>
         <RightRail />
       </div>

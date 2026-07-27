@@ -116,6 +116,13 @@ export function buildCreatePropertyFormData(values: PropertyFormValues, photos: 
     form.append('hasWaterAvailable', String(values.hasWaterAvailable));
     form.append('hasElectricityAvailable', String(values.hasElectricityAvailable));
     form.append('isBuildReady', String(values.isBuildReady));
+    form.append('isLotissement', String(values.isLotissement));
+    form.append('priceType', values.priceType);
+    form.append('surfaceM2', String(values.surfaceM2));
+    form.append('isSubdivisible', String(values.isSubdivisible));
+    if (values.minSubdivisionM2 != null) {
+      form.append('minSubdivisionM2', String(values.minSubdivisionM2));
+    }
   }
 
   const [cover, ...gallery] = photos;
@@ -172,6 +179,11 @@ export function buildUpdatePropertyPayload(values: PropertyFormValues): Record<s
       hasWaterAvailable: values.hasWaterAvailable,
       hasElectricityAvailable: values.hasElectricityAvailable,
       isBuildReady: values.isBuildReady,
+      isLotissement: values.isLotissement,
+      priceType: values.priceType,
+      surfaceM2: values.surfaceM2,
+      isSubdivisible: values.isSubdivisible,
+      minSubdivisionM2: values.minSubdivisionM2,
     });
   }
 

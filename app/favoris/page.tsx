@@ -25,7 +25,7 @@ function FavoriteListItem({ property, onRemove }: { property: Property; onRemove
       <Link href={`/annonce/${property.id}`} className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-content-main truncate">{property.title}</p>
         <p className="text-xs text-content-muted flex items-center gap-1 mt-0.5 min-w-0">
-          <MapPin size={11} className="shrink-0" />
+          <MapPin size={11} className="shrink-0 text-brand-primary" />
           <span className="truncate">{property.location}</span>
         </p>
         <p className="text-sm font-bold text-brand-secondary-text mt-0.5">{formatPrice(property.price)}</p>

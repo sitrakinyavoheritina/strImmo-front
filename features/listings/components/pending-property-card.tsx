@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Check, X } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
-import { formatPrice } from '@/features/search/utils/format-price';
+import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import { useApproveProperty, useRejectProperty } from '@/features/search/hooks/use-moderate-property';
 import type { Property } from '@/features/search/types/listing.types';
 
@@ -95,7 +95,7 @@ export function PendingPropertyCard({ property }: { property: Property }) {
         <p className="text-xs text-content-muted truncate">{property.location}</p>
         <p className="text-sm font-bold text-brand-secondary-text mt-0.5">
           {formatPrice(property.price)}
-          {property.propertyType === 'land' && <span className="font-normal text-content-muted"> / m²</span>}
+          {getPriceSuffix(property) && <span className="font-normal text-content-muted">{getPriceSuffix(property)}</span>}
         </p>
         {error && <p className="text-xs text-danger mt-0.5">{error}</p>}
       </Link>

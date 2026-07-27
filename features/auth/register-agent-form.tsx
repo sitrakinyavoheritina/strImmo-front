@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { FileInput } from './components/file-input';
 import { agentSchema, AgentFormData } from './schemas';
 import { useRegisterSubmit } from './hooks/use-register';
+import { SHOW_CIN_UPLOAD } from './config';
 
 export const RegisterAgentForm: React.FC = () => {
   const { t } = useTranslation();
@@ -98,8 +99,12 @@ export const RegisterAgentForm: React.FC = () => {
           {errors.password && <p className="mt-0.5 text-xs text-danger">{errors.password.message}</p>}
         </div>
 
-        <FileInput label={t.auth.cinRecto} file={cinRecto} onChange={setCinRecto} />
-        <FileInput label={t.auth.cinVerso} file={cinVerso} onChange={setCinVerso} />
+        {SHOW_CIN_UPLOAD && (
+          <>
+            <FileInput label={t.auth.cinRecto} file={cinRecto} onChange={setCinRecto} />
+            <FileInput label={t.auth.cinVerso} file={cinVerso} onChange={setCinVerso} />
+          </>
+        )}
 
         <Button type="submit" disabled={isLoading} variant="secondary" className="w-full mt-1 sm:mt-2">
           {isLoading ? t.auth.registering : t.auth.register}

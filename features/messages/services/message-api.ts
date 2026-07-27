@@ -23,11 +23,28 @@ export type ApiMessage = {
   readAt: string | null;
 };
 
+// Forme minimale renvoyée par `GET /auth/search-contacts` (voir AuthService.searchContacts) —
+// jamais le compte complet (téléphone/email non exposés), juste de quoi afficher un résultat de
+// recherche et démarrer une conversation.
+export type ApiContact = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  avatarUrl: string | null;
+  role: 'owner' | 'agent' | 'agency';
+  agencyName?: string;
+};
+
 export const messageApi = {
   listConversations: () => apiClient.get<ApiConversation[]>('/conversations').then((r) => r.data),
 
-  startConversation: (propertyId: string) =>
-    apiClient.post<ApiConversation>('/conversations/start', { propertyId }).then((r) => r.data),
+  // `propertyId` (depuis une annonce) ou `userId` (depuis une recherche de contact, voir
+  // searchContacts) — jamais les deux, MessagingController.start() exige l'un des deux.
+  startConversation: (target: { propertyId: string } | { userId: string }) =>
+    apiClient.post<ApiConversation>('/conversations/start', target).then((r) => r.data),
+
+  searchContacts: (query: string) =>
+    apiClient.get<ApiContact[]>('/auth/search-contacts', { params: { query } }).then((r) => r.data),
 
   getMessages: (conversationId: string) =>
     apiClient.get<ApiMessage[]>(`/conversations/${conversationId}/messages`).then((r) => r.data),

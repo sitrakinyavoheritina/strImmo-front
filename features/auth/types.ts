@@ -26,8 +26,12 @@ export type RegisterAgencyPayload = RegisterBaseFields & {
   email: string;
   agencyName: string;
   address: string;
-  nif: File | null;
-  stat: File | null;
+  // NIF/STAT facultatifs (archive, jamais affichés sur le profil) : soit les photos (`nif`/`stat`),
+  // soit les numéros saisis à la main, soit rien.
+  nif?: File | null;
+  stat?: File | null;
+  nifNumber?: string;
+  statNumber?: string;
 };
 
 export type RegisterPayload =
@@ -54,6 +58,8 @@ export interface CompleteProfilePayload {
   cinVerso?: File | null;
   nif?: File | null;
   stat?: File | null;
+  nifNumber?: string;
+  statNumber?: string;
 }
 
 export interface UpdateProfilePayload {

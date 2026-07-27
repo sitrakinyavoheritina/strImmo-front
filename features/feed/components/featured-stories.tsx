@@ -32,7 +32,16 @@ const AUTO_SCROLL_SPEED_PX_PER_SEC = 12;
  * glisser-déposer à la souris + flèches au survol sur desktop, où il n'y a
  * pas de swipe natif.
  */
-export function FeaturedStories({ properties }: { properties: Property[] }) {
+export function FeaturedStories({
+  properties,
+  showTitle = true,
+}: {
+  properties: Property[];
+  /** Masque le titre de l'annonce sous la vignette — utilisé sur le profil public d'un
+   *  propriétaire/agence (voir app/profil/[id]/page.tsx), où le rail sert juste à montrer un
+   *  aperçu visuel de ses biens, pas à mettre en avant le nom de chacun. */
+  showTitle?: boolean;
+}) {
   const { t } = useTranslation();
   const router = useRouter();
   const railRef = useRef<HTMLDivElement>(null);
@@ -227,9 +236,11 @@ export function FeaturedStories({ properties }: { properties: Property[] }) {
               </div>
               <div className="p-1.5 space-y-0.5">
                 <p className="text-xs font-bold text-brand-primary line-clamp-1">{formatPrice(property.price)}</p>
-                <p className="text-[11px] font-semibold text-content-main line-clamp-1">{property.title}</p>
+                {showTitle && (
+                  <p className="text-[11px] font-semibold text-content-main line-clamp-1">{property.title}</p>
+                )}
                 <p className="flex items-center gap-0.5 text-[10px] text-content-muted">
-                  <MapPin size={9} className="shrink-0" />
+                  <MapPin size={9} className="shrink-0 text-brand-primary" />
                   <span className="truncate">{property.location}</span>
                 </p>
                 {spec && (

@@ -14,6 +14,7 @@ import { useFokontany } from '../hooks/use-fokontany';
 import { useGeocodeFokontany } from '../hooks/use-geocode-fokontany';
 import type {
   BathroomLocation,
+  LandPriceType,
   LandStatus,
   ListingKind,
   PropertyFormValues,
@@ -35,7 +36,16 @@ const PROPERTY_TYPES: { value: PropertyType; labelKey: 'typeHouse' | 'typeApartm
 
 type FormErrors = Partial<
   Record<
-    'title' | 'description' | 'price' | 'commune' | 'fokontany' | 'bedrooms' | 'surfaceM2' | 'commission' | 'caution',
+    | 'title'
+    | 'description'
+    | 'price'
+    | 'commune'
+    | 'fokontany'
+    | 'bedrooms'
+    | 'surfaceM2'
+    | 'commission'
+    | 'caution'
+    | 'minSubdivisionM2',
     string
   >
 >;
@@ -140,8 +150,15 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   // Partagé Maison + Terrain (jamais affichés en même temps).
   const [hasCarAccess, setHasCarAccess] = useState(houseDefaults?.hasCarAccess ?? landDefaults?.hasCarAccess ?? false);
 
-  // Villa / Appartement
-  const [surfaceM2, setSurfaceM2] = useState(residentialDefaults ? String(residentialDefaults.surfaceM2) : '');
+  // Villa / Appartement / Terrain (surface partagée par les trois — jamais affichés en même
+  // temps, même logique que `hasCarAccess` partagé Maison + Terrain juste au-dessus).
+  const [surfaceM2, setSurfaceM2] = useState(
+    residentialDefaults
+      ? String(residentialDefaults.surfaceM2)
+      : landDefaults
+        ? String(landDefaults.surfaceM2)
+        : ''
+  );
   const [isIndependent, setIsIndependent] = useState(residentialDefaults?.isIndependent ?? false);
   const [roomType, setRoomType] = useState<RoomType>(residentialDefaults?.roomType ?? 'T3');
   const [parkingSpots, setParkingSpots] = useState(residentialDefaults ? String(residentialDefaults.parkingSpots) : '');
@@ -155,6 +172,12 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   const [hasWaterAvailable, setHasWaterAvailable] = useState(landDefaults?.hasWaterAvailable ?? false);
   const [hasElectricityAvailable, setHasElectricityAvailable] = useState(landDefaults?.hasElectricityAvailable ?? false);
   const [isBuildReady, setIsBuildReady] = useState(landDefaults?.isBuildReady ?? false);
+  const [isLotissement, setIsLotissement] = useState(landDefaults?.isLotissement ?? false);
+  const [priceType, setPriceType] = useState<LandPriceType>(landDefaults?.priceType ?? 'per_m2');
+  const [isSubdivisible, setIsSubdivisible] = useState(landDefaults?.isSubdivisible ?? false);
+  const [minSubdivisionM2, setMinSubdivisionM2] = useState(
+    landDefaults?.minSubdivisionM2 !== undefined ? String(landDefaults.minSubdivisionM2) : ''
+  );
 
   const [errors, setErrors] = useState<FormErrors>({});
   function clearError(key: keyof FormErrors) {
@@ -202,6 +225,11 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
         hasWaterAvailable,
         hasElectricityAvailable,
         isBuildReady,
+        isLotissement,
+        priceType,
+        surfaceM2: Number(surfaceM2) || 0,
+        isSubdivisible,
+        minSubdivisionM2: isSubdivisible ? Number(minSubdivisionM2) || 0 : undefined,
       };
     }
     return {
@@ -239,8 +267,14 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
       if (!caution || Number(caution) <= 0) next.caution = t.listing.cautionRequired;
     }
     if (propertyType === 'house' && (!bedrooms || Number(bedrooms) <= 0)) next.bedrooms = t.listing.bedroomsRequired;
-    if ((propertyType === 'villa' || propertyType === 'apartment') && (!surfaceM2 || Number(surfaceM2) <= 0)) {
+    if (
+      (propertyType === 'villa' || propertyType === 'apartment' || propertyType === 'land') &&
+      (!surfaceM2 || Number(surfaceM2) <= 0)
+    ) {
       next.surfaceM2 = t.listing.surfaceRequired;
+    }
+    if (propertyType === 'land' && isSubdivisible && (!minSubdivisionM2 || Number(minSubdivisionM2) <= 0)) {
+      next.minSubdivisionM2 = t.listing.minSubdivisionRequired;
     }
     return next;
   }
@@ -330,8 +364,30 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
             {mode === 'edit' && <p className="mt-1 text-[11px] text-content-muted">{t.listing.propertyTypeImmutable}</p>}
           </div>
 
+          {propertyType === 'land' && (
+            <div>
+              <FieldLabel>{t.listing.priceTypeLabel}</FieldLabel>
+              <div className="flex gap-2">
+                <Chip active={priceType === 'total'} onClick={() => setPriceType('total')}>
+                  {t.listing.priceTypeTotal}
+                </Chip>
+                <Chip active={priceType === 'per_m2'} onClick={() => setPriceType('per_m2')}>
+                  {t.listing.priceTypePerM2}
+                </Chip>
+              </div>
+            </div>
+          )}
+
           <FormInput
-            label={propertyType === 'land' ? t.listing.pricePerSqm : kind === 'rent' ? t.listing.rentLabel : t.listing.priceLabel}
+            label={
+              propertyType === 'land'
+                ? priceType === 'per_m2'
+                  ? t.listing.pricePerSqm
+                  : t.listing.priceTypeTotal
+                : kind === 'rent'
+                  ? t.listing.rentLabel
+                  : t.listing.priceLabel
+            }
             value={price}
             onChange={(value) => {
               setPrice(value);
@@ -497,6 +553,12 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
 
       {step === 3 && propertyType === 'land' && (
         <LandFields
+          surfaceM2={surfaceM2}
+          setSurfaceM2={(v) => {
+            setSurfaceM2(v);
+            clearError('surfaceM2');
+          }}
+          surfaceM2Error={errors.surfaceM2}
           legalStatus={legalStatus}
           setLegalStatus={setLegalStatus}
           hasCarAccess={hasCarAccess}
@@ -509,6 +571,16 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
           setHasElectricityAvailable={setHasElectricityAvailable}
           isBuildReady={isBuildReady}
           setIsBuildReady={setIsBuildReady}
+          isLotissement={isLotissement}
+          setIsLotissement={setIsLotissement}
+          isSubdivisible={isSubdivisible}
+          setIsSubdivisible={setIsSubdivisible}
+          minSubdivisionM2={minSubdivisionM2}
+          setMinSubdivisionM2={(v) => {
+            setMinSubdivisionM2(v);
+            clearError('minSubdivisionM2');
+          }}
+          minSubdivisionM2Error={errors.minSubdivisionM2}
         />
       )}
 
@@ -700,6 +772,9 @@ export function ResidentialFields({
 }
 
 type LandFieldsProps = {
+  surfaceM2: string;
+  setSurfaceM2: (value: string) => void;
+  surfaceM2Error?: string;
   legalStatus: LandStatus;
   setLegalStatus: (value: LandStatus) => void;
   hasCarAccess: boolean;
@@ -712,6 +787,13 @@ type LandFieldsProps = {
   setHasElectricityAvailable: (value: boolean) => void;
   isBuildReady: boolean;
   setIsBuildReady: (value: boolean) => void;
+  isLotissement: boolean;
+  setIsLotissement: (value: boolean) => void;
+  isSubdivisible: boolean;
+  setIsSubdivisible: (value: boolean) => void;
+  minSubdivisionM2: string;
+  setMinSubdivisionM2: (value: string) => void;
+  minSubdivisionM2Error?: string;
 };
 
 const LAND_STATUSES: { value: LandStatus; labelKey: 'legalStatusTitled' | 'legalStatusCadastre' | 'legalStatusFitanolorana' | 'other' }[] = [
@@ -722,6 +804,9 @@ const LAND_STATUSES: { value: LandStatus; labelKey: 'legalStatusTitled' | 'legal
 ];
 
 export function LandFields({
+  surfaceM2,
+  setSurfaceM2,
+  surfaceM2Error,
   legalStatus,
   setLegalStatus,
   hasCarAccess,
@@ -734,10 +819,26 @@ export function LandFields({
   setHasElectricityAvailable,
   isBuildReady,
   setIsBuildReady,
+  isLotissement,
+  setIsLotissement,
+  isSubdivisible,
+  setIsSubdivisible,
+  minSubdivisionM2,
+  setMinSubdivisionM2,
+  minSubdivisionM2Error,
 }: LandFieldsProps) {
   const { t } = useTranslation();
   return (
     <div className="space-y-3">
+      <FormInput
+        label={t.listing.surface}
+        value={surfaceM2}
+        onChange={setSurfaceM2}
+        placeholder="0"
+        type="number"
+        suffix="m²"
+        error={surfaceM2Error}
+      />
       <div>
         <FieldLabel>{t.search.legalStatus}</FieldLabel>
         <div className="flex flex-wrap gap-2">
@@ -753,6 +854,19 @@ export function LandFields({
       <Toggle label={t.search.hasWaterAvailable} checked={hasWaterAvailable} onChange={setHasWaterAvailable} />
       <Toggle label={t.search.hasElectricityAvailable} checked={hasElectricityAvailable} onChange={setHasElectricityAvailable} />
       <Toggle label={t.search.isBuildReady} checked={isBuildReady} onChange={setIsBuildReady} />
+      <Toggle label={t.search.isLotissement} checked={isLotissement} onChange={setIsLotissement} />
+      <Toggle label={t.search.isSubdivisible} checked={isSubdivisible} onChange={setIsSubdivisible} />
+      {isSubdivisible && (
+        <FormInput
+          label={t.listing.minSubdivision}
+          value={minSubdivisionM2}
+          onChange={setMinSubdivisionM2}
+          placeholder="0"
+          type="number"
+          suffix="m²"
+          error={minSubdivisionM2Error}
+        />
+      )}
     </div>
   );
 }

@@ -1,5 +1,5 @@
-import { messageApi, type ApiConversation, type ApiMessage } from './message-api';
-import type { Conversation, Message } from '../types/message.types';
+import { messageApi, type ApiConversation, type ApiContact, type ApiMessage } from './message-api';
+import type { Contact, Conversation, Message } from '../types/message.types';
 
 // Exportées séparément (pas seulement via `messageService`) : réutilisées telles quelles par
 // use-realtime-messages.ts pour traduire les payloads reçus en direct sur la WebSocket, qui ont
@@ -17,6 +17,16 @@ export function toConversation(api: ApiConversation): Conversation {
   };
 }
 
+export function toContact(api: ApiContact): Contact {
+  return {
+    id: api.id,
+    fullName: `${api.firstName} ${api.lastName}`.trim(),
+    avatarUrl: api.avatarUrl ?? undefined,
+    role: api.role,
+    agencyName: api.agencyName,
+  };
+}
+
 export function toMessage(api: ApiMessage): Message {
   return {
     id: api.id,
@@ -31,7 +41,9 @@ export function toMessage(api: ApiMessage): Message {
 
 export const messageService = {
   listConversations: () => messageApi.listConversations().then((list) => list.map(toConversation)),
-  startConversation: (propertyId: string) => messageApi.startConversation(propertyId).then(toConversation),
+  startConversation: (target: { propertyId: string } | { userId: string }) =>
+    messageApi.startConversation(target).then(toConversation),
+  searchContacts: (query: string) => messageApi.searchContacts(query).then((list) => list.map(toContact)),
   getMessages: (conversationId: string) =>
     messageApi.getMessages(conversationId).then((list) => list.map(toMessage)),
   markRead: (conversationId: string) => messageApi.markRead(conversationId),

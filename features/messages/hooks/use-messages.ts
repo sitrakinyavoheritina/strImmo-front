@@ -15,9 +15,22 @@ export const messagesQueryKeys = {
 };
 
 export function useConversations() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   return useQuery({
     queryKey: messagesQueryKeys.conversations,
     queryFn: messageService.listConversations,
+    enabled: isAuthenticated,
+  });
+}
+
+// `enabled` sur la longueur de la requête (pas seulement sa présence) : évite d'interroger le
+// backend à chaque frappe des 1 premiers caractères, avant que la recherche ait un sens (le
+// backend refuse de toute façon en dessous de 2 caractères, voir AuthService.searchContacts).
+export function useSearchContacts(query: string) {
+  return useQuery({
+    queryKey: ['contacts', 'search', query],
+    queryFn: () => messageService.searchContacts(query),
+    enabled: query.trim().length >= 2,
   });
 }
 
@@ -34,7 +47,8 @@ export function useConversation(id: string) {
 export function useStartConversation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (propertyId: string) => messageService.startConversation(propertyId),
+    mutationFn: (target: { propertyId: string } | { userId: string }) =>
+      messageService.startConversation(target),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: messagesQueryKeys.conversations });
     },

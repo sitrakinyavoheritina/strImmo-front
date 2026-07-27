@@ -9,6 +9,7 @@ export type PropertyType = 'house' | 'apartment' | 'villa' | 'land';
 export type WaterSource = 'jirama' | 'well' | 'other';
 export type BathroomLocation = 'interior' | 'exterior';
 export type LandStatus = 'titled' | 'cadastre' | 'fitanolorana' | 'other';
+export type LandPriceType = 'total' | 'per_m2';
 export type RoomType = 'T1' | 'T2' | 'T3' | 'T4' | 'T5' | 'T6plus';
 
 export type PropertyModerationStatus = 'pending' | 'approved' | 'rejected';
@@ -93,13 +94,19 @@ export type ApartmentProperty = PropertyBase & ResidentialFields & { propertyTyp
 
 export type LandProperty = PropertyBase & {
   propertyType: 'land';
-  // `price` = prix AU M² pour un terrain (sémantique différente des autres types).
+  // Sens de `price` déterminé par `priceType` ('total' ou 'per_m2') — plus jamais implicite.
+  priceType: LandPriceType;
+  surfaceM2: number;
   legalStatus: LandStatus;
   hasCarAccess: boolean;
   isResidentialArea: boolean;
   hasWaterAvailable: boolean;
   hasElectricityAvailable: boolean;
   isBuildReady: boolean;
+  isLotissement: boolean;
+  isSubdivisible: boolean;
+  /** Surface minimale (m²) d'un lot en cas de morcellement — absent si `isSubdivisible` est faux. */
+  minSubdivisionM2?: number;
 };
 
 export type Property = HouseProperty | VillaProperty | ApartmentProperty | LandProperty;
@@ -124,6 +131,11 @@ export type PropertyFilters = {
   /** Statut de modération — sans ce filtre, seules les annonces approuvées sont retournées. */
   status?: 'pending' | 'approved' | 'rejected';
   sortBy?: 'recent' | 'price_asc' | 'price_desc' | 'popular';
+  /** Scroll infini (accueil uniquement, voir use-infinite-properties.ts) — sans ces deux champs,
+   *  le backend renvoie tous les résultats d'un coup (comportement historique, toujours utilisé
+   *  par Mes Biens/Favoris/la modération admin). */
+  limit?: number;
+  offset?: number;
   // Maison
   minBedrooms?: number;
   hasCarAccess?: boolean;

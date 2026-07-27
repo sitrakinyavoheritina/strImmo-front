@@ -1,6 +1,7 @@
 import { apiClient } from '@/lib/api/client';
 import type {
   BathroomLocation,
+  LandPriceType,
   LandStatus,
   ListingKind,
   PropertyFilters,
@@ -42,6 +43,11 @@ export type ApiLandDetails = {
   hasWaterAvailable: boolean;
   hasElectricityAvailable: boolean;
   isBuildReady: boolean;
+  isLotissement: boolean;
+  priceType: LandPriceType;
+  surfaceM2: number;
+  isSubdivisible: boolean;
+  minSubdivisionM2?: number;
 };
 
 // Forme allégée renvoyée par GET /properties/nearby — voir property-api.ts:nearby.

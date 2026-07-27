@@ -7,15 +7,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
 import { Button } from '@/components/ui/button';
-import { FileInput } from './components/file-input';
+import { EMPTY_NIF_STAT, NifStatFields, toNifStatPayload, type NifStatValue } from './components/nif-stat-fields';
 import { agencySchema, AgencyFormData } from './schemas';
 import { useRegisterSubmit } from './hooks/use-register';
 
 export const RegisterAgencyForm: React.FC = () => {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
-  const [nif, setNif] = useState<File | null>(null);
-  const [stat, setStat] = useState<File | null>(null);
+  const [nifStat, setNifStat] = useState<NifStatValue>(EMPTY_NIF_STAT);
   const { submit, isLoading, errorMessage } = useRegisterSubmit();
 
   const {
@@ -35,7 +34,7 @@ export const RegisterAgencyForm: React.FC = () => {
     },
   });
 
-  const onSubmit = handleSubmit((data) => submit({ ...data, role: 'agency', nif, stat }));
+  const onSubmit = handleSubmit((data) => submit({ ...data, role: 'agency', ...toNifStatPayload(nifStat) }));
 
   return (
     <div className="bg-surface-card py-4 px-4 sm:py-8 sm:px-10 shadow-sm border border-stroke-default/80 rounded-xl sm:rounded-2xl space-y-3 sm:space-y-4">
@@ -143,8 +142,7 @@ export const RegisterAgencyForm: React.FC = () => {
           {errors.password && <p className="mt-0.5 text-xs text-danger">{errors.password.message}</p>}
         </div>
 
-        <FileInput label={t.auth.nifDocument} file={nif} onChange={setNif} />
-        <FileInput label={t.auth.statDocument} file={stat} onChange={setStat} />
+        <NifStatFields value={nifStat} onChange={setNifStat} />
 
         <Button type="submit" disabled={isLoading} variant="secondary" className="w-full mt-1 sm:mt-2">
           {isLoading ? t.auth.registering : t.auth.register}

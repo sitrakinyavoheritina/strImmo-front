@@ -7,7 +7,7 @@ import { useTranslation } from '@/lib/i18n/use-translation';
 const ROLES = [
   { href: '/inscription/proprietaire', icon: Home, titleKey: 'roleOwner', descKey: 'roleOwnerDescription' },
   { href: '/inscription/locataire', icon: Key, titleKey: 'roleTenant', descKey: 'roleTenantDescription' },
-  { href: '/inscription/intermediaire', icon: Handshake, titleKey: 'roleAgent', descKey: 'roleAgentDescription' },
+  { href: '/inscription/intermediaire', icon: Handshake, titleKey: 'roleAgentChoice', descKey: 'roleAgentDescription' },
   { href: '/inscription/agence', icon: Building2, titleKey: 'roleAgency', descKey: 'roleAgencyDescription' },
 ] as const;
 
