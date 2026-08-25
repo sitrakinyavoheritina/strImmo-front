@@ -19,7 +19,7 @@ export const RegisterForm: React.FC = () => {
   } = useRegister();
 
   return (
-    <div className="bg-white py-8 px-6 shadow-sm border border-slate-200/80 rounded-2xl sm:px-10">
+    <div className="bg-surface-card py-8 px-6 shadow-sm border border-stroke-default/80 rounded-2xl sm:px-10">
       <form className="space-y-4" onSubmit={onSubmit}>
         {/* Nom & Prénom */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -31,8 +31,8 @@ export const RegisterForm: React.FC = () => {
               type="text"
               placeholder="ex: Jean"
               {...register('firstname')}
-              className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
-                errors.firstname ? 'border-red-500' : 'border-slate-200'
+              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+                errors.firstname ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
             {errors.firstname && (
@@ -48,8 +48,8 @@ export const RegisterForm: React.FC = () => {
               type="text"
               placeholder="ex: Rakoto"
               {...register('lastname')}
-              className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
-                errors.lastname ? 'border-red-500' : 'border-slate-200'
+              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+                errors.lastname ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
             {errors.lastname && (
@@ -71,8 +71,8 @@ export const RegisterForm: React.FC = () => {
               type="tel"
               placeholder="34 00 000 00"
               {...register('phone')}
-              className={`w-full pl-14 pr-3 py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
-                errors.phone ? 'border-red-500' : 'border-slate-200'
+              className={`w-full pl-14 pr-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+                errors.phone ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
           </div>
@@ -90,8 +90,8 @@ export const RegisterForm: React.FC = () => {
             type="email"
             placeholder="exemple@domaine.mg"
             {...register('email')}
-            className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
-              errors.email ? 'border-red-500' : 'border-slate-200'
+            className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+              errors.email ? 'border-red-500' : 'border-stroke-default'
             }`}
           />
           {errors.email && (
@@ -109,8 +109,8 @@ export const RegisterForm: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('password')}
-              className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
-                errors.password ? 'border-red-500' : 'border-slate-200'
+              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+                errors.password ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
             <button
@@ -136,8 +136,8 @@ export const RegisterForm: React.FC = () => {
               type={showConfirmPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('confirmPassword')}
-              className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
-                errors.confirmPassword ? 'border-red-500' : 'border-slate-200'
+              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+                errors.confirmPassword ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
             <button
@@ -159,7 +159,7 @@ export const RegisterForm: React.FC = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full mt-2 py-3 px-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl text-sm shadow-md shadow-orange-500/20 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition disabled:opacity-50"
+          className="w-full mt-2 py-3 px-4 bg-brand-secondary hover:bg-brand-secondary-hover text-white font-semibold rounded-xl text-sm shadow-md shadow-orange-500/20 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition disabled:opacity-50"
         >
           {isLoading ? 'Création en cours...' : 'Créer mon compte'}
         </button>
@@ -167,11 +167,11 @@ export const RegisterForm: React.FC = () => {
 
       {/* Lien vers connexion */}
       <div className="mt-6 text-center border-t border-slate-100 pt-5">
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-content-muted">
           Vous avez déjà un compte ?{' '}
           <Link
             href="/connexion"
-            className="font-semibold text-blue-600 hover:text-blue-700"
+            className="font-semibold text-brand-primary hover:text-blue-700"
           >
             Se connecter
           </Link>

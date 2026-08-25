@@ -42,7 +42,7 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-white py-8 px-6 shadow-sm border border-slate-200/80 rounded-2xl sm:px-10">
+    <div className="bg-surface-card py-8 px-6 shadow-sm border border-stroke-default/80 rounded-2xl sm:px-10">
       {/* Bascule Téléphone / Email */}
       <div className="flex bg-slate-100 p-1 rounded-xl mb-6">
         <button
@@ -50,8 +50,8 @@ export const LoginForm: React.FC = () => {
           onClick={() => handleMethodChange('phone')}
           className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
             authMethod === 'phone'
-              ? 'bg-white text-slate-900 shadow-sm'
-              : 'text-slate-500 hover:text-slate-700'
+              ? 'bg-surface-card text-content-main shadow-sm'
+              : 'text-content-muted hover:text-slate-700'
           }`}
         >
           Téléphone
@@ -61,8 +61,8 @@ export const LoginForm: React.FC = () => {
           onClick={() => handleMethodChange('email')}
           className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
             authMethod === 'email'
-              ? 'bg-white text-slate-900 shadow-sm'
-              : 'text-slate-500 hover:text-slate-700'
+              ? 'bg-surface-card text-content-main shadow-sm'
+              : 'text-content-muted hover:text-slate-700'
           }`}
         >
           Email
@@ -85,9 +85,9 @@ export const LoginForm: React.FC = () => {
               type={authMethod === 'phone' ? 'tel' : 'email'}
               placeholder={authMethod === 'phone' ? '34 00 000 00' : 'exemple@domaine.mg'}
               {...register('identifier')}
-              className={`w-full py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+              className={`w-full py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
                 authMethod === 'phone' ? 'pl-14 pr-3' : 'px-3'
-              } ${errors.identifier ? 'border-red-500' : 'border-slate-200'}`}
+              } ${errors.identifier ? 'border-red-500' : 'border-stroke-default'}`}
             />
           </div>
           {errors.identifier && (
@@ -103,7 +103,7 @@ export const LoginForm: React.FC = () => {
             </label>
             <Link
               href="/forgot-password"
-              className="text-xs font-medium text-blue-600 hover:text-blue-700"
+              className="text-xs font-medium text-brand-primary hover:text-blue-700"
             >
               Mot de passe oublié ?
             </Link>
@@ -113,8 +113,8 @@ export const LoginForm: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('password')}
-              className={`w-full px-3 py-2.5 bg-slate-50 border rounded-xl text-sm text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
-                errors.password ? 'border-red-500' : 'border-slate-200'
+              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+                errors.password ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
             <button
@@ -134,7 +134,7 @@ export const LoginForm: React.FC = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3 px-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl text-sm shadow-md shadow-orange-500/20 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition disabled:opacity-50"
+          className="w-full py-3 px-4 bg-brand-secondary hover:bg-brand-secondary-hover text-white font-semibold rounded-xl text-sm shadow-md shadow-orange-500/20 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition disabled:opacity-50"
         >
           {isLoading ? 'Connexion en cours...' : 'Se connecter'}
         </button>
@@ -142,9 +142,9 @@ export const LoginForm: React.FC = () => {
 
       {/* Lien vers inscription */}
       <div className="mt-6 text-center border-t border-slate-100 pt-5">
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-content-muted">
           Vous n'avez pas encore de compte ?{' '}
-          <Link href="/inscription" className="font-semibold text-blue-600 hover:text-blue-700">
+          <Link href="/inscription" className="font-semibold text-brand-primary hover:text-blue-700">
             Créer un compte
           </Link>
         </p>
