@@ -24,84 +24,84 @@ export const RegisterForm: React.FC = () => {
         {/* Nom & Prénom */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">
+            <label className="block text-xs font-medium text-content-main mb-1">
               Prénom
             </label>
             <input
               type="text"
               placeholder="ex: Jean"
               {...register('firstname')}
-              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
                 errors.firstname ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
             {errors.firstname && (
-              <p className="mt-1 text-xs text-red-500">{errors.firstname.message}</p>
+              <p className="mt-1 text-xs text-danger">{errors.firstname.message}</p>
             )}
           </div>
 
           <div>
-            <label className="block text-xs font-medium text-slate-700 mb-1">
+            <label className="block text-xs font-medium text-content-main mb-1">
               Nom
             </label>
             <input
               type="text"
               placeholder="ex: Rakoto"
               {...register('lastname')}
-              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
                 errors.lastname ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
             {errors.lastname && (
-              <p className="mt-1 text-xs text-red-500">{errors.lastname.message}</p>
+              <p className="mt-1 text-xs text-danger">{errors.lastname.message}</p>
             )}
           </div>
         </div>
 
         {/* Téléphone */}
         <div>
-          <label className="block text-xs font-medium text-slate-700 mb-1">
+          <label className="block text-xs font-medium text-content-main mb-1">
             Numéro de téléphone
           </label>
           <div className="relative">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 text-sm font-medium">
+            <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-content-muted text-sm font-medium">
               +261
             </span>
             <input
               type="tel"
               placeholder="34 00 000 00"
               {...register('phone')}
-              className={`w-full pl-14 pr-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+              className={`w-full pl-14 pr-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
                 errors.phone ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
           </div>
           {errors.phone && (
-            <p className="mt-1 text-xs text-red-500">{errors.phone.message}</p>
+            <p className="mt-1 text-xs text-danger">{errors.phone.message}</p>
           )}
         </div>
 
         {/* Email (Optionnel) */}
         <div>
-          <label className="block text-xs font-medium text-slate-700 mb-1">
-            Adresse email <span className="text-slate-400">(optionnel)</span>
+          <label className="block text-xs font-medium text-content-main mb-1">
+            Adresse email <span className="text-content-muted">(optionnel)</span>
           </label>
           <input
             type="email"
             placeholder="exemple@domaine.mg"
             {...register('email')}
-            className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+            className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
               errors.email ? 'border-red-500' : 'border-stroke-default'
             }`}
           />
           {errors.email && (
-            <p className="mt-1 text-xs text-red-500">{errors.email.message}</p>
+            <p className="mt-1 text-xs text-danger">{errors.email.message}</p>
           )}
         </div>
 
         {/* Mot de passe */}
         <div>
-          <label className="block text-xs font-medium text-slate-700 mb-1">
+          <label className="block text-xs font-medium text-content-main mb-1">
             Mot de passe
           </label>
           <div className="relative">
@@ -109,26 +109,26 @@ export const RegisterForm: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('password')}
-              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
                 errors.password ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-400 hover:text-slate-600 font-medium"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-content-muted hover:text-content-main font-medium"
             >
               {showPassword ? 'Masquer' : 'Afficher'}
             </button>
           </div>
           {errors.password && (
-            <p className="mt-1 text-xs text-red-500">{errors.password.message}</p>
+            <p className="mt-1 text-xs text-danger">{errors.password.message}</p>
           )}
         </div>
 
         {/* Confirmation Mot de passe */}
         <div>
-          <label className="block text-xs font-medium text-slate-700 mb-1">
+          <label className="block text-xs font-medium text-content-main mb-1">
             Confirmer le mot de passe
           </label>
           <div className="relative">
@@ -136,20 +136,20 @@ export const RegisterForm: React.FC = () => {
               type={showConfirmPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('confirmPassword')}
-              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-slate-400 focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 transition ${
+              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
                 errors.confirmPassword ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-slate-400 hover:text-slate-600 font-medium"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-content-muted hover:text-content-main font-medium"
             >
               {showConfirmPassword ? 'Masquer' : 'Afficher'}
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="mt-1 text-xs text-red-500">
+            <p className="mt-1 text-xs text-danger">
               {errors.confirmPassword.message}
             </p>
           )}
@@ -166,12 +166,12 @@ export const RegisterForm: React.FC = () => {
       </form>
 
       {/* Lien vers connexion */}
-      <div className="mt-6 text-center border-t border-slate-100 pt-5">
+      <div className="mt-6 text-center border-t border-stroke-default pt-5">
         <p className="text-xs text-content-muted">
           Vous avez déjà un compte ?{' '}
           <Link
             href="/connexion"
-            className="font-semibold text-brand-primary hover:text-blue-700"
+            className="font-semibold text-brand-primary hover:text-brand-primary-hover"
           >
             Se connecter
           </Link>

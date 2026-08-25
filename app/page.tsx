@@ -1,13 +1,17 @@
+'use client';
+
 import Link from 'next/link';
-import { Navbar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
 import { HeroSearch } from '@/components/search/hero-search';
 import { PropertyCard } from '@/components/property/property-card';
 import { FeatureCard } from '@/components/ui/feature-card';
+import { MOCK_PROPERTIES } from '@/lib/mock/properties';
+import { useTranslation } from '@/lib/i18n/use-translation';
 
 export default function HomePage() {
+  const { t } = useTranslation();
+
   return (
-    <div className="min-h-screen flex flex-col bg-surface-app text-slate-800">
+    <div className="min-h-screen flex flex-col bg-surface-app text-content-main">
 
       <main className="flex-1">
         <HeroSearch />
@@ -16,47 +20,24 @@ export default function HomePage() {
           <div className="flex justify-between items-end mb-8">
             <div>
               <h2 className="text-2xl font-bold text-content-main">
-                Annonces récentes
+                {t.home.recentListings}
               </h2>
               <p className="text-content-muted text-sm">
-                Découvrez les derniers biens immobiliers publiés sur Onina.
+                {t.home.recentListingsDesc}
               </p>
             </div>
             <Link
               href="/recherche"
-              className="text-sm font-semibold text-brand-primary hover:text-blue-700 hidden sm:block"
+              className="text-sm font-semibold text-brand-primary hover:text-brand-primary-hover hidden sm:block"
             >
-              Voir tout $\rightarrow$
+              {t.home.viewAll} →
             </Link>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <PropertyCard
-              title="Villa T4 moderne avec jardin"
-              price="1 500 000 Ar"
-              priceUnit="/ mois"
-              location="Ivandry, Antananarivo"
-              type="location"
-              bedrooms={3}
-              bathrooms={2}
-              area={150}
-            />
-            <PropertyCard
-              title="Appartement T3 en centre-ville"
-              price="280 000 000 Ar"
-              location="Isoraka, Antananarivo"
-              type="vente"
-              bedrooms={2}
-              bathrooms={1}
-              area={80}
-            />
-            <PropertyCard
-              title="Terrain titré-borné de 500 m²"
-              price="95 000 000 Ar"
-              location="Ambohibao, Antananarivo"
-              type="vente"
-              area={500}
-            />
+            {MOCK_PROPERTIES.map((property) => (
+              <PropertyCard key={property.id} {...property} />
+            ))}
           </div>
         </section>
 
@@ -64,32 +45,30 @@ export default function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-xl mx-auto mb-12">
               <h2 className="text-2xl font-bold text-content-main">
-                Pourquoi choisir Onina ?
+                {t.home.whyChoose}
               </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <FeatureCard
                 icon="🔍"
-                title="Annonces Vérifiées"
-                description="Nous modérons chaque annonce pour vous garantir des informations fiables."
+                title={t.home.verifiedTitle}
+                description={t.home.verifiedDesc}
               />
               <FeatureCard
                 icon="📱"
-                title="Contact Direct"
-                description="Mise en relation rapide avec les propriétaires et les agences immobilières."
+                title={t.home.contactTitle}
+                description={t.home.contactDesc}
               />
               <FeatureCard
                 icon="🇲🇬"
-                title="100% Local"
-                description="Une interface optimisée pour le marché et les usages à Madagascar."
+                title={t.home.localTitle}
+                description={t.home.localDesc}
               />
             </div>
           </div>
         </section>
       </main>
-
-      <Footer />
     </div>
   );
 }

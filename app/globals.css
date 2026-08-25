@@ -2,8 +2,9 @@
 
 @theme {
   /* Couleurs de marque */
-  --color-brand-primary: red;        /* Bleu principal */
+  --color-brand-primary: #2563eb;    /* Bleu principal */
   --color-brand-primary-hover: #1d4ed8;  /* Bleu survol */
+  --color-brand-primary-soft: #eff6ff;   /* Bleu clair (fonds d'icônes, badges) */
   --color-brand-secondary: #f97316;      /* Orange secondaire */
   --color-brand-secondary-hover: #ea580c;/* Orange survol */
 
@@ -18,4 +19,8 @@
 
   /* Bordures */
   --color-stroke-default: #e2e8f0;       /* Bordures communes */
+
+  /* États */
+  --color-danger: #ef4444;               /* Suppression / erreurs */
+  --color-danger-hover: #dc2626;         /* Survol suppression / erreurs */
 }

@@ -3,16 +3,20 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTranslation } from '@/lib/i18n/use-translation';
+import { useFavoritesStore } from '@/lib/state/use-favorites-store';
 
 export const MobileNav = () => {
   const pathname = usePathname();
+  const { t } = useTranslation();
+  const favoritesCount = useFavoritesStore((state) => state.favorites.length);
 
   const navItems = [
-    { label: 'Accueil', href: '/', icon: '🏠' },
-    { label: 'Recherche', href: '/recherche', icon: '🔍' },
-    { label: 'Favoris', href: '/favoris', icon: '🤍' },
-    { label: 'Messages', href: '/messages', icon: '💬' },
-    { label: 'Compte', href: '/connexion', icon: '👤' },
+    { label: t.mobileNav.home, href: '/', icon: '🏠' },
+    { label: t.mobileNav.search, href: '/recherche', icon: '🔍' },
+    { label: t.mobileNav.favorites, href: '/favoris', icon: '🤍', badge: favoritesCount },
+    { label: t.mobileNav.messages, href: '/messages', icon: '💬' },
+    { label: t.mobileNav.account, href: '/connexion', icon: '👤' },
   ];
 
   return (
@@ -24,12 +28,17 @@ export const MobileNav = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition ${
+              className={`relative flex flex-col items-center gap-0.5 px-3 py-1 text-[10px] font-medium transition ${
                 isActive ? 'text-brand-primary font-bold' : 'text-content-muted'
               }`}
             >
               <span className="text-lg">{item.icon}</span>
               <span>{item.label}</span>
+              {!!item.badge && (
+                <span className="absolute top-0 right-1 min-w-[16px] h-[16px] px-1 rounded-full bg-brand-secondary text-white text-[9px] font-bold flex items-center justify-center">
+                  {item.badge}
+                </span>
+              )}
             </Link>
           );
         })}
