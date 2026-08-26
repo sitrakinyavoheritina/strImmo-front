@@ -27,14 +27,23 @@ export const FilterModal: React.FC<FilterModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
+    <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm p-0 sm:p-4">
       {/* Container type Sheet sur mobile / Modal sur Desktop */}
-      <div className="w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-2xl p-6 space-y-6 shadow-2xl animate-in fade-in slide-in-from-bottom duration-200">
+      <div
+        className="w-full max-w-lg bg-surface-card rounded-t-3xl sm:rounded-2xl p-6 space-y-6 shadow-2xl animate-in fade-in slide-in-from-bottom duration-200"
+        style={{ paddingBottom: 'calc(1.5rem + var(--safe-bottom))' }}
+      >
+        {/* Poignée de glissement (repère visuel type app native, mobile uniquement) */}
+        <div className="sm:hidden -mt-2 mb-2 flex justify-center">
+          <span className="w-10 h-1.5 rounded-full bg-stroke-default" />
+        </div>
+
         <div className="flex justify-between items-center border-b border-stroke-default pb-4">
           <h2 className="text-lg font-bold text-content-main">{t.filterModal.title}</h2>
           <button
             onClick={onClose}
-            className="text-content-muted hover:text-content-main text-xl font-bold p-1"
+            aria-label={t.filterModal.title}
+            className="text-content-muted hover:text-content-main text-xl font-bold p-2 -mr-2"
           >
             ✕
           </button>

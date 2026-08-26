@@ -42,9 +42,9 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-surface-card py-8 px-6 shadow-sm border border-stroke-default/80 rounded-2xl sm:px-10">
+    <div className="bg-surface-card py-4 px-4 sm:py-8 sm:px-10 shadow-sm border border-stroke-default/80 rounded-xl sm:rounded-2xl">
       {/* Bascule Téléphone / Email */}
-      <div className="flex bg-surface-app p-1 rounded-xl mb-6">
+      <div className="flex bg-surface-app p-1 rounded-xl mb-3 sm:mb-6">
         <button
           type="button"
           onClick={() => handleMethodChange('phone')}
@@ -69,10 +69,10 @@ export const LoginForm: React.FC = () => {
         </button>
       </div>
 
-      <form className="space-y-5" onSubmit={handleSubmit(onSubmit)}>
+      <form className="space-y-3 sm:space-y-5" onSubmit={handleSubmit(onSubmit)}>
         {/* Identifiant */}
         <div>
-          <label className="block text-xs font-medium text-content-main mb-1">
+          <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">
             {authMethod === 'phone' ? 'Numéro de téléphone' : 'Adresse email'}
           </label>
           <div className="relative">
@@ -85,19 +85,19 @@ export const LoginForm: React.FC = () => {
               type={authMethod === 'phone' ? 'tel' : 'email'}
               placeholder={authMethod === 'phone' ? '34 00 000 00' : 'exemple@domaine.mg'}
               {...register('identifier')}
-              className={`w-full py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
+              className={`w-full py-2 sm:py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
                 authMethod === 'phone' ? 'pl-14 pr-3' : 'px-3'
               } ${errors.identifier ? 'border-red-500' : 'border-stroke-default'}`}
             />
           </div>
           {errors.identifier && (
-            <p className="mt-1 text-xs text-danger">{errors.identifier.message}</p>
+            <p className="mt-0.5 text-xs text-danger">{errors.identifier.message}</p>
           )}
         </div>
 
         {/* Mot de passe */}
         <div>
-          <div className="flex items-center justify-between mb-1">
+          <div className="flex items-center justify-between mb-0.5 sm:mb-1">
             <label className="block text-xs font-medium text-content-main">
               Mot de passe
             </label>
@@ -113,7 +113,7 @@ export const LoginForm: React.FC = () => {
               type={showPassword ? 'text' : 'password'}
               placeholder="••••••••"
               {...register('password')}
-              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
+              className={`w-full px-3 py-2 sm:py-2.5 bg-surface-app border rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
                 errors.password ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
@@ -126,7 +126,7 @@ export const LoginForm: React.FC = () => {
             </button>
           </div>
           {errors.password && (
-            <p className="mt-1 text-xs text-danger">{errors.password.message}</p>
+            <p className="mt-0.5 text-xs text-danger">{errors.password.message}</p>
           )}
         </div>
 
@@ -134,14 +134,14 @@ export const LoginForm: React.FC = () => {
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full py-3 px-4 bg-brand-secondary hover:bg-brand-secondary-hover text-white font-semibold rounded-xl text-sm shadow-md shadow-orange-500/20 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition disabled:opacity-50"
+          className="w-full py-2.5 sm:py-3 px-4 bg-brand-secondary hover:bg-brand-secondary-hover text-white font-semibold rounded-xl text-sm shadow-md shadow-orange-500/20 focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition disabled:opacity-50"
         >
           {isLoading ? 'Connexion en cours...' : 'Se connecter'}
         </button>
       </form>
 
       {/* Lien vers inscription */}
-      <div className="mt-6 text-center border-t border-stroke-default pt-5">
+      <div className="mt-3 sm:mt-6 text-center border-t border-stroke-default pt-3 sm:pt-5">
         <p className="text-xs text-content-muted">
           Vous n&apos;avez pas encore de compte ?{' '}
           <Link href="/inscription" className="font-semibold text-brand-primary hover:text-brand-primary-hover">

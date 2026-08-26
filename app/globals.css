@@ -23,4 +23,32 @@
   /* États */
   --color-danger: #ef4444;               /* Suppression / erreurs */
   --color-danger-hover: #dc2626;         /* Survol suppression / erreurs */
+
+  /* Espacement des zones sécurisées (encoche, barre d'accueil iOS) */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+
+html {
+  /* Empêche le rebond élastique du navigateur : la page se comporte comme
+     une vue d'app plutôt qu'un document web qui "flotte". */
+  overscroll-behavior-y: none;
+  height: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+
+/* Défilement fluide type natif sur les rails horizontaux (carrousels, tabs) */
+.scroll-touch {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-touch::-webkit-scrollbar {
+  display: none;
 }

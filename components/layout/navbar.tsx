@@ -1,23 +1,37 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useFavoritesStore } from '@/lib/state/use-favorites-store';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
+import { LanguageMenu } from '@/components/ui/language-menu';
 import { Button } from '@/components/ui/button';
 
 export const Navbar = () => {
   const { t } = useTranslation();
+  const pathname = usePathname();
   const favoritesCount = useFavoritesStore((state) => state.favorites.length);
 
+  const tabs = [
+    { href: '/', icon: '🏠', label: t.mobileNav.home },
+    { href: '/recherche', icon: '🔍', label: t.mobileNav.search },
+    { href: '/favoris', icon: '🤍', label: t.mobileNav.favorites, badge: favoritesCount },
+    { href: '/messages', icon: '💬', label: t.mobileNav.messages },
+    { href: '/connexion', icon: '👤', label: t.mobileNav.account },
+  ];
+
   return (
-    <header className="sticky top-0 z-50 bg-surface-card/95 backdrop-blur border-b border-stroke-default">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="w-10 h-10 rounded-xl bg-brand-primary text-white font-bold text-xl flex items-center justify-center shadow-md shadow-brand-primary/20">
+    <header
+      className="sticky top-0 z-50 bg-surface-card/95 backdrop-blur border-b border-stroke-default"
+      style={{ paddingTop: 'var(--safe-top)' }}
+    >
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-12 sm:h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-2">
+          <span className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-brand-primary text-white font-bold text-sm sm:text-xl flex items-center justify-center shadow-md shadow-brand-primary/20">
             O
           </span>
-          <span className="text-xl font-bold text-content-main tracking-tight">
+          <span className="text-sm sm:text-xl font-bold text-content-main tracking-tight">
             Onina<span className="text-brand-primary">.mg</span>
           </span>
         </Link>
@@ -45,8 +59,14 @@ export const Navbar = () => {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-3">
-          <LanguageSwitcher />
+        <div className="flex items-center gap-1.5 sm:gap-3">
+          {/* Desktop : sélecteur toujours visible. Mobile : icône discrète + menu, pour laisser la place au contenu. */}
+          <div className="hidden md:block">
+            <LanguageSwitcher />
+          </div>
+          <div className="md:hidden">
+            <LanguageMenu />
+          </div>
           <Link
             href="/connexion"
             className="px-4 py-2 text-sm font-semibold text-content-muted hover:text-brand-primary transition hidden sm:block"
@@ -58,6 +78,33 @@ export const Navbar = () => {
           </Link>
         </div>
       </div>
+
+      {/* Onglets de navigation mobile, en haut (façon Facebook) plutôt qu'en barre fixe basse */}
+      <nav className="md:hidden flex items-stretch border-t border-stroke-default">
+        {tabs.map((tab) => {
+          const isActive = pathname === tab.href;
+          return (
+            <Link
+              key={tab.href}
+              href={tab.href}
+              aria-label={tab.label}
+              aria-current={isActive ? 'page' : undefined}
+              className={`relative flex-1 flex items-center justify-center py-1.5 min-h-10 border-b-2 transition active:bg-surface-app ${
+                isActive ? 'border-brand-primary' : 'border-transparent'
+              }`}
+            >
+              <span className={`text-lg leading-none transition-opacity ${isActive ? 'opacity-100' : 'opacity-60'}`}>
+                {tab.icon}
+              </span>
+              {!!tab.badge && (
+                <span className="absolute top-0.5 right-1/4 min-w-[16px] h-[16px] px-1 rounded-full bg-brand-secondary text-white text-[9px] font-bold flex items-center justify-center">
+                  {tab.badge}
+                </span>
+              )}
+            </Link>
+          );
+        })}
+      </nav>
     </header>
   );
 };
