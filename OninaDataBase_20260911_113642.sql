@@ -24,7 +24,7 @@ DROP DATABASE IF EXISTS "OninaDataBase";
 -- Name: OninaDataBase; Type: DATABASE; Schema: -; Owner: -
 --
 
-CREATE DATABASE "OninaDataBase" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'fr_FR.UTF-8';
+CREATE DATABASE "OninaDataBase" WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'C.UTF-8';
 
 
 \unrestrict dOnuiE0XWGGhh1cjk1GzDgY1pJr1DQDBz77al9EwgFeoaenxFP9UL6xxab3YzSZ
