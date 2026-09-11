@@ -1,7 +1,13 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { ImageResponse } from 'next/og';
 
 export const size = { width: 48, height: 48 };
 export const contentType = 'image/png';
+
+// Lu à chaque requête plutôt qu'importé statiquement : `next/og` (Satori) ne sait pas rendre un
+// <img> pointant vers une URL relative du site, il lui faut le SVG déjà en mémoire (data URI).
+const logoDataUri = `data:image/svg+xml;base64,${readFileSync(join(process.cwd(), 'public/logo.svg')).toString('base64')}`;
 
 export default function Icon() {
   return new ImageResponse(
@@ -13,15 +19,11 @@ export default function Icon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#2563eb',
-          color: '#ffffff',
-          fontSize: 28,
-          fontWeight: 800,
-          fontFamily: 'sans-serif',
+          background: '#ffffff',
           borderRadius: 10,
         }}
       >
-        O
+        <img src={logoDataUri} alt="" width={38} height={23} />
       </div>
     ),
     { ...size }

@@ -1,7 +1,11 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { ImageResponse } from 'next/og';
 
 export const size = { width: 180, height: 180 };
 export const contentType = 'image/png';
+
+const logoDataUri = `data:image/svg+xml;base64,${readFileSync(join(process.cwd(), 'public/logo.svg')).toString('base64')}`;
 
 export default function AppleIcon() {
   return new ImageResponse(
@@ -13,14 +17,10 @@ export default function AppleIcon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#2563eb',
-          color: '#ffffff',
-          fontSize: 100,
-          fontWeight: 800,
-          fontFamily: 'sans-serif',
+          background: '#ffffff',
         }}
       >
-        O
+        <img src={logoDataUri} alt="" width={150} height={90} />
       </div>
     ),
     { ...size }

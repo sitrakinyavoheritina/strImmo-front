@@ -1,26 +1,33 @@
-import Link from 'next/link';
+'use client';
+
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { useTranslation } from '@/lib/i18n/use-translation';
+import { AuthPageShell } from '@/features/auth/components/auth-page-shell';
 import { LoginForm } from '@/features/auth/login-form';
+
+function ConnexionContent() {
+  const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const isPending = searchParams.get('attente') === '1';
+
+  return (
+    <AuthPageShell title={t.auth.loginTitle} subtitle={t.auth.loginSubtitle}>
+      {isPending && (
+        <div className="mb-3 sm:mb-4 rounded-xl border border-brand-primary/30 bg-brand-primary-soft px-3 py-2.5 text-sm text-brand-primary text-left">
+          <p className="font-semibold">{t.auth.pendingApprovalTitle}</p>
+          <p className="mt-0.5 text-xs">{t.auth.pendingApprovalMessage}</p>
+        </div>
+      )}
+      <LoginForm />
+    </AuthPageShell>
+  );
+}
 
 export default function ConnexionPage() {
   return (
-    <div className="bg-surface-app flex flex-col justify-start sm:justify-center py-4 sm:py-12 px-4 sm:px-6 lg:px-8 sm:min-h-[calc(100dvh-4rem)]">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link href="/" className="inline-block mb-1.5 sm:mb-3">
-          <span className="inline-flex items-center justify-center w-9 h-9 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-brand-primary text-white font-bold text-base sm:text-xl shadow-md shadow-brand-primary/20">
-            O
-          </span>
-        </Link>
-        <h2 className="text-lg sm:text-2xl font-bold text-content-main tracking-tight">
-          Connexion à Onina
-        </h2>
-        <p className="mt-0.5 sm:mt-1 text-xs sm:text-sm text-content-muted">
-          Accédez aux annonces immobilières en direct
-        </p>
-      </div>
-
-      <div className="mt-3 sm:mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <LoginForm />
-      </div>
-    </div>
+    <Suspense fallback={null}>
+      <ConnexionContent />
+    </Suspense>
   );
 }

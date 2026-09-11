@@ -1,7 +1,11 @@
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { ImageResponse } from 'next/og';
 
 export const size = { width: 192, height: 192 };
 export const contentType = 'image/png';
+
+const logoDataUri = `data:image/svg+xml;base64,${readFileSync(join(process.cwd(), 'public/logo.svg')).toString('base64')}`;
 
 export function GET() {
   return new ImageResponse(
@@ -13,14 +17,11 @@ export function GET() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#2563eb',
-          color: '#ffffff',
-          fontSize: 110,
-          fontWeight: 800,
-          fontFamily: 'sans-serif',
+          background: '#ffffff',
         }}
       >
-        O
+        {/* eslint-disable-next-line @next/next/no-img-element -- rendu par Satori (next/og), pas par le navigateur */}
+        <img src={logoDataUri} alt="" width={140} height={84} />
       </div>
     ),
     { ...size }

@@ -1,0 +1,81 @@
+'use client';
+
+import Link from 'next/link';
+import { Bell, Plus } from 'lucide-react';
+import { useTranslation } from '@/lib/i18n/use-translation';
+import { useAuthStore } from '@/lib/state/use-auth-store';
+import { useUnreadNotificationsCount } from '@/features/notifications/hooks/use-notifications';
+import { LanguageSwitcher } from '@/components/ui/language-switcher';
+import { LanguageMenu } from '@/components/ui/language-menu';
+import { UserMenu } from './user-menu';
+
+export function Topbar() {
+  const { t } = useTranslation();
+  const user = useAuthStore((state) => state.user);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const unreadNotifications = useUnreadNotificationsCount();
+
+  return (
+    <header
+      className="sticky top-0 z-50 bg-surface-card/95 backdrop-blur border-b border-stroke-default"
+      style={{ paddingTop: 'var(--safe-top)' }}
+    >
+      <div className="w-full px-3 sm:px-6 lg:px-8 h-12 sm:h-14 flex items-center gap-3 sm:gap-6">
+        <Link href="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* eslint-disable-next-line @next/next/no-img-element -- logo décoratif (SVG statique dans /public), pas besoin de l'optimiseur next/image */}
+          <img src="/logo.svg" alt="Onina" className="h-7 sm:h-8 w-auto" />
+        </Link>
+
+        <div className="flex-1" />
+
+        {/* Pas de lien "Messages" ici : déjà accessible via la sidebar (desktop) et la bande de
+            navigation mobile (voir nav-items.ts) — le dupliquer dans la topbar créait deux icônes
+            "Messages" visibles en même temps sur la plupart des largeurs d'écran. */}
+        <nav className="hidden md:flex items-center gap-4 shrink-0">
+          <Link
+            href="/notifications"
+            aria-label={t.topbar.notifications}
+            className="relative flex items-center text-content-muted hover:text-brand-primary transition"
+          >
+            <Bell size={20} />
+            {unreadNotifications > 0 && (
+              <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-danger text-white text-[10px] font-bold flex items-center justify-center">
+                {unreadNotifications}
+              </span>
+            )}
+          </Link>
+        </nav>
+
+        <Link
+          href="/annonce/nouvelle"
+          className="hidden sm:inline-flex items-center gap-1.5 bg-[#c9992f] hover:bg-[#b3852a] text-white text-sm font-semibold rounded-xl px-3.5 py-2 transition shrink-0"
+        >
+          <Plus size={16} />
+          <span className="hidden lg:inline">{t.topbar.postAd}</span>
+        </Link>
+
+        <div className="hidden lg:block shrink-0">
+          <LanguageSwitcher />
+        </div>
+        <div className="lg:hidden shrink-0">
+          <LanguageMenu />
+        </div>
+
+        {isAuthenticated && user ? (
+          <UserMenu user={user} />
+        ) : (
+          <div className="hidden sm:flex items-center gap-2 shrink-0">
+            <Link href="/connexion" className="text-sm font-semibold text-content-muted hover:text-brand-primary transition">
+              {t.nav.login}
+            </Link>
+            <Link href="/inscription">
+              <span className="inline-flex items-center bg-brand-primary hover:bg-brand-primary-hover text-white text-sm font-semibold rounded-xl px-3.5 py-2 transition">
+                {t.nav.register}
+              </span>
+            </Link>
+          </div>
+        )}
+      </div>
+    </header>
+  );
+}

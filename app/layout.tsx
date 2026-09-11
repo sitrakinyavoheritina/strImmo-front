@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Navbar } from '@/components/layout/navbar';
-import { Footer } from '@/components/layout/footer';
+import { AppShell } from '@/components/layout/app-shell';
+import { QueryProvider } from '@/lib/api/query-provider';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -29,9 +29,9 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body className="antialiased bg-surface-app text-content-main min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-1">{children}</main>
-        <Footer />
+        <QueryProvider>
+          <AppShell>{children}</AppShell>
+        </QueryProvider>
       </body>
     </html>
   );

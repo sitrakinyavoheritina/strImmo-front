@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Check } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { LOCALES, LOCALE_LABELS } from '@/lib/i18n/translations';
 
@@ -48,7 +49,7 @@ export function LanguageMenu() {
                 } hover:bg-surface-app`}
               >
                 {LOCALE_LABELS[code]}
-                {locale === code && <span>✓</span>}
+                {locale === code && <Check size={14} />}
               </button>
             ))}
           </div>

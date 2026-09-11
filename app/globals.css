@@ -1,28 +1,47 @@
 @import "tailwindcss";
 
 @theme {
-  /* Couleurs de marque */
-  --color-brand-primary: #2563eb;    /* Bleu principal */
-  --color-brand-primary-hover: #1d4ed8;  /* Bleu survol */
-  --color-brand-primary-soft: #eff6ff;   /* Bleu clair (fonds d'icônes, badges) */
-  --color-brand-secondary: #f97316;      /* Orange secondaire */
-  --color-brand-secondary-hover: #ea580c;/* Orange survol */
+  /* Palette "terracotta" (alignée sur le logo + la maquette mobile fournie par l'utilisateur,
+     2026-09-10) — l'ancienne palette bleue reste ci-dessous en commentaire : pour revenir en
+     arrière, il suffit de recommenter le bloc actif et décommenter l'ancien, aucune autre
+     modification n'est nécessaire (toutes les couleurs de l'app passent par ces variables). */
+  --color-brand-primary: #c74f2d;        /* Terracotta (couleur du logo) */
+  --color-brand-primary-hover: #a83f21;  /* Terracotta survol */
+  --color-brand-primary-soft: #f7e3da;   /* Terracotta clair (fonds d'icônes, badges) */
+  --color-brand-secondary: #5b291b;      /* Brun foncé (couleur du logo) */
+  --color-brand-secondary-hover: #431d12;/* Brun survol */
 
   /* Arrière-plans / Surfaces */
-  --color-surface-app: #f8fafc;          /* Fond de page */
+  --color-surface-app: #f3e8d2;          /* Fond de page (crème) */
   --color-surface-card: #ffffff;         /* Fond de carte */
-  --color-surface-dark: #0f172a;         /* Fond sombre (Hero/Footer) */
+  --color-surface-dark: #3d2015;         /* Fond sombre (Hero/Footer) */
 
   /* Textes */
-  --color-content-main: #0f172a;         /* Texte principal */
-  --color-content-muted: #64748b;        /* Texte secondaire */
+  --color-content-main: #2b1b12;         /* Texte principal */
+  --color-content-muted: #8a7259;        /* Texte secondaire */
 
   /* Bordures */
-  --color-stroke-default: #e2e8f0;       /* Bordures communes */
+  --color-stroke-default: #e8dcc3;       /* Bordures communes */
 
   /* États */
   --color-danger: #ef4444;               /* Suppression / erreurs */
   --color-danger-hover: #dc2626;         /* Survol suppression / erreurs */
+
+  /* --- Ancienne palette bleue (avant le 2026-09-10) — décommenter pour revenir en arrière :
+  --color-brand-primary: #2563eb;
+  --color-brand-primary-hover: #1d4ed8;
+  --color-brand-primary-soft: #eff6ff;
+  --color-brand-secondary: #f97316;
+  --color-brand-secondary-hover: #ea580c;
+  --color-surface-app: #f8fafc;
+  --color-surface-card: #ffffff;
+  --color-surface-dark: #0f172a;
+  --color-content-main: #0f172a;
+  --color-content-muted: #64748b;
+  --color-stroke-default: #e2e8f0;
+  --color-danger: #ef4444;
+  --color-danger-hover: #dc2626;
+  --- */
 
   /* Espacement des zones sécurisées (encoche, barre d'accueil iOS) */
   --safe-top: env(safe-area-inset-top, 0px);
@@ -51,4 +70,18 @@ body {
 }
 .scroll-touch::-webkit-scrollbar {
   display: none;
+}
+
+/* Tailwind v4 ne remet plus `cursor: pointer` sur les <button> (choix assumé par l'équipe
+   Tailwind depuis la v3.3, contrairement à l'ancien comportement du navigateur) — sans ce
+   correctif global, chaque bouton de l'app (chips, toggles, onglets, icônes...) affiche le
+   curseur flèche par défaut au survol, ce qui ne se voit pas au premier coup d'œil mais rend
+   l'interface moins évidente à l'usage. Un seul endroit à maintenir plutôt qu'un
+   `cursor-pointer` répété sur des dizaines de boutons dans toute l'app. */
+button:not(:disabled),
+select {
+  cursor: pointer;
+}
+button:disabled {
+  cursor: not-allowed;
 }
