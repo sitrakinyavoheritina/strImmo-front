@@ -189,7 +189,7 @@ export function FilterFields({ draft, onUpdate, onSelectPropertyType, isAdvanced
           className="w-full flex items-center justify-between text-sm font-semibold text-content-main"
         >
           <span className="flex items-center gap-1.5">
-            {t.search.advancedFilters}
+            {t.search.moreCriteria}
             {hasActiveAdvancedFilters(draft) && <span className="w-1.5 h-1.5 rounded-full bg-brand-secondary" />}
           </span>
           <ChevronDown size={18} className={`text-content-muted transition-transform ${isAdvancedOpen ? 'rotate-180' : ''}`} />

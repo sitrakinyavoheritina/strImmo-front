@@ -2,9 +2,11 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { MoreHorizontal, Bookmark, Flag, Phone, MessageCircle, Check } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
-import { useFavoritesStore } from '@/lib/state/use-favorites-store';
+import { useAuthStore } from '@/lib/state/use-auth-store';
+import { useFavoriteIds, useToggleFavorite } from '@/features/search/hooks/use-favorites';
 import type { Property } from '@/features/search/types/listing.types';
 
 /** Menu "..." : enregistrer, contacter le vendeur, discuter, signaler — utilisé sur la carte du
@@ -19,10 +21,24 @@ export function CardOptionsMenu({
   triggerClassName?: string;
 }) {
   const { t } = useTranslation();
+  const router = useRouter();
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { data: favoriteIds } = useFavoriteIds();
+  const { mutate: toggleFavorite } = useToggleFavorite();
   const [isOpen, setIsOpen] = useState(false);
   const [isReported, setIsReported] = useState(false);
-  const isSaved = useFavoritesStore((state) => state.favorites.includes(property.id));
-  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+  const isSaved = favoriteIds?.includes(property.id) ?? false;
+
+  // "Enregistrer" est maintenant un vrai favori côté serveur (voir use-favorites.ts) — comme pour
+  // "j'aime", impossible sans compte de savoir à qui l'attribuer.
+  function handleSaveClick() {
+    setIsOpen(false);
+    if (!isAuthenticated) {
+      router.push('/connexion');
+      return;
+    }
+    toggleFavorite({ propertyId: property.id, wasSaved: isSaved });
+  }
 
   return (
     <div className="relative">
@@ -48,10 +64,7 @@ export function CardOptionsMenu({
           <div className="absolute right-0 top-full mt-1 z-50 w-52 bg-surface-card border border-stroke-default rounded-xl shadow-lg py-1">
             <button
               type="button"
-              onClick={() => {
-                toggleFavorite(property.id);
-                setIsOpen(false);
-              }}
+              onClick={handleSaveClick}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-content-main hover:bg-surface-app transition"
             >
               <Bookmark size={15} className={isSaved ? 'fill-brand-primary text-brand-primary' : ''} />

@@ -62,7 +62,7 @@ function SearchResultsContent() {
       <div className="flex-1 min-w-0 pt-0 sm:pt-2 pb-4 sm:pb-6 space-y-3">
         <SearchSection />
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-brand-secondary mb-4">
+          <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text mb-4">
             {t.search.results} {properties ? `(${properties.length})` : ''}
           </h1>
           {!isAiResultsMode && isLoading ? (

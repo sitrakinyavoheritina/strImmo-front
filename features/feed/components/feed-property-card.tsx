@@ -83,7 +83,10 @@ export function FeedPropertyCard({ property }: { property: Property }) {
 
       <div className="px-3 py-2 space-y-0.5">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-xs text-content-muted flex items-center gap-1 min-w-0">
+          {/* `content-main` (pas `content-muted`) : la localisation reste une information clé de
+              l'annonce, pas un simple détail secondaire — demandé explicitement après un retour
+              sur sa lisibilité en thème sombre. */}
+          <p className="text-xs text-content-main flex items-center gap-1 min-w-0">
             <MapPin size={12} className="shrink-0" />
             <span className="truncate">{property.location}</span>
           </p>

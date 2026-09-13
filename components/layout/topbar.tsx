@@ -24,7 +24,10 @@ export function Topbar() {
         <Link href="/" className="flex items-center gap-3 sm:gap-3.5 shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element -- logo décoratif (SVG statique dans /public), pas besoin de l'optimiseur next/image */}
           <img src="/logo.svg" alt="Onina" className="h-8 sm:h-10 w-auto" />
-          <span className="text-lg sm:text-xl font-extrabold text-brand-secondary tracking-tight">Onina</span>
+          <span className="font-extrabold tracking-tight">
+            <span className="text-lg sm:text-xl text-brand-secondary-text">Onina</span>
+            <span className="text-sm sm:text-base text-brand-primary">.mg</span>
+          </span>
         </Link>
 
         <div className="flex-1" />

@@ -99,6 +99,10 @@ export type PropertyFilters = {
   publisherType?: PublisherType;
   /** Restreint aux annonces publiées par cet utilisateur (écran "Mon compte"). */
   ownerId?: string;
+  /** Restreint aux annonces mises en favori par cet utilisateur (écran "Mes favoris") — une seule
+   *  requête groupée côté backend plutôt qu'une requête par annonce, voir
+   *  strImmo/src/properties/dto/list-properties-query.dto.ts. */
+  favoritesOf?: string;
   /** Statut de modération — sans ce filtre, seules les annonces approuvées sont retournées. */
   status?: 'pending' | 'approved' | 'rejected';
   sortBy?: 'recent' | 'price_asc' | 'price_desc' | 'popular';

@@ -22,7 +22,7 @@ export function FavoritesMapWidget() {
           <MapPin
             key={index}
             size={20}
-            className="absolute -translate-x-1/2 -translate-y-full text-brand-secondary fill-brand-secondary/20"
+            className="absolute -translate-x-1/2 -translate-y-full text-brand-secondary-text fill-brand-secondary/20"
             style={pos}
           />
         ))}

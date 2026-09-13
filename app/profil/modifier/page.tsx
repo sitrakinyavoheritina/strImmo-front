@@ -122,7 +122,7 @@ export default function ModifierProfilPage() {
         {t.profile.myAccount}
       </Link>
 
-      <h1 className="text-lg font-bold text-brand-secondary mb-4">{t.profile.edit}</h1>
+      <h1 className="text-lg font-bold text-brand-secondary-text mb-4">{t.profile.edit}</h1>
 
       <div className="bg-surface-card border border-stroke-default/80 rounded-2xl p-4 sm:p-6 space-y-4">
         <FormErrorBanner message={errorMessage} />

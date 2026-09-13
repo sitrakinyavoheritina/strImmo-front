@@ -322,7 +322,7 @@ export default function AnnoncePage() {
               si stats/équipements/description au-dessus ont besoin de défiler en interne. */}
           <div className="lg:sticky lg:bottom-0 lg:bg-surface-card mt-3 pt-3 border-t border-stroke-default flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-stretch">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-xl sm:text-2xl font-bold text-brand-secondary">{formatPrice(property.price)}</span>
+              <span className="text-xl sm:text-2xl font-bold text-brand-secondary-text">{formatPrice(property.price)}</span>
               {property.propertyType === 'land' && <span className="text-content-muted text-xs sm:text-sm"> / m²</span>}
             </div>
             {property.contactPhone &&

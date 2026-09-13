@@ -18,8 +18,27 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: 'cover',
-  themeColor: '#2563eb',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f3e8d2' },
+    { media: '(prefers-color-scheme: dark)', color: '#1c1410' },
+  ],
 };
+
+// Appliqué avant l'hydratation React (donc avant que useThemePreference ne s'exécute) pour éviter
+// un flash du mauvais thème : sans ça, la page afficherait d'abord le thème clair par défaut
+// pendant une fraction de seconde même pour quelqu'un ayant choisi le sombre manuellement, le
+// temps que React démarre et lise localStorage. `prefers-color-scheme` seul (sans préférence
+// enregistrée) n'a pas besoin de ce script : c'est déjà purement du CSS (voir globals.css).
+const THEME_INIT_SCRIPT = `
+(function() {
+  try {
+    var pref = localStorage.getItem('onina_theme');
+    if (pref === 'light' || pref === 'dark') {
+      document.documentElement.setAttribute('data-theme', pref);
+    }
+  } catch (e) {}
+})();
+`;
 
 export default function RootLayout({
   children,
@@ -27,7 +46,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr">
+    // `suppressHydrationWarning` : le script ci-dessous pose `data-theme` sur cet élément AVANT
+    // l'hydratation React, donc le HTML rendu par le serveur (sans cet attribut, puisque
+    // localStorage n'existe pas côté serveur) ne correspond plus à ce que le navigateur affiche
+    // déjà au moment où React s'hydrate — un mismatch attendu et sans conséquence ici (React ne
+    // touche plus jamais cet attribut ensuite), pas un vrai bug à corriger. Cette prop ne
+    // supprime l'avertissement QUE pour les attributs de cet élément précis, pas pour ses enfants.
+    <html lang="fr" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+      </head>
       <body className="antialiased bg-surface-app text-content-main min-h-screen flex flex-col">
         <QueryProvider>
           <AppShell>{children}</AppShell>

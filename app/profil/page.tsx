@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Phone, Mail, Home, Heart, LogOut, Pencil } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
-import { useFavoritesStore } from '@/lib/state/use-favorites-store';
+import { useFavoriteIds } from '@/features/search/hooks/use-favorites';
 import { useProperties } from '@/features/search/hooks/use-properties';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ export default function ProfilPage() {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const clearSession = useAuthStore((state) => state.clearSession);
-  const favoritesCount = useFavoritesStore((state) => state.favorites.length);
+  const favoritesCount = useFavoriteIds().data?.length ?? 0;
 
   const { data: myProperties } = useProperties(
     user ? { ownerId: user.id, status: 'approved' } : undefined,

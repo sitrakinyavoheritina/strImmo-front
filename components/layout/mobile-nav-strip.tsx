@@ -40,6 +40,11 @@ export function MobileNavStrip() {
                 isActive ? 'bg-brand-primary-soft' : ''
               }`}
             >
+              {/* `content-main` (pas `content-muted`) même inactif : un libellé de navigation
+                  reste une information importante pour se repérer, pas un simple détail
+                  secondaire — demandé explicitement après un retour sur sa lisibilité en thème
+                  sombre. Seul l'icône, purement décorative une fois le texte lu, garde la nuance
+                  discrète à l'état inactif. */}
               <Icon
                 size={20}
                 strokeWidth={isActive ? 2.4 : 2}
@@ -47,7 +52,7 @@ export function MobileNavStrip() {
               />
               <span
                 className={`text-[10px] leading-none ${
-                  isActive ? 'font-bold text-brand-primary' : 'font-medium text-content-muted'
+                  isActive ? 'font-bold text-brand-primary' : 'font-medium text-content-main'
                 }`}
               >
                 {t.sidebar[labelKey]}

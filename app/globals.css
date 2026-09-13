@@ -10,6 +10,13 @@
   --color-brand-primary-soft: #f7e3da;   /* Terracotta clair (fonds d'icônes, badges) */
   --color-brand-secondary: #5b291b;      /* Brun foncé (couleur du logo) */
   --color-brand-secondary-hover: #431d12;/* Brun survol */
+  /* Même brun que brand-secondary en clair (aucun changement visuel ici), mais un jeton à part :
+     brand-secondary sert aussi de FOND (badges/boutons avec texte blanc dessus, voir button.tsx),
+     qui doit rester sombre pour garder ce texte blanc lisible. En thème sombre, un texte aussi
+     sombre que brand-secondary deviendrait illisible sur un fond déjà sombre — ce jeton, réservé
+     aux usages en TEXTE (titres, prix, le mot "Onina"), peut donc s'éclaircir en sombre sans rien
+     casser côté fonds. */
+  --color-brand-secondary-text: #5b291b;
 
   /* Arrière-plans / Surfaces */
   --color-surface-app: #f3e8d2;          /* Fond de page (crème) */
@@ -48,6 +55,62 @@
   --safe-bottom: env(safe-area-inset-bottom, 0px);
   --safe-left: env(safe-area-inset-left, 0px);
   --safe-right: env(safe-area-inset-right, 0px);
+}
+
+/* Mode sombre — toutes les couleurs de l'app passent par les variables ci-dessus (voir le
+   commentaire en tête de @theme), donc les redéfinir ici suffit à adapter TOUTE l'app, sans
+   toucher un seul composant. Trois façons d'arriver ici, dans cet ordre de priorité croissante :
+   1) `@media (prefers-color-scheme: dark)` sans attribut posé : suit la préférence système —
+      c'est le cas normal, personne n'a rien choisi dans /parametres.
+   2) `:root[data-theme="dark"]` : préférence "Sombre" choisie explicitement (voir
+      useThemePreference), quel que soit le système.
+   3) Le `:not([data-theme="light"])` sur la règle média empêche un choix explicite "Clair" de se
+      faire écraser par un système en mode sombre.
+   Palette conçue pour rester dans l'identité terracotta/brun (pas un simple gris/noir générique) :
+   fonds très sombres à dominante brune (pas de bleu/noir froid), texte crème (écho à
+   `surface-app` du thème clair), accents éclaircis pour rester lisibles sur fond sombre. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-brand-primary: #d6603c;
+    --color-brand-primary-hover: #e37750;
+    --color-brand-primary-soft: #3a2419;
+    --color-brand-secondary: #7a4028;
+    --color-brand-secondary-hover: #96502f;
+    --color-brand-secondary-text: #dda06d;
+
+    --color-surface-app: #1c1410;
+    --color-surface-card: #2a2019;
+    --color-surface-dark: #120b08;
+
+    --color-content-main: #f3e8d2;
+    --color-content-muted: #c9b499;
+
+    --color-stroke-default: #3d3226;
+
+    --color-danger: #f87171;
+    --color-danger-hover: #ef4444;
+  }
+}
+
+:root[data-theme="dark"] {
+  --color-brand-primary: #d6603c;
+  --color-brand-primary-hover: #e37750;
+  --color-brand-primary-soft: #3a2419;
+  --color-brand-secondary: #7a4028;
+  --color-brand-secondary-hover: #96502f;
+  --color-brand-secondary-text: #dda06d;
+
+  --color-surface-app: #1c1410;
+  --color-surface-card: #2a2019;
+  --color-surface-dark: #120b08;
+
+  --color-content-main: #f3e8d2;
+  --color-content-muted: #c9b499;
+
+  --color-stroke-default: #3d3226;
+
+  --color-danger: #f87171;
+  --color-danger-hover: #ef4444;
 }
 
 html {

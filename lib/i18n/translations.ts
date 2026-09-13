@@ -119,6 +119,9 @@ const translations = {
       language: 'Langue',
       darkMode: 'Mode sombre',
       comingSoon: 'Bientôt',
+      themeSystem: 'Système',
+      themeLight: 'Clair',
+      themeDark: 'Sombre',
     },
     sidebar: {
       home: 'Accueil',
@@ -175,6 +178,7 @@ const translations = {
       bedroomsMin: 'Nombre de chambres',
       advancedFilters: 'Filtres avancés',
       moreFilters: 'Plus de filtres',
+      moreCriteria: 'Plus de critères',
       comfort: 'Confort',
       carAccess: 'Accès voiture',
       bathroomLocation: 'WC et douche',
@@ -261,6 +265,12 @@ const translations = {
       deleteCancelButton: 'Annuler',
       deleteError: "Impossible de supprimer l'annonce. Réessayez.",
       viewsLabel: 'vue(s)',
+    },
+    favoritesPage: {
+      title: 'Mes favoris',
+      emptyTitle: 'Aucune annonce enregistrée',
+      emptyDescription: 'Enregistrez une annonce (bouton "..." sur une carte) pour la retrouver ici.',
+      browse: "Parcourir les annonces",
     },
     hero: {
       title: 'Trouvez votre chez-vous à Madagascar 🇲🇬',
@@ -515,6 +525,9 @@ const translations = {
       language: 'Fiteny',
       darkMode: 'Endrika maizina',
       comingSoon: 'Ho avy',
+      themeSystem: 'Rafitra',
+      themeLight: 'Mazava',
+      themeDark: 'Maizina',
     },
     sidebar: {
       home: 'Fandraisana',
@@ -571,6 +584,7 @@ const translations = {
       bedroomsMin: "Isan'ny efitra fandriana",
       advancedFilters: 'Sivana lalina',
       moreFilters: 'Sivana bebe kokoa',
+      moreCriteria: 'Fepetra fanampiny',
       comfort: 'Fahamoram-piainana',
       carAccess: "Azon'ny fiara idirana",
       bathroomLocation: 'WC sy douche',
@@ -657,6 +671,12 @@ const translations = {
       deleteCancelButton: 'Aoka ihany',
       deleteError: 'Tsy voafafa ny doka. Andramo indray.',
       viewsLabel: 'fijerena',
+    },
+    favoritesPage: {
+      title: 'Ny tiako',
+      emptyTitle: 'Tsy mbola misy doka voatahiry',
+      emptyDescription: 'Tahirizo ny doka (bokotra "..." eo amin\'ny doka) mba hahitanao azy eto.',
+      browse: 'Jereo ny doka',
     },
     hero: {
       title: 'Mitadiava ny tranonao eto Madagasikara 🇲🇬',

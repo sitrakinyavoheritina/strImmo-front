@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Pencil, Home, Heart, Globe, Moon, LogOut } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
+import { useThemePreference, type ThemePreference } from '@/lib/theme/use-theme-preference';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { MenuRow } from '@/components/ui/menu-row';
@@ -21,6 +22,13 @@ export default function ParametresPage() {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const clearSession = useAuthStore((state) => state.clearSession);
+  const { preference: themePreference, setTheme } = useThemePreference();
+
+  const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
+    { value: 'system', label: t.profile.themeSystem },
+    { value: 'light', label: t.profile.themeLight },
+    { value: 'dark', label: t.profile.themeDark },
+  ];
 
   function handleLogout() {
     clearSession();
@@ -30,7 +38,7 @@ export default function ParametresPage() {
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
       <div className="flex-1 min-w-0 max-w-2xl mx-auto py-3 sm:py-6 space-y-4">
-        <h1 className="text-lg sm:text-xl font-bold text-brand-secondary">{t.profile.settingsTitle}</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text">{t.profile.settingsTitle}</h1>
 
         {isAuthenticated && user ? (
           <Link
@@ -71,10 +79,32 @@ export default function ParametresPage() {
               <span className="flex-1 text-sm font-medium text-content-main">{t.profile.language}</span>
               <LanguageSwitcher />
             </div>
-            {/* Pas de vraie palette sombre pour l'instant (aucune infra dark mode dans
-                strImmo-front) : rangée visible mais désactivée, avec la mention "Bientôt", plutôt
-                que de la cacher entièrement — demandé explicitement. */}
-            <MenuRow icon={Moon} label={t.profile.darkMode} badge={t.profile.comingSoon} disabled />
+            {/* "Système" (par défaut) suit `prefers-color-scheme`, sans rien à choisir — un choix
+                explicite Clair/Sombre prend le dessus quel que soit le système (voir
+                useThemePreference et les blocs `@media`/`[data-theme]` dans globals.css). */}
+            <div className="px-4 py-2.5 space-y-2">
+              <div className="flex items-center gap-3">
+                <Moon size={18} className="text-content-main shrink-0" />
+                <span className="flex-1 text-sm font-medium text-content-main">{t.profile.darkMode}</span>
+              </div>
+              <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-xs font-semibold">
+                {THEME_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => setTheme(value)}
+                    aria-pressed={themePreference === value}
+                    className={`flex-1 px-2.5 py-1.5 rounded-lg transition ${
+                      themePreference === value
+                        ? 'bg-brand-primary text-white'
+                        : 'text-content-muted hover:text-content-main'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
