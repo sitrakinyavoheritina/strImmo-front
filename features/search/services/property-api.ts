@@ -60,6 +60,7 @@ export type ApiProperty = {
   commission: string | null;
   caution: string | null;
   viewCount: number;
+  likesCount: number;
   // Liste (`GET /properties`) : nom/avatar/rôle seulement (jamais téléphone/email/adresse, voir
   // strImmo/src/properties/properties.service.ts:findAll). Détail (`GET /properties/:id`) : objet
   // complet, `phone` inclus (nécessaire pour "Contacter le vendeur").
@@ -92,4 +93,10 @@ export const propertyApi = {
       .then((r) => r.data),
 
   remove: (id: string) => apiClient.delete<void>(`/properties/${id}`).then((r) => r.data),
+
+  like: (id: string) =>
+    apiClient.post<{ likesCount: number }>(`/properties/${id}/like`).then((r) => r.data),
+
+  unlike: (id: string) =>
+    apiClient.post<{ likesCount: number }>(`/properties/${id}/unlike`).then((r) => r.data),
 };

@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Bell, Plus } from 'lucide-react';
+import { Bell, Plus, User } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { useUnreadNotificationsCount } from '@/features/notifications/hooks/use-notifications';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
-import { LanguageMenu } from '@/components/ui/language-menu';
+import { Avatar } from '@/components/ui/avatar';
 import { UserMenu } from './user-menu';
 
 export function Topbar() {
@@ -21,9 +21,10 @@ export function Topbar() {
       style={{ paddingTop: 'var(--safe-top)' }}
     >
       <div className="w-full px-3 sm:px-6 lg:px-8 h-12 sm:h-14 flex items-center gap-3 sm:gap-6">
-        <Link href="/" className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <Link href="/" className="flex items-center gap-3 sm:gap-3.5 shrink-0">
           {/* eslint-disable-next-line @next/next/no-img-element -- logo décoratif (SVG statique dans /public), pas besoin de l'optimiseur next/image */}
-          <img src="/logo.svg" alt="Onina" className="h-7 sm:h-8 w-auto" />
+          <img src="/logo.svg" alt="Onina" className="h-8 sm:h-10 w-auto" />
+          <span className="text-lg sm:text-xl font-extrabold text-brand-secondary tracking-tight">Onina</span>
         </Link>
 
         <div className="flex-1" />
@@ -46,20 +47,40 @@ export function Topbar() {
           </Link>
         </nav>
 
+        {/* Terracotta (brand-primary), pas le brun du mot-clé "Onina" (brand-secondary) : deux
+            couleurs déjà de la charte, pas une nouvelle — pour que le bouton d'action se distingue
+            du logo/wordmark plutôt que de se fondre dans le même ton (retour UI/UX explicite). */}
         <Link
           href="/annonce/nouvelle"
-          className="hidden sm:inline-flex items-center gap-1.5 bg-[#c9992f] hover:bg-[#b3852a] text-white text-sm font-semibold rounded-xl px-3.5 py-2 transition shrink-0"
+          className="inline-flex items-center gap-2 text-brand-primary hover:text-brand-primary-hover text-sm font-semibold rounded-xl py-2 transition shrink-0"
         >
-          <Plus size={16} />
+          <span className="flex items-center justify-center w-7 h-7 rounded-full bg-brand-primary text-white shrink-0">
+            <Plus size={20} strokeWidth={2.5} />
+          </span>
+          <span className="sm:hidden">{t.topbar.add}</span>
           <span className="hidden lg:inline">{t.topbar.postAd}</span>
         </Link>
 
+        {/* Masqué sur mobile (en dessous de `lg:`) — demandé explicitement pour désencombrer la
+            topbar mobile. */}
         <div className="hidden lg:block shrink-0">
           <LanguageSwitcher />
         </div>
-        <div className="lg:hidden shrink-0">
-          <LanguageMenu />
-        </div>
+
+        {/* Remplace la sélection de langue à cet emplacement sur mobile : seul accès au profil
+            visible dans la topbar en dessous de `sm:` (UserMenu et les liens connexion/inscription
+            juste en dessous sont tous les deux réservés au desktop) — demandé explicitement. Lien
+            direct plutôt qu'un menu déroulant (comme UserMenu) : /profil affiche déjà lui-même
+            l'invite de connexion si besoin, pas la peine de dupliquer cette logique ici. */}
+        <Link href="/profil" aria-label={t.profile.myAccount} className="sm:hidden shrink-0">
+          {isAuthenticated && user ? (
+            <Avatar name={user.fullName} imageUrl={user.avatarUrl} size={30} />
+          ) : (
+            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-app border border-stroke-default text-content-muted">
+              <User size={16} />
+            </span>
+          )}
+        </Link>
 
         {isAuthenticated && user ? (
           <UserMenu user={user} />

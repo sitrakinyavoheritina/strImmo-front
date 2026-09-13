@@ -34,10 +34,10 @@ export default function MesBiensPage() {
     <div className="flex px-3 sm:px-6 lg:px-0">
       <div className="flex-1 min-w-0 py-3 sm:py-6">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-lg sm:text-xl font-bold text-content-main">{t.myPropertiesPage.title}</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-brand-secondary">{t.myPropertiesPage.title}</h1>
           <Link
             href="/annonce/nouvelle"
-            className="hidden sm:inline-flex items-center gap-1.5 bg-[#c9992f] hover:bg-[#b3852a] text-white text-sm font-semibold rounded-xl px-3.5 py-2 transition"
+            className="hidden sm:inline-flex items-center gap-1.5 bg-brand-secondary hover:bg-brand-secondary-hover text-white text-sm font-semibold rounded-xl px-3.5 py-2 transition"
           >
             <Plus size={16} />
             {t.myPropertiesPage.postAd}
@@ -59,7 +59,7 @@ export default function MesBiensPage() {
             <p className="text-sm text-content-muted">{t.myPropertiesPage.emptyDescription}</p>
             <Link
               href="/annonce/nouvelle"
-              className="inline-flex items-center gap-1.5 bg-[#c9992f] hover:bg-[#b3852a] text-white text-sm font-semibold rounded-xl px-3.5 py-2 transition mt-1"
+              className="inline-flex items-center gap-1.5 bg-brand-secondary hover:bg-brand-secondary-hover text-white text-sm font-semibold rounded-xl px-3.5 py-2 transition mt-1"
             >
               <Plus size={16} />
               {t.myPropertiesPage.postAd}

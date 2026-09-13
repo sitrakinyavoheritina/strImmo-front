@@ -6,6 +6,7 @@ import { useTranslation } from '@/lib/i18n/use-translation';
 import { useHomeSearchFiltersStore } from '@/lib/state/use-home-search-filters-store';
 import { useAiSearchResultsStore } from '@/lib/state/use-ai-search-results-store';
 import { useProperties } from '@/features/search/hooks/use-properties';
+import { useDebouncedSearchFilters } from '@/features/search/hooks/use-debounced-search-filters';
 import { SearchSection } from '@/features/search/components/search-section';
 import { FeedList } from '@/features/feed/components/feed-list';
 import { RightRail } from '@/features/feed/components/right-rail';
@@ -50,15 +51,18 @@ function SearchResultsContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, isAiResultsMode]);
 
-  const { data: fetchedProperties, isLoading } = useProperties(filters, { enabled: !isAiResultsMode });
+  // Le texte libre (lieu) est retardé/filtré (voir use-debounced-search-filters.ts) : sans ça,
+  // chaque lettre tapée dans la barre déclencherait sa propre requête réseau.
+  const debouncedFilters = useDebouncedSearchFilters(filters);
+  const { data: fetchedProperties, isLoading } = useProperties(debouncedFilters, { enabled: !isAiResultsMode });
   const properties = isAiResultsMode ? (aiResults ?? []) : fetchedProperties;
 
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
-      <div className="flex-1 min-w-0 pt-2 pb-4 sm:pb-6 space-y-3">
+      <div className="flex-1 min-w-0 pt-0 sm:pt-2 pb-4 sm:pb-6 space-y-3">
         <SearchSection />
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-content-main mb-4">
+          <h1 className="text-lg sm:text-xl font-bold text-brand-secondary mb-4">
             {t.search.results} {properties ? `(${properties.length})` : ''}
           </h1>
           {!isAiResultsMode && isLoading ? (

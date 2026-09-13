@@ -7,8 +7,17 @@ import { useTranslation } from '@/lib/i18n/use-translation';
 import { useFavoritesStore } from '@/lib/state/use-favorites-store';
 import type { Property } from '@/features/search/types/listing.types';
 
-/** Menu "..." d'une carte du fil : enregistrer, contacter le vendeur, discuter, signaler. */
-export function CardOptionsMenu({ property }: { property: Property }) {
+/** Menu "..." : enregistrer, contacter le vendeur, discuter, signaler — utilisé sur la carte du
+ *  fil et sur la fiche détail (voir `triggerClassName`, qui permet d'adapter le bouton
+ *  déclencheur à chaque contexte : discret dans la carte, cercle blanc en overlay sur la photo
+ *  de la fiche détail). */
+export function CardOptionsMenu({
+  property,
+  triggerClassName = 'text-content-muted hover:text-content-main transition shrink-0',
+}: {
+  property: Property;
+  triggerClassName?: string;
+}) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [isReported, setIsReported] = useState(false);
@@ -22,7 +31,7 @@ export function CardOptionsMenu({ property }: { property: Property }) {
         onClick={() => setIsOpen((v) => !v)}
         aria-label="Options"
         aria-expanded={isOpen}
-        className="text-content-muted hover:text-content-main transition shrink-0"
+        className={triggerClassName}
       >
         <MoreHorizontal size={18} />
       </button>

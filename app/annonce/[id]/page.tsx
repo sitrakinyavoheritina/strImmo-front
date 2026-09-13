@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -26,14 +26,16 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
-import { useFavoritesStore } from '@/lib/state/use-favorites-store';
+import { useLikesStore } from '@/lib/state/use-likes-store';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { useProperty } from '@/features/search/hooks/use-property';
+import { useLikeProperty } from '@/features/search/hooks/use-like-property';
 import { PROPERTY_TYPE_LABEL_KEY } from '@/features/search/utils/get-key-features';
 import { formatPrice } from '@/features/search/utils/format-price';
 import { Button } from '@/components/ui/button';
 import { RightRail } from '@/features/feed/components/right-rail';
 import { InlineChatPanel } from '@/features/property-detail/components/inline-chat-panel';
+import { CardOptionsMenu } from '@/features/feed/components/card-options-menu';
 
 interface Stat {
   icon: LucideIcon;
@@ -57,12 +59,19 @@ const LEGAL_STATUS_LABEL_KEY = {
 export default function AnnoncePage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t } = useTranslation();
-  const isFavorite = useFavoritesStore((state) => state.favorites.includes(id));
-  const toggleFavorite = useFavoritesStore((state) => state.toggleFavorite);
+  const userId = useAuthStore((state) => state.user?.id);
+  const isLiked = useLikesStore((state) => (userId ? state.likedByUser[userId] : undefined)?.includes(id) ?? false);
+  const { mutate: toggleLike } = useLikeProperty();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [activePhoto, setActivePhoto] = useState(0);
-  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [manualChatOpen, setManualChatOpen] = useState(false);
+  // Arrivée depuis le bouton "message" d'une carte du fil (?chat=1, voir feed-property-card.tsx) :
+  // ouvre directement la discussion plutôt que de forcer un second clic sur "Discuter". Dérivé du
+  // rendu (pas un state+effect) pour rester correct si la session finit de se réhydrater après le
+  // premier rendu.
+  const isChatOpen = manualChatOpen || (searchParams.get('chat') === '1' && isAuthenticated);
 
   const { data: property, isLoading } = useProperty(id);
 
@@ -71,6 +80,22 @@ export default function AnnoncePage() {
   // mène) — on envoie directement vers la connexion plutôt que de laisser cliquer dans le vide.
   function requireAuth() {
     router.push('/connexion');
+  }
+
+  // Même règle que sur la carte du fil (voir feed-property-card.tsx) : "j'aime" est un compteur
+  // partagé côté backend, impossible à attribuer sans compte.
+  function handleLikeClick() {
+    if (!isAuthenticated || !userId) {
+      requireAuth();
+      return;
+    }
+    toggleLike({ id, wasLiked: isLiked, userId });
+  }
+
+  // Retire aussi `?chat=1` de l'URL : sinon la discussion rouvrirait aussitôt au prochain rendu.
+  function closeChat() {
+    setManualChatOpen(false);
+    if (searchParams.get('chat') === '1') router.replace(`/annonce/${id}`);
   }
 
   if (isLoading) {
@@ -176,18 +201,24 @@ export default function AnnoncePage() {
             >
               {property.kind === 'rent' ? t.property.forRent : t.property.forSale}
             </span>
-            <button
-              type="button"
-              onClick={() => toggleFavorite(property.id)}
-              aria-label={isFavorite ? t.property.removeFromFavorites : t.property.addToFavorites}
-              aria-pressed={isFavorite}
-              className="absolute top-2 right-2 sm:top-3 sm:right-3 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition"
-            >
-              <Heart
-                size={18}
-                className={isFavorite ? 'text-danger fill-danger' : 'text-content-muted'}
+            {/* Cœur ("j'aime", compteur partagé) + menu "..." (enregistrer/signaler, voir
+                CardOptionsMenu) — mêmes actions que sur la carte du fil, en overlay sur la photo
+                ici faute de ligne dédiée comme dans la carte. */}
+            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleLikeClick}
+                aria-label={isLiked ? t.property.unlike : t.property.like}
+                aria-pressed={isLiked}
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition"
+              >
+                <Heart size={18} className={isLiked ? 'text-danger fill-danger' : 'text-content-muted'} />
+              </button>
+              <CardOptionsMenu
+                property={property}
+                triggerClassName="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition text-content-muted"
               />
-            </button>
+            </div>
           </div>
 
           {property.photoUrls.length > 1 && (
@@ -216,7 +247,7 @@ export default function AnnoncePage() {
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => (isAuthenticated ? setIsChatOpen(true) : requireAuth())}
+                onClick={() => (isAuthenticated ? setManualChatOpen(true) : requireAuth())}
                 className="shrink-0 mt-2 w-full"
               >
                 <MessageCircle size={14} className="shrink-0" />
@@ -229,7 +260,7 @@ export default function AnnoncePage() {
                 propertyId={property.id}
                 authorName={property.authorName}
                 authorAvatarUrl={property.authorAvatarUrl}
-                onClose={() => setIsChatOpen(false)}
+                onClose={closeChat}
               />
             ))}
         </div>
@@ -291,7 +322,7 @@ export default function AnnoncePage() {
               si stats/équipements/description au-dessus ont besoin de défiler en interne. */}
           <div className="lg:sticky lg:bottom-0 lg:bg-surface-card mt-3 pt-3 border-t border-stroke-default flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-stretch">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-xl sm:text-2xl font-bold text-content-main">{formatPrice(property.price)}</span>
+              <span className="text-xl sm:text-2xl font-bold text-brand-secondary">{formatPrice(property.price)}</span>
               {property.propertyType === 'land' && <span className="text-content-muted text-xs sm:text-sm"> / m²</span>}
             </div>
             {property.contactPhone &&

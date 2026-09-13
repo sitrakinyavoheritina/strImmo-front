@@ -39,6 +39,7 @@ export function mapApiPropertyToProperty(api: ApiProperty): Property {
     publisherType: api.user?.role,
     contactPhone: api.user?.phone,
     favoritesCount: api.favoritesCount,
+    likesCount: api.likesCount,
   };
 
   if (api.propertyType === 'house' && api.houseDetails) {

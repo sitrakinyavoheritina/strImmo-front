@@ -42,6 +42,10 @@ type PropertyBase = {
   contactPhone?: string;
   /** Calculé côté backend (COUNT sur `favorites`), jamais persisté. */
   favoritesCount?: number;
+  /** Compteur de "j'aime" (cœur) — distinct de `favoritesCount` (annonces enregistrées pour plus
+   *  tard). Colonne persistée (`properties.likes_count`), pas de suivi "qui a aimé quoi" côté
+   *  backend — voir lib/state/use-likes-store.ts pour l'état local par navigateur. */
+  likesCount: number;
 };
 
 export type HouseProperty = PropertyBase & {
@@ -127,5 +131,5 @@ export type PropertyFilters = {
 type DistributiveOmit<T, K extends keyof T> = T extends unknown ? Omit<T, K> : never;
 export type PropertyFormValues = DistributiveOmit<
   Property,
-  'id' | 'ownerId' | 'createdAt' | 'viewCount' | 'moderationStatus'
+  'id' | 'ownerId' | 'createdAt' | 'viewCount' | 'moderationStatus' | 'likesCount'
 >;

@@ -55,6 +55,15 @@ html {
      une vue d'app plutôt qu'un document web qui "flotte". */
   overscroll-behavior-y: none;
   height: 100%;
+  /* Désactive le "scroll anchoring" du navigateur pour toute la page, pas juste pour un élément
+     ciblé : quand un bloc replie/déplie pendant le scroll (voir MobileSearchPanel), le navigateur
+     recale automatiquement scrollY pour garder le même contenu sous les yeux — mais ce contenu
+     "ancré" peut très bien être ailleurs sur la page (le fil d'annonces juste en dessous), donc
+     `overflow-anchor: none` posé seulement sur le bloc qui replie ne suffit pas à l'empêcher.
+     Confirmé en mesurant `scrollY` pendant un scroll molette/trackpad : sans ce réglage global, il
+     oscillait de façon erratique (167→211→183→170→222...) au lieu d'augmenter proprement,
+     provoquant le repli qui clignotait/redevenait vide par intermittence. */
+  overflow-anchor: none;
 }
 
 body {

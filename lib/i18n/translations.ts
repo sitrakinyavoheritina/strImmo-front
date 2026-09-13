@@ -114,6 +114,11 @@ const translations = {
       saving: 'Enregistrement...',
       avatarChange: 'Changer la photo',
       cancel: 'Annuler',
+      settingsTitle: 'Paramètres',
+      preferences: 'Préférences',
+      language: 'Langue',
+      darkMode: 'Mode sombre',
+      comingSoon: 'Bientôt',
     },
     sidebar: {
       home: 'Accueil',
@@ -121,6 +126,7 @@ const translations = {
       favorites: 'Favoris',
       myProperties: 'Mes Biens',
       messages: 'Messages',
+      menu: 'Menu',
     },
     topbar: {
       searchPlaceholder: 'Chercher',
@@ -128,6 +134,7 @@ const translations = {
       messages: 'Messages',
       notifications: 'Notifications',
       postAd: 'Publier une annonce',
+      add: 'Ajouter',
     },
     feed: {
       featuredTitle: 'Propriétés en Vedette',
@@ -306,6 +313,8 @@ const translations = {
       forSale: 'vente',
       addToFavorites: 'Ajouter aux favoris',
       removeFromFavorites: 'Retirer des favoris',
+      like: "J'aime",
+      unlike: "Je n'aime plus",
     },
     propertyDetail: {
       notFoundTitle: 'Annonce introuvable',
@@ -501,6 +510,11 @@ const translations = {
       saving: 'Mitahiry...',
       avatarChange: 'Ovay ny sary',
       cancel: 'Aoka',
+      settingsTitle: 'Kirakira',
+      preferences: 'Safidy',
+      language: 'Fiteny',
+      darkMode: 'Endrika maizina',
+      comingSoon: 'Ho avy',
     },
     sidebar: {
       home: 'Fandraisana',
@@ -508,6 +522,7 @@ const translations = {
       favorites: 'Tiana',
       myProperties: 'Fananako',
       messages: 'Hafatra',
+      menu: 'Menu',
     },
     topbar: {
       searchPlaceholder: 'Karohy',
@@ -515,6 +530,7 @@ const translations = {
       messages: 'Hafatra',
       notifications: 'Fampandrenesana',
       postAd: 'Mamoaka filazana',
+      add: 'Ampidino',
     },
     feed: {
       featuredTitle: 'Fananana Voatondro',
@@ -693,6 +709,8 @@ const translations = {
       forSale: 'fivarotana',
       addToFavorites: 'Ampio amin\'ny tiana',
       removeFromFavorites: 'Esory amin\'ny tiana',
+      like: 'Tiako',
+      unlike: 'Tsy tiako intsony',
     },
     propertyDetail: {
       notFoundTitle: 'Tsy hita ny filazana',

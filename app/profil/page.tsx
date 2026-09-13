@@ -2,46 +2,15 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Phone, Mail, Home, Heart, LogOut, ChevronRight, Pencil } from 'lucide-react';
+import { Phone, Mail, Home, Heart, LogOut, Pencil } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { useFavoritesStore } from '@/lib/state/use-favorites-store';
 import { useProperties } from '@/features/search/hooks/use-properties';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import { MenuRow } from '@/components/ui/menu-row';
 import { RightRail } from '@/features/feed/components/right-rail';
-
-function MenuRow({ href, icon: Icon, label, danger, onClick }: {
-  href?: string;
-  icon: React.ComponentType<{ size?: number }>;
-  label: string;
-  danger?: boolean;
-  onClick?: () => void;
-}) {
-  const content = (
-    <>
-      <Icon size={18} />
-      <span className="flex-1 text-left">{label}</span>
-      {href && <ChevronRight size={16} className="text-content-muted" />}
-    </>
-  );
-  const className = `w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${
-    danger ? 'text-danger hover:bg-danger/10' : 'text-content-main hover:bg-surface-app'
-  }`;
-
-  if (href) {
-    return (
-      <Link href={href} className={className}>
-        {content}
-      </Link>
-    );
-  }
-  return (
-    <button type="button" onClick={onClick} className={className}>
-      {content}
-    </button>
-  );
-}
 
 export default function ProfilPage() {
   const { t } = useTranslation();

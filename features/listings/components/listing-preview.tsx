@@ -46,7 +46,7 @@ export function ListingPreview({ values, photos }: { values: PropertyFormValues;
           <MapPin size={13} />
           {values.location || '—'}
         </p>
-        <p className="text-2xl font-bold text-content-main mt-1">
+        <p className="text-2xl font-bold text-brand-secondary mt-1">
           {formatPrice(values.price)}
           {values.propertyType === 'land' && <span className="text-sm font-normal"> / m²</span>}
         </p>

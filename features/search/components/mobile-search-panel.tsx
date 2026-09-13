@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
@@ -10,16 +10,6 @@ import { ActiveFilterChips } from './active-filter-chips';
 import { PROPERTY_TYPES, PUBLISHER_TYPES } from './filter-fields';
 import { filtersToSearchParams } from '../utils/filters-query';
 import type { PropertyFilters, PublisherType } from '../types/listing.types';
-
-// Au-delà de ce défilement, le panneau (barre de recherche + tous les champs) prend une part trop
-// importante d'un écran de téléphone — sur les hauteurs les plus courtes, il ne restait plus
-// qu'un filet de fil visible pendant le scroll, ce qui pouvait se lire comme "seuls les filtres
-// s'affichent" — signalé explicitement par l'utilisateur. Repris de la même logique déjà
-// éprouvée côté app mobile (Onina-mobile QuickSearchPanel : isCollapsed/onExpand).
-const COLLAPSE_SCROLL_THRESHOLD = 80;
-// En dessous de ce défilement, on considère qu'on est "revenu en haut" — réaffiche toujours le
-// panneau complet, y compris après une expansion manuelle (voir manualOverrideRef ci-dessous).
-const NEAR_TOP_SCROLL_THRESHOLD = 20;
 
 /** Ligne de choix exclusifs pleine largeur (ici : Propriétaire/Intermédiaire/Agence) — même
  * principe que le SegmentedControl de l'app mobile (Onina-mobile), repris ici pour le web plutôt
@@ -63,8 +53,24 @@ function SegmentedRow<T extends string>({
  * Louer/Acheter reste petit (pas pleine largeur) sur la dernière ligne, à côté de "Plus de
  * filtres" — pas de bouton "Rechercher" séparé : chaque sélection modifie directement les filtres
  * partagés, et "Plus de filtres" ouvre la feuille complète qui a son propre bouton de recherche
- * (demandé explicitement). */
-export function MobileSearchPanel() {
+ * (demandé explicitement).
+ *
+ * Repli/déploiement au scroll : `isCollapsed` et `onManualExpand` viennent de `SearchSection`, qui
+ * les pilote via un `IntersectionObserver` sur une sentinelle placée AVANT la section sticky (pas
+ * un écouteur "scroll" ici). Plusieurs versions à base de scroll (seuil unique, seuils avec
+ * hystérésis, valeur continue) clignotaient sur mobile : ce bloc étant dans un conteneur `sticky`,
+ * le replier/déplier change la hauteur de ce qui est collé en haut, ce qui décale le contenu en
+ * dessous et redéclenche un événement "scroll" de compensation du navigateur — un aller-retour qui
+ * s'auto-entretient. Une sentinelle placée hors de la section sticky ne bouge, elle, jamais à
+ * cause de nos propres changements de hauteur : sa position ne dépend que du vrai scroll de la
+ * page, ce qui casse la boucle à la racine plutôt que d'essayer de la rendre moins sensible. */
+export function MobileSearchPanel({
+  isCollapsed,
+  onManualExpand,
+}: {
+  isCollapsed: boolean;
+  onManualExpand: () => void;
+}) {
   const { t } = useTranslation();
   const router = useRouter();
   const filters = useHomeSearchFiltersStore((state) => state.filters);
@@ -73,39 +79,13 @@ export function MobileSearchPanel() {
   const selectPropertyType = useHomeSearchFiltersStore((state) => state.selectPropertyType);
   const reset = useHomeSearchFiltersStore((state) => state.reset);
   const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
-  // Replié pendant le scroll (voir COLLAPSE_SCROLL_THRESHOLD) : ne garde que la barre de
-  // recherche, elle, toujours visible, au-dessus (comme sur mobile). Réexpansion manuelle
-  // possible (bouton dans le bloc replié) sans attendre de remonter en haut.
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  // Replier/déplier ce bloc change sa hauteur pendant qu'on est déjà scrollé — Chrome (scroll
-  // anchoring) recale alors scrollY tout seul pour garder le même contenu sous les yeux, ce qui
-  // redéclenche un événement "scroll" resynthétisé. Sans ce garde-fou, ce second événement
-  // artificiel (scrollY toujours > COLLAPSE_SCROLL_THRESHOLD) repliait aussitôt le panneau qu'on
-  // venait de rouvrir manuellement — bug constaté en testant le bouton d'expansion. Le
-  // contournement : une fois déplié à la main, on ignore le repli automatique tant qu'on n'est
-  // pas réellement revenu en haut (voir NEAR_TOP_SCROLL_THRESHOLD), plutôt que d'essayer de
-  // distinguer un "vrai" scroll utilisateur d'un recalage automatique.
-  const manualOverrideRef = useRef(false);
-
-  useEffect(() => {
-    function handleScroll() {
-      const y = window.scrollY;
-      if (y <= NEAR_TOP_SCROLL_THRESHOLD) {
-        manualOverrideRef.current = false;
-        setIsCollapsed(false);
-        return;
-      }
-      if (manualOverrideRef.current) return;
-      setIsCollapsed(y > COLLAPSE_SCROLL_THRESHOLD);
-    }
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  function handleManualExpand() {
-    manualOverrideRef.current = true;
-    setIsCollapsed(false);
-  }
+  // Avant toute interaction, seule la barre de recherche est visible (rien en dessous, pas même
+  // les puces/le bouton pour déplier) — demandé explicitement, pour ne pas surcharger l'écran tant
+  // que l'utilisateur n'a pas commencé à chercher. Se déclenche à la première frappe dans l'input
+  // et ne revient plus en arrière ensuite (effacer le texte ne recache pas les filtres déjà
+  // choisis). Initialisé à `true` si des filtres sont déjà actifs à l'arrivée sur la page (retour
+  // depuis une recherche précédente) — sinon leurs puces seraient masquées de façon surprenante.
+  const [hasStartedTyping, setHasStartedTyping] = useState(() => Object.keys(filters).length > 0);
 
   function handleRemoveFilter(key: keyof PropertyFilters) {
     if (key === 'propertyType') {
@@ -121,7 +101,11 @@ export function MobileSearchPanel() {
         <Search size={18} className="text-content-muted shrink-0" />
         <input
           value={filters.location ?? ''}
-          onChange={(event) => update('location', event.target.value || undefined)}
+          onChange={(event) => {
+            const value = event.target.value;
+            update('location', value || undefined);
+            if (value.trim().length > 0) setHasStartedTyping(true);
+          }}
           placeholder={t.hero.searchBarPlaceholder}
           className="flex-1 min-w-0 text-sm text-content-main placeholder-content-muted outline-none"
         />
@@ -132,27 +116,51 @@ export function MobileSearchPanel() {
         )}
       </div>
 
-      {isCollapsed ? (
-        <div className="flex items-center gap-1.5">
-          <div className="flex-1 min-w-0">
-            <ActiveFilterChips filters={filters} onRemove={handleRemoveFilter} />
+      {/* Rien sous la barre de recherche tant que l'utilisateur n'a pas commencé à taper (voir
+          `hasStartedTyping`) — demandé explicitement pour ne pas surcharger l'écran au chargement.
+          Les deux blocs (replié / déplié) restent ensuite tous les deux montés en permanence —
+          seule leur hauteur (via `grid-template-rows`, animable contrairement à `height: auto`) et
+          leur opacité sont animées, plutôt qu'un démontage/remontage brutal du DOM à chaque
+          bascule. Transition courte (200ms) : assez pour ne pas être un à-coup sec, assez peu pour
+          ne pas laisser le temps à un empilement d'événements "scroll" tactiles de s'accumuler
+          dessus. */}
+      {hasStartedTyping && (
+        <div>
+      <div
+        className="grid transition-[grid-template-rows] duration-200 ease-out"
+        style={{ gridTemplateRows: isCollapsed ? '1fr' : '0fr' }}
+      >
+        <div
+          className={`overflow-hidden min-h-0 transition-opacity duration-150 ${isCollapsed ? 'opacity-100 delay-75' : 'opacity-0'}`}
+        >
+          <div className="flex items-center gap-1.5 pt-0.5">
+            <div className="flex-1 min-w-0">
+              <ActiveFilterChips filters={filters} onRemove={handleRemoveFilter} />
+            </div>
+            <button
+              type="button"
+              onClick={onManualExpand}
+              aria-label={t.search.moreFilters}
+              className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full border border-stroke-default bg-surface-card text-brand-primary shadow-sm"
+            >
+              <SlidersHorizontal size={16} />
+            </button>
           </div>
-          <button
-            type="button"
-            onClick={handleManualExpand}
-            aria-label={t.search.moreFilters}
-            className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full border border-stroke-default bg-surface-card text-brand-primary shadow-sm"
-          >
-            <SlidersHorizontal size={16} />
-          </button>
         </div>
-      ) : (
-        <>
+      </div>
+
+      <div
+        className="grid transition-[grid-template-rows] duration-200 ease-out"
+        style={{ gridTemplateRows: isCollapsed ? '0fr' : '1fr' }}
+      >
+        <div
+          className={`overflow-hidden min-h-0 space-y-2.5 transition-opacity duration-150 ${isCollapsed ? 'opacity-0' : 'opacity-100 delay-75'}`}
+        >
           {/* Une seule ligne, défilable horizontalement (pas de retour à la ligne) : les 4
               libellés mis bout à bout ne tiennent pas sur un écran de 390px sans rétrécir le
               texte à l'illisible — demandé explicitement de les garder tous sur la même ligne
               plutôt que de les empiler. */}
-          <div className="flex gap-1.5 overflow-x-auto scroll-touch pb-0.5 -mx-0.5 px-0.5">
+          <div className="flex gap-1.5 overflow-x-auto scroll-touch pb-0.5 -mx-0.5 px-0.5 pt-0.5">
             {PROPERTY_TYPES.map(({ value, labelKey }) => {
               const isSelected = filters.propertyType === value;
               return (
@@ -230,7 +238,9 @@ export function MobileSearchPanel() {
           </div>
 
           <ActiveFilterChips filters={filters} onRemove={handleRemoveFilter} />
-        </>
+        </div>
+      </div>
+        </div>
       )}
 
       {isFilterModalOpen && (

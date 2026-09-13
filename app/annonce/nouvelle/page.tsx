@@ -78,7 +78,7 @@ export default function NouvelleAnnoncePage() {
   } else {
     content = (
       <div className="max-w-2xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-24">
-        <h1 className="text-xl sm:text-2xl font-extrabold text-content-main">
+        <h1 className="text-xl sm:text-2xl font-extrabold text-brand-secondary">
           {step === 'preview' ? t.listing.preview : t.listing.newTitle}
         </h1>
 

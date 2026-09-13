@@ -40,7 +40,7 @@ export default function NotificationsPage() {
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
       <div className="flex-1 min-w-0 max-w-2xl mx-auto py-3 sm:py-6">
-        <h1 className="text-lg sm:text-xl font-bold text-content-main mb-4">{t.notificationsPage.title}</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-brand-secondary mb-4">{t.notificationsPage.title}</h1>
 
         {isLoading ? (
           <p className="text-sm text-content-muted">{t.search.searching}</p>

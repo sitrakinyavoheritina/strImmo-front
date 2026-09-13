@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Sparkles, Search } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useHomeSearchFiltersStore } from '@/lib/state/use-home-search-filters-store';
@@ -11,6 +11,12 @@ import { MobileSearchPanel } from './mobile-search-panel';
 import { AiSearchPanel } from './ai-search-panel';
 import { ActiveFilterChips } from './active-filter-chips';
 import type { PropertyFilters } from '../types/listing.types';
+
+// Distance de scroll (px) à partir du haut de la page avant que `MobileSearchPanel` se replie —
+// un scroll franc, pas le moindre pixel. La sentinelle observée est positionnée exactement à cette
+// distance (voir plus bas) : ajuster cette seule valeur suffit à changer la sensibilité du repli,
+// sans toucher au mécanisme (IntersectionObserver) qui, lui, ne doit pas changer.
+const COLLAPSE_SCROLL_DISTANCE = 120;
 
 /** Section recherche de l'accueil, au-dessus du fil — onglets Recherche / Recherche IA, puis
  * (location/vente + type de bien) sur la même ligne que les onglets, et (prix min/max, publié
@@ -34,6 +40,41 @@ export function SearchSection() {
   const update = useHomeSearchFiltersStore((state) => state.update);
   const selectPropertyType = useHomeSearchFiltersStore((state) => state.selectPropertyType);
   const resetFilters = useHomeSearchFiltersStore((state) => state.reset);
+
+  // Repli mobile de `MobileSearchPanel` — voir le commentaire détaillé dans ce fichier pour
+  // pourquoi c'est un IntersectionObserver sur une sentinelle (placée hors de la section sticky
+  // juste en dessous) plutôt qu'un écouteur "scroll". `manualOverrideRef` : une fois déplié à la
+  // main pendant qu'on est déjà scrollé, on ignore le repli automatique tant que la sentinelle
+  // n'est pas réellement redevenue visible (retour près du haut) — sinon le premier événement
+  // d'intersection après le clic (déclenché par le changement de hauteur du panneau qu'on vient de
+  // rouvrir) le repliait aussitôt.
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [isPanelCollapsed, setIsPanelCollapsed] = useState(false);
+  const manualOverrideRef = useRef(false);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+    // `rootMargin` positif : agrandit (pas rétrécit) la zone observée vers le haut, au-delà du
+    // bord réel de l'écran — la sentinelle (qui reste juste au-dessus de la section, en flux
+    // normal) ne "sort" donc de cette zone élargie qu'après avoir défilé de COLLAPSE_SCROLL_DISTANCE
+    // px supplémentaires, pas dès le premier pixel de scroll.
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) manualOverrideRef.current = false;
+        if (manualOverrideRef.current) return;
+        setIsPanelCollapsed(!entry.isIntersecting);
+      },
+      { rootMargin: `${COLLAPSE_SCROLL_DISTANCE}px 0px 0px 0px`, threshold: 0 }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, []);
+
+  function handleManualExpandPanel() {
+    manualOverrideRef.current = true;
+    setIsPanelCollapsed(false);
+  }
 
   // Retirer "Type de bien" doit aussi effacer les critères propres à ce type (chambres, eau...),
   // devenus sans objet — même logique que le choix d'un autre type dans la rangée du dessus.
@@ -59,14 +100,24 @@ export function SearchSection() {
   }
 
   return (
-    // `overflow-anchor: none` : sans ça, le Chrome "scroll anchoring" recale automatiquement
-    // scrollY quand ce bloc change de hauteur (repli/redéploiement de MobileSearchPanel pendant le
-    // scroll), redéclenchant un événement "scroll" qui referme aussitôt le panneau qu'on venait
-    // de rouvrir manuellement — bug constaté en testant le bouton d'expansion manuelle.
-    <section
-      className="sticky top-12 sm:top-14 z-30 bg-surface-card rounded-2xl border border-stroke-default/80 p-3 shadow-sm"
-      style={{ overflowAnchor: 'none' }}
-    >
+    <>
+      {/* Sentinelle invisible, en flux normal juste AVANT la section sticky (pas de wrapper
+          `position: relative` autour des deux : ça réduirait le "conteneur" de l'élément sticky à
+          sa propre hauteur et lui retirerait toute marge pour rester collé — bug constaté : la
+          section ne collait plus du tout et défilait hors écran avec tout son contenu). Sa
+          position ne dépend que du vrai scroll de la page, jamais des changements de hauteur de
+          MobileSearchPanel juste en dessous (contrairement à un écouteur "scroll" classique) — ce
+          qui casse à la racine la boucle de rétroaction scroll ↔ repli qui clignotait sur mobile
+          avec les versions précédentes (seuil unique, hystérésis, valeur continue). */}
+      <div ref={sentinelRef} aria-hidden className="h-px" />
+      {/* `overflow-anchor: none` : sans ça, le Chrome "scroll anchoring" recale automatiquement
+          scrollY quand ce bloc change de hauteur (repli/redéploiement de MobileSearchPanel pendant
+          le scroll), redéclenchant un événement "scroll" qui referme aussitôt le panneau qu'on
+          venait de rouvrir manuellement — bug constaté en testant le bouton d'expansion manuelle. */}
+      <section
+        className="sticky top-12 sm:top-14 z-30 bg-surface-card rounded-2xl border border-stroke-default/80 p-3 shadow-sm"
+        style={{ overflowAnchor: 'none' }}
+      >
       {/* `gap-5` entre groupes (onglets / location-vente / type de bien) pour bien les séparer
           visuellement, contre `gap-1.5` à l'intérieur d'un même groupe (entre ses propres
           boutons/puces) — sans ça, tout se retrouvait à équidistance et se lisait comme une
@@ -77,7 +128,7 @@ export function SearchSection() {
             type="button"
             onClick={handleClickSearchTab}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition ${
-              tab === 'search' ? 'bg-brand-primary text-white' : 'text-content-muted hover:bg-surface-app'
+              tab === 'search' ? 'bg-brand-secondary text-white' : 'text-content-muted hover:bg-surface-app'
             }`}
           >
             <Search size={12} />
@@ -87,7 +138,7 @@ export function SearchSection() {
             type="button"
             onClick={handleClickAiTab}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition ${
-              tab === 'ai' ? 'bg-brand-primary text-white' : 'text-content-muted hover:bg-surface-app'
+              tab === 'ai' ? 'bg-brand-secondary text-white' : 'text-content-muted hover:bg-surface-app'
             }`}
           >
             <Sparkles size={12} />
@@ -145,7 +196,7 @@ export function SearchSection() {
             <QuickSearchForm />
           </div>
           <div className="sm:hidden">
-            <MobileSearchPanel />
+            <MobileSearchPanel isCollapsed={isPanelCollapsed} onManualExpand={handleManualExpandPanel} />
           </div>
         </>
       ) : (
@@ -157,6 +208,7 @@ export function SearchSection() {
           <ActiveFilterChips filters={filters} onRemove={handleRemoveFilter} />
         </div>
       )}
-    </section>
+      </section>
+    </>
   );
 }

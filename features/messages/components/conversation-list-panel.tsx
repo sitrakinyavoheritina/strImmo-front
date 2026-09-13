@@ -17,7 +17,7 @@ export function ConversationListPanel() {
 
   return (
     <div className="flex flex-col h-full">
-      <h1 className="shrink-0 text-lg font-bold text-content-main px-4 py-3.5 border-b border-stroke-default">
+      <h1 className="shrink-0 text-lg font-bold text-brand-secondary px-4 py-3.5 border-b border-stroke-default">
         {t.messages.title}
       </h1>
       <div className="flex-1 min-h-0 overflow-y-auto divide-y divide-stroke-default">

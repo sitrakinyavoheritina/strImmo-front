@@ -35,6 +35,12 @@ export function Avatar({ name, imageUrl, size = 36, className = '' }: AvatarProp
         alt={name}
         width={size}
         height={size}
+        // `style` (pas juste les props width/height) : le reset Tailwind `img { height: auto }`
+        // a une spécificité CSS plus forte que les attributs HTML width/height posés par
+        // next/image, donc sans ce style explicite l'avatar s'aplatissait (largeur figée par
+        // `max-width`, hauteur recalculée sur le ratio réel de la photo) au lieu de rester un
+        // cercle parfait — repéré sur l'icône de profil de la topbar mobile.
+        style={{ width: size, height: size }}
         className={`rounded-full object-cover shrink-0 ${className}`}
       />
     );

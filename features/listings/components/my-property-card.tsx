@@ -49,7 +49,7 @@ export function MyPropertyCard({ property }: { property: Property }) {
         >
           {t.myPropertiesPage[STATUS_LABEL_KEY[property.moderationStatus]]}
         </span>
-        <span className="absolute bottom-3 right-3 bg-surface-card/95 text-content-main text-xs font-bold px-2 py-1 rounded-md">
+        <span className="absolute bottom-3 right-3 bg-surface-card/95 text-brand-secondary text-xs font-bold px-2 py-1 rounded-md">
           {formatPrice(property.price)}
           {property.propertyType === 'land' && <span className="font-normal text-content-muted"> / m²</span>}
         </span>
