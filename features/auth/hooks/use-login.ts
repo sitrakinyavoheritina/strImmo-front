@@ -8,6 +8,8 @@ import { loginSchema, LoginFormData } from '../schemas';
 import { authService } from '../services/auth-service';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { getErrorMessage } from '@/lib/api/get-error-message';
+import { setStoredTheme } from '@/lib/theme/use-theme-preference';
+import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
 
 export function useLogin() {
   const router = useRouter();
@@ -26,6 +28,11 @@ export function useLogin() {
     try {
       const { user, token } = await authService.login(data);
       setSession(user, token);
+      // Le compte a sa propre préférence enregistrée côté serveur — elle prend le dessus sur ce
+      // qui était choisi localement en tant que visiteur, pour retrouver le même réglage que sur
+      // n'importe quel autre appareil une fois connecté (voir /auth/preferences).
+      setStoredTheme(user.themePreference);
+      setStoredFeedDisplay(user.feedDisplay);
       // Même comportement que mobile : admin/superadmin atterrit sur le profil, tout le monde
       // d'autre sur l'accueil (voir Onina-mobile/src/features/auth/screens/login-screen.tsx).
       router.push(user.role === 'admin' || user.role === 'superadmin' ? '/profil' : '/');

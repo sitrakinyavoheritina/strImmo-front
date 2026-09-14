@@ -122,6 +122,9 @@ const translations = {
       themeSystem: 'Système',
       themeLight: 'Clair',
       themeDark: 'Sombre',
+      feedDisplay: "Affichage du fil",
+      feedDisplayCard: 'Cartes',
+      feedDisplayList: 'Liste',
     },
     sidebar: {
       home: 'Accueil',
@@ -528,6 +531,9 @@ const translations = {
       themeSystem: 'Rafitra',
       themeLight: 'Mazava',
       themeDark: 'Maizina',
+      feedDisplay: 'Fomba fampisehoana',
+      feedDisplayCard: 'Karatra',
+      feedDisplayList: 'Lisitra',
     },
     sidebar: {
       home: 'Fandraisana',

@@ -5,6 +5,8 @@ import type {
   RegisterResult,
   UpdateProfilePayload,
   User,
+  ThemePreference,
+  FeedDisplayPreference,
 } from '../types';
 
 function toUser(api: ApiUser): User {
@@ -18,6 +20,8 @@ function toUser(api: ApiUser): User {
     avatarUrl: api.avatarUrl ?? undefined,
     address: api.address ?? undefined,
     role: api.role,
+    themePreference: api.themePreference,
+    feedDisplay: api.feedDisplay,
   };
 }
 
@@ -78,4 +82,7 @@ export const authService = {
     const res = await authApi.updateProfile(form);
     return toUser(res);
   },
+
+  updatePreferences: (payload: { themePreference?: ThemePreference; feedDisplay?: FeedDisplayPreference }) =>
+    authApi.updatePreferences(payload),
 };

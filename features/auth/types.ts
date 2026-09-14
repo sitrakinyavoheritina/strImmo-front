@@ -52,6 +52,9 @@ export interface UpdateProfilePayload {
   avatar?: File | null;
 }
 
+export type ThemePreference = 'system' | 'light' | 'dark';
+export type FeedDisplayPreference = 'card' | 'list';
+
 export interface User {
   id: string;
   firstName: string;
@@ -62,4 +65,6 @@ export interface User {
   avatarUrl?: string;
   address?: string;
   role: UserRole;
+  themePreference: ThemePreference;
+  feedDisplay: FeedDisplayPreference;
 }

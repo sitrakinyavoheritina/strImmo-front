@@ -32,6 +32,17 @@ function getServerSnapshot(): ThemePreference {
   return 'system';
 }
 
+/** Écrit la préférence en localStorage, l'applique tout de suite et notifie les hooks montés —
+ *  exporté séparément du hook pour pouvoir aussi être appelé juste après une connexion, quand le
+ *  compte a sa propre préférence enregistrée côté serveur (voir use-login.ts/use-register.ts) et
+ *  pas seulement depuis le sélecteur de /parametres. */
+export function setStoredTheme(next: ThemePreference) {
+  applyTheme(next);
+  if (next === 'system') localStorage.removeItem(STORAGE_KEY);
+  else localStorage.setItem(STORAGE_KEY, next);
+  window.dispatchEvent(new StorageEvent('storage'));
+}
+
 /** Préférence de thème (système / clair / sombre), persistée en localStorage et appliquée via
  *  l'attribut `data-theme` sur `<html>` — voir globals.css pour les valeurs de palette associées à
  *  chaque état. `useSyncExternalStore` (pas useState+useEffect) : même pattern que
@@ -43,13 +54,6 @@ function getServerSnapshot(): ThemePreference {
  *  /parametres) affiche l'état correct. */
 export function useThemePreference() {
   const preference = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
-
-  const setTheme = useCallback((next: ThemePreference) => {
-    applyTheme(next);
-    if (next === 'system') localStorage.removeItem(STORAGE_KEY);
-    else localStorage.setItem(STORAGE_KEY, next);
-    window.dispatchEvent(new StorageEvent('storage'));
-  }, []);
-
+  const setTheme = useCallback((next: ThemePreference) => setStoredTheme(next), []);
   return { preference, setTheme };
 }

@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { authService } from '../services/auth-service';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { getErrorMessage } from '@/lib/api/get-error-message';
+import { setStoredTheme } from '@/lib/theme/use-theme-preference';
+import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
 import type { RegisterPayload } from '../types';
 
 // Orchestration partagée par les 4 formulaires d'inscription (owner/tenant/agent/agency) : chaque
@@ -25,6 +27,8 @@ export function useRegisterSubmit() {
       const result = await authService.register(payload);
       if (result.status === 'authenticated') {
         setSession(result.user, result.token);
+        setStoredTheme(result.user.themePreference);
+        setStoredFeedDisplay(result.user.feedDisplay);
         router.push('/');
       } else {
         router.push('/connexion?attente=1');

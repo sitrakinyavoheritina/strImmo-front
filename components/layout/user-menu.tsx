@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 import { ChevronDown, User, LogOut } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
-import { useThemePreference } from '@/lib/theme/use-theme-preference';
+import { useThemePreference, type ThemePreference } from '@/lib/theme/use-theme-preference';
+import { authService } from '@/features/auth/services/auth-service';
 import { Avatar } from '@/components/ui/avatar';
 import type { User as AuthUser } from '@/features/auth/types';
 
@@ -16,6 +17,7 @@ export function UserMenu({ user }: { user: AuthUser }) {
   const { t } = useTranslation();
   const router = useRouter();
   const clearSession = useAuthStore((state) => state.clearSession);
+  const updateUser = useAuthStore((state) => state.updateUser);
   const { preference: themePreference, setTheme } = useThemePreference();
   const [isOpen, setIsOpen] = useState(false);
   // Accès rapide (juste clair/sombre, pas "système") : le choix complet à 3 états reste dans
@@ -26,6 +28,16 @@ export function UserMenu({ user }: { user: AuthUser }) {
     setIsOpen(false);
     clearSession();
     router.push('/connexion');
+  }
+
+  // Cette barre ne s'affiche que pour un utilisateur connecté (voir la prop `user`, obligatoire) —
+  // persisté sur le compte pour retrouver le même réglage sur un autre appareil, comme dans
+  // /parametres.
+  function handleSetTheme(next: ThemePreference) {
+    setTheme(next);
+    updateUser({ themePreference: next });
+    authService.updatePreferences({ themePreference: next }).catch(() => {});
+    setIsOpen(false);
   }
 
   return (
@@ -72,10 +84,7 @@ export function UserMenu({ user }: { user: AuthUser }) {
               <div className="flex items-center gap-1 rounded-lg border border-stroke-default bg-surface-app p-1 text-xs font-semibold">
                 <button
                   type="button"
-                  onClick={() => {
-                    setTheme('light');
-                    setIsOpen(false);
-                  }}
+                  onClick={() => handleSetTheme('light')}
                   aria-pressed={!isDark}
                   className={`flex-1 px-2 py-1 rounded-md transition ${
                     !isDark ? 'bg-brand-primary text-white' : 'text-content-muted hover:text-content-main'
@@ -85,10 +94,7 @@ export function UserMenu({ user }: { user: AuthUser }) {
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    setTheme('dark');
-                    setIsOpen(false);
-                  }}
+                  onClick={() => handleSetTheme('dark')}
                   aria-pressed={isDark}
                   className={`flex-1 px-2 py-1 rounded-md transition ${
                     isDark ? 'bg-brand-primary text-white' : 'text-content-muted hover:text-content-main'

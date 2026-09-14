@@ -277,6 +277,14 @@ export default function AnnoncePage() {
               <MapPin size={14} />
               {property.location}
             </p>
+            {/* Remonté ici (pas tout en bas, groupé avec "Contacter") : c'est l'info n°1 pour
+                décider si on continue à regarder l'annonce, demandé explicitement après un retour
+                sur le fait qu'il fallait scroller au-delà des caractéristiques/équipements/
+                description avant de le voir. */}
+            <div className="flex items-baseline gap-1.5 mt-1.5">
+              <span className="text-xl sm:text-2xl font-bold text-brand-secondary-text">{formatPrice(property.price)}</span>
+              {property.propertyType === 'land' && <span className="text-content-muted text-xs sm:text-sm"> / m²</span>}
+            </div>
           </div>
 
           {stats.length > 0 && (
@@ -319,15 +327,12 @@ export default function AnnoncePage() {
           )}
 
           {/* Toujours visible sans avoir à chercher : collé en bas du panneau (lg:sticky), même
-              si stats/équipements/description au-dessus ont besoin de défiler en interne. */}
-          <div className="lg:sticky lg:bottom-0 lg:bg-surface-card mt-3 pt-3 border-t border-stroke-default flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between lg:flex-col lg:items-stretch">
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-xl sm:text-2xl font-bold text-brand-secondary-text">{formatPrice(property.price)}</span>
-              {property.propertyType === 'land' && <span className="text-content-muted text-xs sm:text-sm"> / m²</span>}
-            </div>
+              si stats/équipements/description au-dessus ont besoin de défiler en interne. Le prix
+              est remonté sous le titre (voir plus haut) — seul le bouton d'action reste ici. */}
+          <div className="lg:sticky lg:bottom-0 lg:bg-surface-card mt-3 pt-3 border-t border-stroke-default">
             {property.contactPhone &&
               (isAuthenticated ? (
-                <a href={`tel:${property.contactPhone}`} className="min-w-0 sm:w-auto lg:w-full">
+                <a href={`tel:${property.contactPhone}`} className="block w-full">
                   <Button size="sm" className="w-full">
                     <Phone size={14} className="shrink-0" />
                     <span className="truncate">
@@ -339,12 +344,7 @@ export default function AnnoncePage() {
                 // Le numéro n'est pas révélé tant qu'on n'est pas connecté — inutile de le
                 // mettre dans le DOM pour un utilisateur qui ne peut de toute façon pas encore
                 // l'utiliser.
-                <Button
-                  type="button"
-                  size="sm"
-                  onClick={requireAuth}
-                  className="min-w-0 sm:w-auto lg:w-full"
-                >
+                <Button type="button" size="sm" onClick={requireAuth} className="w-full">
                   <Phone size={14} className="shrink-0" />
                   <span className="truncate">{t.propertyDetail.contact}</span>
                 </Button>

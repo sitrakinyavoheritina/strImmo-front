@@ -2,10 +2,12 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Pencil, Home, Heart, Globe, Moon, LogOut } from 'lucide-react';
+import { Pencil, Home, Heart, Globe, Moon, LayoutGrid, LogOut } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { useThemePreference, type ThemePreference } from '@/lib/theme/use-theme-preference';
+import { useFeedDisplayPreference, type FeedDisplayPreference } from '@/lib/theme/use-feed-display-preference';
+import { authService } from '@/features/auth/services/auth-service';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { MenuRow } from '@/components/ui/menu-row';
@@ -22,12 +24,38 @@ export default function ParametresPage() {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const clearSession = useAuthStore((state) => state.clearSession);
+  const updateUser = useAuthStore((state) => state.updateUser);
   const { preference: themePreference, setTheme } = useThemePreference();
+  const { preference: feedDisplay, setPreference: setFeedDisplay } = useFeedDisplayPreference();
+
+  // Applique tout de suite en local (localStorage), puis persiste sur le compte si connecté — pour
+  // retrouver le même réglage sur un autre appareil. Un visiteur non connecté garde le
+  // comportement d'avant : réglage local au navigateur uniquement.
+  function handleSetTheme(next: ThemePreference) {
+    setTheme(next);
+    if (isAuthenticated) {
+      updateUser({ themePreference: next });
+      authService.updatePreferences({ themePreference: next }).catch(() => {});
+    }
+  }
+
+  function handleSetFeedDisplay(next: FeedDisplayPreference) {
+    setFeedDisplay(next);
+    if (isAuthenticated) {
+      updateUser({ feedDisplay: next });
+      authService.updatePreferences({ feedDisplay: next }).catch(() => {});
+    }
+  }
 
   const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
     { value: 'system', label: t.profile.themeSystem },
     { value: 'light', label: t.profile.themeLight },
     { value: 'dark', label: t.profile.themeDark },
+  ];
+
+  const FEED_DISPLAY_OPTIONS: { value: FeedDisplayPreference; label: string }[] = [
+    { value: 'card', label: t.profile.feedDisplayCard },
+    { value: 'list', label: t.profile.feedDisplayList },
   ];
 
   function handleLogout() {
@@ -92,10 +120,36 @@ export default function ParametresPage() {
                   <button
                     key={value}
                     type="button"
-                    onClick={() => setTheme(value)}
+                    onClick={() => handleSetTheme(value)}
                     aria-pressed={themePreference === value}
                     className={`flex-1 px-2.5 py-1.5 rounded-lg transition ${
                       themePreference === value
+                        ? 'bg-brand-primary text-white'
+                        : 'text-content-muted hover:text-content-main'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Cartes (par défaut) ou liste compacte façon Mes Biens/Favoris sur l'accueil — à
+                l'essai, gardé en option plutôt qu'imposé (voir feed-list.tsx : `variant`). */}
+            <div className="px-4 py-2.5 space-y-2">
+              <div className="flex items-center gap-3">
+                <LayoutGrid size={18} className="text-content-main shrink-0" />
+                <span className="flex-1 text-sm font-medium text-content-main">{t.profile.feedDisplay}</span>
+              </div>
+              <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-xs font-semibold">
+                {FEED_DISPLAY_OPTIONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => handleSetFeedDisplay(value)}
+                    aria-pressed={feedDisplay === value}
+                    className={`flex-1 px-2.5 py-1.5 rounded-lg transition ${
+                      feedDisplay === value
                         ? 'bg-brand-primary text-white'
                         : 'text-content-muted hover:text-content-main'
                     }`}

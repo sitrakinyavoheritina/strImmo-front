@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MoreHorizontal, Bookmark, Flag, Phone, MessageCircle, Check } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
@@ -38,6 +37,15 @@ export function CardOptionsMenu({
       return;
     }
     toggleFavorite({ propertyId: property.id, wasSaved: isSaved });
+  }
+
+  // Même route que le bouton message autonome de la carte (voir feed-property-card.tsx /
+  // feed-property-row.tsx) : la discussion propre à CETTE annonce, pas la liste générale des
+  // conversations — un lien statique vers "/messages" ouvrait la messagerie sans jamais atterrir
+  // sur le bon fil, constaté explicitement par l'utilisateur.
+  function handleChatClick() {
+    setIsOpen(false);
+    router.push(isAuthenticated ? `/annonce/${property.id}?chat=1` : '/connexion');
   }
 
   return (
@@ -82,14 +90,14 @@ export function CardOptionsMenu({
               </a>
             )}
 
-            <Link
-              href="/messages"
-              onClick={() => setIsOpen(false)}
+            <button
+              type="button"
+              onClick={handleChatClick}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-content-main hover:bg-surface-app transition"
             >
               <MessageCircle size={15} />
               {t.feed.menuChat}
-            </Link>
+            </button>
 
             <div className="my-1 border-t border-stroke-default" />
 

@@ -1,5 +1,5 @@
 import { apiClient } from '@/lib/api/client';
-import type { LoginPayload, UserRole } from '../types';
+import type { LoginPayload, UserRole, ThemePreference, FeedDisplayPreference } from '../types';
 
 // Forme brute renvoyée par strImmo pour un utilisateur (voir strImmo/src/auth/auth.service.ts).
 export type ApiUser = {
@@ -11,6 +11,8 @@ export type ApiUser = {
   avatarUrl: string | null;
   address: string | null;
   role: UserRole;
+  themePreference: ThemePreference;
+  feedDisplay: FeedDisplayPreference;
 };
 
 export type AuthenticatedResponse = { user: ApiUser; access_token: string };
@@ -46,5 +48,12 @@ export const authApi = {
       .patch<ApiUser>('/auth/profile', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
+      .then((r) => r.data),
+
+  // Pas de mot de passe requis ici (contrairement à updateProfile) — préférences d'affichage, pas
+  // des données sensibles du compte (voir strImmo/src/auth/auth.controller.ts).
+  updatePreferences: (payload: { themePreference?: ThemePreference; feedDisplay?: FeedDisplayPreference }) =>
+    apiClient
+      .patch<{ themePreference: ThemePreference; feedDisplay: FeedDisplayPreference }>('/auth/preferences', payload)
       .then((r) => r.data),
 };
