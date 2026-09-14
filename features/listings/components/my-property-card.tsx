@@ -7,19 +7,8 @@ import { Trash2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { formatPrice } from '@/features/search/utils/format-price';
 import { useDeleteProperty } from '@/features/search/hooks/use-delete-property';
+import { STATUS_LABEL_KEY, STATUS_BADGE_CLASS } from '../utils/status-badge';
 import type { Property } from '@/features/search/types/listing.types';
-
-const STATUS_LABEL_KEY = {
-  pending: 'statusPending',
-  approved: 'statusApproved',
-  rejected: 'statusRejected',
-} as const;
-
-const STATUS_BADGE_CLASS = {
-  pending: 'bg-amber-100 text-amber-800',
-  approved: 'bg-emerald-100 text-emerald-800',
-  rejected: 'bg-danger/10 text-danger',
-} as const;
 
 // Même ligne compacte que /favoris (FavoriteListItem) — demandé explicitement, une seule
 // interface de liste dans toute l'app plutôt qu'une carte détaillée par écran. L'action de droite

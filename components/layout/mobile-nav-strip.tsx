@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useUnreadMessagesCount } from '@/features/messages/hooks/use-messages';
-import { NAV_ITEMS, isNavItemActive } from './nav-items';
+import { useAuthStore } from '@/lib/state/use-auth-store';
+import { isAdmin } from '@/features/auth/utils/is-admin';
+import { getNavItems, isNavItemActive } from './nav-items';
 
 /** Bande d'icônes fixée en bas de l'écran, visible en dessous de `lg:` (comme l'app mobile,
  * demandé explicitement) — plus sous la topbar. `pb-[var(--safe-bottom)]` évite qu'elle passe
@@ -23,10 +25,12 @@ export function MobileNavStrip() {
   const pathname = usePathname();
   const { t } = useTranslation();
   const unreadCount = useUnreadMessagesCount();
+  const user = useAuthStore((state) => state.user);
+  const navItems = getNavItems(isAdmin(user));
 
   return (
     <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 flex items-stretch bg-surface-card border-t border-stroke-default pb-[var(--safe-bottom)]">
-      {NAV_ITEMS.map(({ href, icon: Icon, labelKey }) => {
+      {navItems.map(({ href, icon: Icon, labelKey }) => {
         const isActive = isNavItemActive(pathname, href);
         return (
           <Link

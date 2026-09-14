@@ -12,4 +12,10 @@ export const listingService = {
     propertyApi.create(buildCreatePropertyFormData(values, photos)).then(mapApiPropertyToProperty),
 
   remove: (id: string) => propertyApi.remove(id),
+
+  approve: (id: string) => propertyApi.approve(id).then(mapApiPropertyToProperty),
+
+  reject: (id: string, reason: string) => propertyApi.reject(id, reason).then(mapApiPropertyToProperty),
+
+  getStats: () => propertyApi.getStats(),
 };

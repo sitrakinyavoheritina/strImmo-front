@@ -9,6 +9,7 @@ import { CardOptionsMenu } from './card-options-menu';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useLikesStore } from '@/lib/state/use-likes-store';
 import { useAuthStore } from '@/lib/state/use-auth-store';
+import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useLikeProperty } from '@/features/search/hooks/use-like-property';
 import { formatPrice } from '@/features/search/utils/format-price';
 import { formatRelativeTime } from '@/features/search/utils/format-relative-time';
@@ -33,10 +34,12 @@ export function FeedPropertyCard({ property }: { property: Property }) {
   const { t } = useTranslation();
   const router = useRouter();
   const cover = property.mainPhotoUrl;
-  const userId = useAuthStore((state) => state.user?.id);
+  const user = useAuthStore((state) => state.user);
+  const userId = user?.id;
   const isLiked = useLikesStore((state) => (userId ? state.likedByUser[userId] : undefined)?.includes(property.id) ?? false);
   const { mutate: toggleLike } = useLikeProperty();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const isAdminUser = isAdmin(user);
 
   // Même règle que sur la page détail (voir app/annonce/[id]/page.tsx) : pas de discussion sans
   // compte. La conversation réelle est démarrée là-bas (InlineChatPanel) — ici on s'y contente de
@@ -104,27 +107,31 @@ export function FeedPropertyCard({ property }: { property: Property }) {
         ) : (
           <span />
         )}
-        <div className="flex items-center gap-3 text-xs font-medium text-content-muted shrink-0">
-          <button
-            type="button"
-            onClick={handleLikeClick}
-            aria-label={isLiked ? t.property.unlike : t.property.like}
-            aria-pressed={isLiked}
-            className="flex items-center gap-1 hover:text-danger transition"
-          >
-            <Heart size={15} className={isLiked ? 'text-danger fill-danger' : ''} />
-            {formatCount(property.likesCount)}
-          </button>
-          <button
-            type="button"
-            onClick={handleChatClick}
-            aria-label={`${t.propertyDetail.chatWith} ${property.authorName ?? ''}`.trim()}
-            className="hover:text-brand-primary transition"
-          >
-            <MessageCircle size={15} />
-          </button>
-          <CardOptionsMenu property={property} />
-        </div>
+        {/* Rien pour un admin : il ne "j'aime"/enregistre/contacte pas une annonce, il modère
+            (voir /admin) — demandé explicitement. */}
+        {!isAdminUser && (
+          <div className="flex items-center gap-3 text-xs font-medium text-content-muted shrink-0">
+            <button
+              type="button"
+              onClick={handleLikeClick}
+              aria-label={isLiked ? t.property.unlike : t.property.like}
+              aria-pressed={isLiked}
+              className="flex items-center gap-1 hover:text-danger transition"
+            >
+              <Heart size={15} className={isLiked ? 'text-danger fill-danger' : ''} />
+              {formatCount(property.likesCount)}
+            </button>
+            <button
+              type="button"
+              onClick={handleChatClick}
+              aria-label={`${t.propertyDetail.chatWith} ${property.authorName ?? ''}`.trim()}
+              className="hover:text-brand-primary transition"
+            >
+              <MessageCircle size={15} />
+            </button>
+            <CardOptionsMenu property={property} />
+          </div>
+        )}
       </div>
     </article>
   );

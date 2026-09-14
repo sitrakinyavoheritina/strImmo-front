@@ -40,6 +40,10 @@ export function mapApiPropertyToProperty(api: ApiProperty): Property {
     contactPhone: api.user?.phone,
     favoritesCount: api.favoritesCount,
     likesCount: api.likesCount,
+    moderatorName:
+      api.moderatedBy?.firstName || api.moderatedBy?.lastName
+        ? [api.moderatedBy.firstName, api.moderatedBy.lastName].filter(Boolean).join(' ')
+        : undefined,
   };
 
   if (api.propertyType === 'house' && api.houseDetails) {

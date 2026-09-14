@@ -56,6 +56,7 @@ export type ApiProperty = {
   available: boolean;
   moderationStatus: PropertyModerationStatus;
   rejectionReason?: string | null;
+  moderatedBy?: { id: string; firstName?: string; lastName?: string } | null;
   phone2: string | null;
   commission: string | null;
   caution: string | null;
@@ -99,4 +100,20 @@ export const propertyApi = {
 
   unlike: (id: string) =>
     apiClient.post<{ likesCount: number }>(`/properties/${id}/unlike`).then((r) => r.data),
+
+  // Réservé admin/superadmin (voir strImmo/src/properties/properties.controller.ts, `@Roles`) —
+  // le backend renvoie 403 sinon.
+  approve: (id: string) => apiClient.patch<ApiProperty>(`/properties/${id}/approve`).then((r) => r.data),
+
+  reject: (id: string, reason: string) =>
+    apiClient.patch<ApiProperty>(`/properties/${id}/reject`, { reason }).then((r) => r.data),
+
+  // Réservé admin/superadmin — voir app/admin/statistiques.
+  getStats: () =>
+    apiClient
+      .get<{
+        byMonth: { month: string; count: number }[];
+        byModerator: { moderatorId: string; moderatorName: string; approvedCount: number; rejectedCount: number }[];
+      }>('/properties/stats')
+      .then((r) => r.data),
 };

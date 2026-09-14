@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { ChevronDown, User, LogOut } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
+import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useThemePreference, type ThemePreference } from '@/lib/theme/use-theme-preference';
 import { authService } from '@/features/auth/services/auth-service';
 import { Avatar } from '@/components/ui/avatar';
@@ -63,14 +64,18 @@ export function UserMenu({ user }: { user: AuthUser }) {
             className="fixed inset-0 z-40 cursor-default"
           />
           <div className="absolute right-0 top-full mt-2 z-50 w-48 bg-surface-card border border-stroke-default rounded-xl shadow-lg py-1">
-            <Link
-              href="/profil"
-              onClick={() => setIsOpen(false)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-content-main hover:bg-surface-app transition"
-            >
-              <User size={15} />
-              {t.profile.viewProfile}
-            </Link>
+            {/* Absent pour un admin : /profil ne fait pas partie de ses routes autorisées (voir
+                AdminRouteGuard). */}
+            {!isAdmin(user) && (
+              <Link
+                href="/profil"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-content-main hover:bg-surface-app transition"
+              >
+                <User size={15} />
+                {t.profile.viewProfile}
+              </Link>
+            )}
             <button
               type="button"
               onClick={handleLogout}

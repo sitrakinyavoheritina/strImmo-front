@@ -33,9 +33,10 @@ export function useLogin() {
       // n'importe quel autre appareil une fois connecté (voir /auth/preferences).
       setStoredTheme(user.themePreference);
       setStoredFeedDisplay(user.feedDisplay);
-      // Même comportement que mobile : admin/superadmin atterrit sur le profil, tout le monde
-      // d'autre sur l'accueil (voir Onina-mobile/src/features/auth/screens/login-screen.tsx).
-      router.push(user.role === 'admin' || user.role === 'superadmin' ? '/profil' : '/');
+      // Déviation volontaire par rapport à l'app mobile (qui envoie admin/superadmin sur le
+      // profil) : un admin arrive directement sur son tableau de bord (voir app/admin/) plutôt
+      // que sur une fiche de profil qui ne lui sert à rien en priorité — demandé explicitement.
+      router.push(user.role === 'admin' || user.role === 'superadmin' ? '/admin' : '/');
     } catch (error) {
       setErrorMessage(getErrorMessage(error, 'Identifiants incorrects.'));
     } finally {

@@ -28,8 +28,10 @@ import {
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useLikesStore } from '@/lib/state/use-likes-store';
 import { useAuthStore } from '@/lib/state/use-auth-store';
+import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useProperty } from '@/features/search/hooks/use-property';
 import { useLikeProperty } from '@/features/search/hooks/use-like-property';
+import { useApproveProperty, useRejectProperty } from '@/features/search/hooks/use-moderate-property';
 import { PROPERTY_TYPE_LABEL_KEY } from '@/features/search/utils/get-key-features';
 import { formatPrice } from '@/features/search/utils/format-price';
 import { Button } from '@/components/ui/button';
@@ -61,12 +63,18 @@ export default function AnnoncePage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useTranslation();
-  const userId = useAuthStore((state) => state.user?.id);
+  const user = useAuthStore((state) => state.user);
+  const userId = user?.id;
   const isLiked = useLikesStore((state) => (userId ? state.likedByUser[userId] : undefined)?.includes(id) ?? false);
   const { mutate: toggleLike } = useLikeProperty();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [activePhoto, setActivePhoto] = useState(0);
   const [manualChatOpen, setManualChatOpen] = useState(false);
+  const { mutate: approve, isPending: isApproving } = useApproveProperty();
+  const { mutate: reject, isPending: isRejecting } = useRejectProperty();
+  const [isRejectFormOpen, setIsRejectFormOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [moderationError, setModerationError] = useState<string | null>(null);
   // Arrivée depuis le bouton "message" d'une carte du fil (?chat=1, voir feed-property-card.tsx) :
   // ouvre directement la discussion plutôt que de forcer un second clic sur "Discuter". Dérivé du
   // rendu (pas un state+effect) pour rester correct si la session finit de se réhydrater après le
@@ -98,6 +106,35 @@ export default function AnnoncePage() {
     if (searchParams.get('chat') === '1') router.replace(`/annonce/${id}`);
   }
 
+  // Modération admin (voir aussi PendingPropertyCard, même paire d'actions sur la liste
+  // /validation) — ici en plus sur la fiche détail : un admin qui ouvre une annonce depuis cette
+  // liste (photo/titre) doit pouvoir valider sans devoir revenir en arrière, ce qui manquait
+  // (constaté explicitement : "il ne trouve pas le bouton pour valider"). Retour direct à
+  // /validation une fois l'action faite (demandé explicitement) — cette fiche n'a plus rien à y
+  // faire pour un admin une fois l'annonce traitée, et ça enchaîne naturellement sur la suivante.
+  function handleApprove() {
+    setModerationError(null);
+    approve(id, {
+      onSuccess: () => router.push('/validation'),
+      onError: () => setModerationError(t.validationPage.approveError),
+    });
+  }
+
+  function handleConfirmReject() {
+    if (!rejectReason.trim()) {
+      setModerationError(t.validationPage.rejectReasonRequired);
+      return;
+    }
+    setModerationError(null);
+    reject(
+      { id, reason: rejectReason.trim() },
+      {
+        onSuccess: () => router.push('/validation'),
+        onError: () => setModerationError(t.validationPage.rejectError),
+      }
+    );
+  }
+
   if (isLoading) {
     return (
       <div className="flex">
@@ -123,6 +160,9 @@ export default function AnnoncePage() {
       </div>
     );
   }
+
+  const isAdminUser = isAdmin(user);
+  const canModerate = isAdminUser && property.moderationStatus === 'pending';
 
   const stats: Stat[] = [];
   const amenities: Amenity[] = [];
@@ -203,22 +243,25 @@ export default function AnnoncePage() {
             </span>
             {/* Cœur ("j'aime", compteur partagé) + menu "..." (enregistrer/signaler, voir
                 CardOptionsMenu) — mêmes actions que sur la carte du fil, en overlay sur la photo
-                ici faute de ligne dédiée comme dans la carte. */}
-            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={handleLikeClick}
-                aria-label={isLiked ? t.property.unlike : t.property.like}
-                aria-pressed={isLiked}
-                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition"
-              >
-                <Heart size={18} className={isLiked ? 'text-danger fill-danger' : 'text-content-muted'} />
-              </button>
-              <CardOptionsMenu
-                property={property}
-                triggerClassName="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition text-content-muted"
-              />
-            </div>
+                ici faute de ligne dédiée comme dans la carte. Absent pour un admin : il ne
+                "j'aime"/enregistre/signale pas une annonce, il modère (voir plus bas). */}
+            {!isAdminUser && (
+              <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={handleLikeClick}
+                  aria-label={isLiked ? t.property.unlike : t.property.like}
+                  aria-pressed={isLiked}
+                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition"
+                >
+                  <Heart size={18} className={isLiked ? 'text-danger fill-danger' : 'text-content-muted'} />
+                </button>
+                <CardOptionsMenu
+                  property={property}
+                  triggerClassName="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition text-content-muted"
+                />
+              </div>
+            )}
           </div>
 
           {property.photoUrls.length > 1 && (
@@ -240,8 +283,9 @@ export default function AnnoncePage() {
           )}
 
           {/* Discuter : bouton juste sous la photo, ouvre la discussion directement ici (pas de
-              modal, pas d'autre page) — remplit l'espace disponible sous les vignettes. */}
-          {property.authorName &&
+              modal, pas d'autre page) — remplit l'espace disponible sous les vignettes. Absent
+              pour un admin : il ne discute pas avec le vendeur, il modère (voir plus bas). */}
+          {!isAdminUser && property.authorName &&
             (!isChatOpen ? (
               <Button
                 type="button"
@@ -285,6 +329,63 @@ export default function AnnoncePage() {
               <span className="text-xl sm:text-2xl font-bold text-brand-secondary-text">{formatPrice(property.price)}</span>
               {property.propertyType === 'land' && <span className="text-content-muted text-xs sm:text-sm"> / m²</span>}
             </div>
+
+            {/* Actions de modération (admin/superadmin, annonce encore "pending") — mêmes actions
+                que sur la liste /validation, en plus ici pour un admin qui ouvre la fiche depuis
+                cette liste (photo/titre) sans avoir à revenir en arrière pour valider. */}
+            {canModerate &&
+              (isRejectFormOpen ? (
+                <div className="mt-3 bg-surface-app border border-stroke-default rounded-xl p-3 space-y-2">
+                  <label className="block text-xs font-semibold text-content-muted" htmlFor="reject-reason">
+                    {t.validationPage.rejectReasonLabel}
+                  </label>
+                  <textarea
+                    id="reject-reason"
+                    value={rejectReason}
+                    onChange={(event) => setRejectReason(event.target.value)}
+                    placeholder={t.validationPage.rejectReasonPlaceholder}
+                    rows={2}
+                    className="w-full rounded-lg border border-stroke-default bg-surface-card px-2.5 py-1.5 text-sm text-content-main placeholder-content-muted outline-none focus:border-brand-primary resize-none"
+                  />
+                  <div className="flex items-center gap-3 text-xs">
+                    <button
+                      type="button"
+                      onClick={handleConfirmReject}
+                      disabled={isRejecting}
+                      className="font-semibold text-danger disabled:opacity-50"
+                    >
+                      {t.validationPage.rejectConfirm}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setIsRejectFormOpen(false);
+                        setRejectReason('');
+                        setModerationError(null);
+                      }}
+                      className="font-semibold text-content-muted"
+                    >
+                      {t.validationPage.rejectCancel}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-3 flex gap-2">
+                  <Button type="button" size="sm" onClick={handleApprove} disabled={isApproving} className="flex-1">
+                    {t.validationPage.approve}
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setIsRejectFormOpen(true)}
+                    className="flex-1 !text-danger !border-danger/30 hover:!bg-danger/10"
+                  >
+                    {t.validationPage.reject}
+                  </Button>
+                </div>
+              ))}
+            {moderationError && <p className="text-xs text-danger mt-1.5">{moderationError}</p>}
           </div>
 
           {stats.length > 0 && (
@@ -328,10 +429,11 @@ export default function AnnoncePage() {
 
           {/* Toujours visible sans avoir à chercher : collé en bas du panneau (lg:sticky), même
               si stats/équipements/description au-dessus ont besoin de défiler en interne. Le prix
-              est remonté sous le titre (voir plus haut) — seul le bouton d'action reste ici. */}
-          <div className="lg:sticky lg:bottom-0 lg:bg-surface-card mt-3 pt-3 border-t border-stroke-default">
-            {property.contactPhone &&
-              (isAuthenticated ? (
+              est remonté sous le titre (voir plus haut) — seul le bouton d'action reste ici. Absent
+              pour un admin : il n'appelle pas le vendeur, il modère (voir plus haut). */}
+          {!isAdminUser && property.contactPhone && (
+            <div className="lg:sticky lg:bottom-0 lg:bg-surface-card mt-3 pt-3 border-t border-stroke-default">
+              {isAuthenticated ? (
                 <a href={`tel:${property.contactPhone}`} className="block w-full">
                   <Button size="sm" className="w-full">
                     <Phone size={14} className="shrink-0" />
@@ -348,8 +450,9 @@ export default function AnnoncePage() {
                   <Phone size={14} className="shrink-0" />
                   <span className="truncate">{t.propertyDetail.contact}</span>
                 </Button>
-              ))}
-          </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
       </div>

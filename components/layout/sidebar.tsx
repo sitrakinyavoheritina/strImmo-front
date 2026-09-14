@@ -4,7 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useUnreadMessagesCount } from '@/features/messages/hooks/use-messages';
-import { NAV_ITEMS, isNavItemActive } from './nav-items';
+import { useAuthStore } from '@/lib/state/use-auth-store';
+import { isAdmin } from '@/features/auth/utils/is-admin';
+import { getNavItems, isNavItemActive } from './nav-items';
 import { SidebarAdvancedFilters } from './sidebar-advanced-filters';
 
 /** Colonne de navigation gauche, persistante à partir de `lg:`. Sur l'accueil uniquement, les
@@ -15,11 +17,13 @@ export function Sidebar() {
   const { t } = useTranslation();
   const isHome = pathname === '/';
   const unreadCount = useUnreadMessagesCount();
+  const user = useAuthStore((state) => state.user);
+  const navItems = getNavItems(isAdmin(user));
 
   return (
     <aside className="hidden lg:block w-72 shrink-0 self-start sticky top-[4.5rem] max-h-[calc(100vh-4.5rem)] overflow-y-auto my-4 ml-4 bg-surface-card border border-stroke-default rounded-2xl shadow-sm py-4 px-3">
       <nav className="flex flex-col gap-1">
-        {NAV_ITEMS.map(({ href, icon: Icon, labelKey }) => {
+        {navItems.map(({ href, icon: Icon, labelKey }) => {
           const isActive = isNavItemActive(pathname, href);
           return (
             <Link

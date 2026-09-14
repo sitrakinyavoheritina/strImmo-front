@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Pencil, Home, Heart, Globe, Moon, LayoutGrid, LogOut } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
+import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useThemePreference, type ThemePreference } from '@/lib/theme/use-theme-preference';
 import { useFeedDisplayPreference, type FeedDisplayPreference } from '@/lib/theme/use-feed-display-preference';
 import { authService } from '@/features/auth/services/auth-service';
@@ -27,6 +28,7 @@ export default function ParametresPage() {
   const updateUser = useAuthStore((state) => state.updateUser);
   const { preference: themePreference, setTheme } = useThemePreference();
   const { preference: feedDisplay, setPreference: setFeedDisplay } = useFeedDisplayPreference();
+  const isAdminUser = isAdmin(user);
 
   // Applique tout de suite en local (localStorage), puis persiste sur le compte si connecté — pour
   // retrouver le même réglage sur un autre appareil. Un visiteur non connecté garde le
@@ -68,7 +70,14 @@ export default function ParametresPage() {
       <div className="flex-1 min-w-0 max-w-2xl mx-auto py-3 sm:py-6 space-y-4">
         <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text">{t.profile.settingsTitle}</h1>
 
-        {isAuthenticated && user ? (
+        {isAuthenticated && user && isAdminUser ? (
+          // Pas de lien vers /profil (route fermée pour un admin, voir AdminRouteGuard) — juste
+          // l'identité, sans action associée.
+          <div className="flex items-center gap-3 bg-surface-card border border-stroke-default/80 rounded-2xl shadow-sm p-4">
+            <Avatar name={user.fullName} imageUrl={user.avatarUrl} size={48} />
+            <p className="font-bold text-content-main truncate">{user.fullName}</p>
+          </div>
+        ) : isAuthenticated && user ? (
           <Link
             href="/profil"
             className="flex items-center gap-3 bg-surface-card border border-stroke-default/80 rounded-2xl shadow-sm p-4 hover:border-brand-primary/40 transition"
@@ -88,7 +97,10 @@ export default function ParametresPage() {
           </div>
         )}
 
-        {isAuthenticated && (
+        {/* Rien à gérer ici pour un admin (annonces, favoris) : ses écrans dédiés sont directement
+            dans la navigation principale (tableau de bord, validation, annonces — voir
+            nav-items.ts), pas la peine de les dupliquer dans ce menu réglages. */}
+        {isAuthenticated && !isAdminUser && (
           <div>
             <h2 className="text-sm font-bold text-content-main mb-2 px-1">{t.profile.myAccount}</h2>
             <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-1.5 space-y-0.5">
@@ -98,6 +110,10 @@ export default function ParametresPage() {
             </div>
           </div>
         )}
+
+        {/* Rien du tout pour un admin ici : ni "Modifier le profil" (il n'a pas de fiche publique
+            à soigner comme un vendeur), ni "Mes annonces"/"Favoris" (voir le bloc ci-dessus) —
+            demandé explicitement ("l'admin ne peut pas modifier son profil"). */}
 
         <div>
           <h2 className="text-sm font-bold text-content-main mb-2 px-1">{t.profile.preferences}</h2>
@@ -135,30 +151,33 @@ export default function ParametresPage() {
             </div>
 
             {/* Cartes (par défaut) ou liste compacte façon Mes Biens/Favoris sur l'accueil — à
-                l'essai, gardé en option plutôt qu'imposé (voir feed-list.tsx : `variant`). */}
-            <div className="px-4 py-2.5 space-y-2">
-              <div className="flex items-center gap-3">
-                <LayoutGrid size={18} className="text-content-main shrink-0" />
-                <span className="flex-1 text-sm font-medium text-content-main">{t.profile.feedDisplay}</span>
+                l'essai, gardé en option plutôt qu'imposé (voir feed-list.tsx : `variant`). Absent
+                pour un admin : il n'a pas de fil d'accueil (route fermée, voir AdminRouteGuard). */}
+            {!isAdminUser && (
+              <div className="px-4 py-2.5 space-y-2">
+                <div className="flex items-center gap-3">
+                  <LayoutGrid size={18} className="text-content-main shrink-0" />
+                  <span className="flex-1 text-sm font-medium text-content-main">{t.profile.feedDisplay}</span>
+                </div>
+                <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-xs font-semibold">
+                  {FEED_DISPLAY_OPTIONS.map(({ value, label }) => (
+                    <button
+                      key={value}
+                      type="button"
+                      onClick={() => handleSetFeedDisplay(value)}
+                      aria-pressed={feedDisplay === value}
+                      className={`flex-1 px-2.5 py-1.5 rounded-lg transition ${
+                        feedDisplay === value
+                          ? 'bg-brand-primary text-white'
+                          : 'text-content-muted hover:text-content-main'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
               </div>
-              <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-xs font-semibold">
-                {FEED_DISPLAY_OPTIONS.map(({ value, label }) => (
-                  <button
-                    key={value}
-                    type="button"
-                    onClick={() => handleSetFeedDisplay(value)}
-                    aria-pressed={feedDisplay === value}
-                    className={`flex-1 px-2.5 py-1.5 rounded-lg transition ${
-                      feedDisplay === value
-                        ? 'bg-brand-primary text-white'
-                        : 'text-content-muted hover:text-content-main'
-                    }`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
+            )}
           </div>
         </div>
 

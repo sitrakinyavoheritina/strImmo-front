@@ -28,6 +28,9 @@ type PropertyBase = {
   moderationStatus: PropertyModerationStatus;
   /** Motif renseigné par un admin en cas de refus — absent sinon (voir "Mes Biens"). */
   rejectionReason?: string;
+  /** Nom de l'admin/superadmin ayant validé ou refusé l'annonce — absent tant qu'elle est
+   *  "pending" (voir /admin, statistiques "par équipe"). */
+  moderatorName?: string;
   phone2?: string;
   commission?: number;
   caution?: number;
