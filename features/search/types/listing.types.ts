@@ -19,7 +19,22 @@ type PropertyBase = {
   description: string;
   price: number;
   kind: ListingKind;
+  /** Texte affichable ("<fokontany>, <commune>" pour une annonce créée via le nouveau parcours,
+   *  texte libre pour une annonce plus ancienne) — jamais saisi directement dans ce nouveau
+   *  parcours, calculé côté serveur à partir de `communeId`/`fokontanyId` (voir property-form.tsx
+   *  et strImmo/src/properties/properties.service.ts:resolveLocation). */
   location: string;
+  /** Localisation précise — absents sur une annonce créée avant l'ajout de cette fonctionnalité
+   *  (voir features/listings/components/property-form.tsx, map-position-picker.tsx). */
+  communeId?: string;
+  communeName?: string;
+  fokontanyId?: string;
+  fokontanyName?: string;
+  /** Indication complémentaire facultative (ex. "Lot II B 123, près de..."), jamais utilisée
+   *  seule pour localiser le bien. */
+  address?: string;
+  latitude?: number;
+  longitude?: number;
   mainPhotoUrl?: string;
   photoUrls: string[];
   ownerId: string;

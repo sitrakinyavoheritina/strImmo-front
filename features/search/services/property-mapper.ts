@@ -20,6 +20,13 @@ export function mapApiPropertyToProperty(api: ApiProperty): Property {
     price: Number(api.price),
     kind: api.kind,
     location: api.location,
+    communeId: api.commune?.id,
+    communeName: api.commune?.name,
+    fokontanyId: api.fokontany?.id,
+    fokontanyName: api.fokontany?.name,
+    address: api.address ?? undefined,
+    latitude: api.latitude != null ? Number(api.latitude) : undefined,
+    longitude: api.longitude != null ? Number(api.longitude) : undefined,
     mainPhotoUrl: cover?.url,
     photoUrls: [...api.photos].sort((a, b) => a.position - b.position).map((photo) => photo.url),
     ownerId: api.user?.id ?? '',
@@ -74,7 +81,15 @@ export function buildCreatePropertyFormData(values: PropertyFormValues, photos: 
   form.append('title', values.title);
   form.append('description', values.description);
   form.append('price', String(values.price));
-  form.append('location', values.location);
+  // Nouveau parcours (commune/fokontany choisis dans le référentiel) : `location` est calculée
+  // côté serveur, pas envoyée — voir strImmo/src/properties/properties.service.ts:resolveLocation.
+  // `values.location` reste rempli côté formulaire uniquement pour l'aperçu avant publication
+  // (listing-preview.tsx), jamais transmis ici.
+  if (values.communeId) form.append('communeId', values.communeId);
+  if (values.fokontanyId) form.append('fokontanyId', values.fokontanyId);
+  if (values.address) form.append('address', values.address);
+  if (values.latitude != null) form.append('latitude', String(values.latitude));
+  if (values.longitude != null) form.append('longitude', String(values.longitude));
   if (values.phone2) form.append('phone2', values.phone2);
   if (values.commission !== undefined) form.append('commission', String(values.commission));
   if (values.caution !== undefined) form.append('caution', String(values.caution));

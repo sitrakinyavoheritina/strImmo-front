@@ -14,10 +14,12 @@ import { FormErrorBanner } from '@/components/ui/form-error-banner';
 import { RightRail } from '@/features/feed/components/right-rail';
 import type { PropertyFormValues } from '@/features/search/types/listing.types';
 
-type Step = 'step1' | 'step2' | 'preview';
+type Step = 'step1' | 'step2' | 'step3' | 'preview';
 
-// Création d'annonce en 2 étapes (infos essentielles, puis détails du bien) suivies d'un aperçu
-// avant publication réelle — port de Onina-mobile/src/features/listings/screens/listing-form-screen.tsx.
+// Création d'annonce en 3 étapes (type de bien, puis localisation/photos/prix, puis détails du
+// bien) suivies d'un aperçu avant publication réelle — variante web à 3 étapes de
+// Onina-mobile/src/features/listings/screens/listing-form-screen.tsx (qui n'en a que 2, sans le
+// parcours de localisation précise qui n'existe que côté web).
 export default function NouvelleAnnoncePage() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -85,13 +87,23 @@ export default function NouvelleAnnoncePage() {
         {step !== 'preview' && (
           <>
             <p className="text-content-muted text-xs font-medium mt-1">
-              {step === 'step1' ? t.listing.step1Subtitle : t.listing.step2Subtitle}
+              {step === 'step1' ? t.listing.step1Subtitle : step === 'step2' ? t.listing.step2Subtitle : t.listing.step3Subtitle}
             </p>
             <div className="mt-2.5 flex items-center gap-1.5">
               <button type="button" onClick={() => setStep('step1')} className="flex-1 py-1.5">
                 <span className="block h-1 rounded-full bg-brand-primary" />
               </button>
-              <span className={`h-1 flex-1 rounded-full ${step === 'step2' ? 'bg-brand-primary' : 'bg-stroke-default'}`} />
+              <button
+                type="button"
+                onClick={() => (step === 'step3' ? setStep('step2') : undefined)}
+                disabled={step === 'step1'}
+                className="flex-1 py-1.5 disabled:cursor-default"
+              >
+                <span
+                  className={`block h-1 rounded-full ${step === 'step2' || step === 'step3' ? 'bg-brand-primary' : 'bg-stroke-default'}`}
+                />
+              </button>
+              <span className={`h-1 flex-1 rounded-full ${step === 'step3' ? 'bg-brand-primary' : 'bg-stroke-default'}`} />
             </div>
           </>
         )}
@@ -102,10 +114,10 @@ export default function NouvelleAnnoncePage() {
           ) : (
             <PropertyForm
               ref={formRef}
-              step={step === 'step1' ? 1 : 2}
+              step={step === 'step1' ? 1 : step === 'step2' ? 2 : 3}
               initialValues={draft ?? undefined}
               initialPhotos={draftPhotos}
-              onNext={() => setStep('step2')}
+              onNext={() => setStep(step === 'step1' ? 'step2' : 'step3')}
               onPreview={(values, photos) => {
                 setDraft(values);
                 setDraftPhotos(photos);
@@ -122,13 +134,13 @@ export default function NouvelleAnnoncePage() {
         )}
 
         <div className="mt-4 flex items-center gap-3">
-          {step === 'step2' && (
-            <Button type="button" variant="outline" onClick={() => setStep('step1')}>
+          {(step === 'step2' || step === 'step3') && (
+            <Button type="button" variant="outline" onClick={() => setStep(step === 'step2' ? 'step1' : 'step2')}>
               {t.listing.back}
             </Button>
           )}
           {step === 'preview' && (
-            <Button type="button" variant="outline" onClick={() => setStep('step2')}>
+            <Button type="button" variant="outline" onClick={() => setStep('step3')}>
               {t.listing.edit}
             </Button>
           )}
@@ -139,7 +151,7 @@ export default function NouvelleAnnoncePage() {
               </Button>
             ) : (
               <Button type="button" className="w-full" onClick={() => formRef.current?.submit()}>
-                {step === 'step1' ? t.listing.next : t.listing.preview}
+                {step === 'step3' ? t.listing.preview : t.listing.next}
               </Button>
             )}
           </div>

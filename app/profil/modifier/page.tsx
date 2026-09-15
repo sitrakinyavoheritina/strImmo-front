@@ -12,7 +12,7 @@ import { EditableRow } from '@/components/ui/editable-row';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
 import { Button } from '@/components/ui/button';
 
-type FieldKey = 'firstName' | 'lastName' | 'email' | 'address' | 'password';
+type FieldKey = 'firstName' | 'lastName' | 'email' | 'address' | 'phone2' | 'password';
 type FormErrors = Partial<Record<FieldKey | 'currentPassword', string>>;
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -34,6 +34,7 @@ export default function ModifierProfilPage() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
+  const [phone2, setPhone2] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [currentPassword, setCurrentPassword] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
@@ -54,6 +55,7 @@ export default function ModifierProfilPage() {
     setLastName(user.lastName);
     setEmail(user.email ?? '');
     setAddress(user.address ?? '');
+    setPhone2(user.phone2 ?? '');
   }, [hasHydrated, user]);
 
   function startEditing(field: FieldKey) {
@@ -106,6 +108,7 @@ export default function ModifierProfilPage() {
       lastName: lastName || undefined,
       email: email || undefined,
       address: address || undefined,
+      phone2: phone2 || undefined,
       newPassword: editingFields.has('password') && newPassword ? newPassword : undefined,
       avatar: avatarFile,
     });
@@ -211,10 +214,20 @@ export default function ModifierProfilPage() {
             editLabel={t.profile.edit}
           />
 
-          <div className="py-2.5">
+          <div className="py-2.5 border-b border-stroke-default">
             <span className="block text-xs font-medium text-content-muted">{t.auth.phone}</span>
             <p className="mt-0.5 text-sm text-content-main">{user.phone}</p>
           </div>
+          <EditableRow
+            label={t.profile.phone2}
+            value={phone2}
+            editing={editingFields.has('phone2')}
+            onEdit={() => startEditing('phone2')}
+            onChange={(event) => setPhone2(event.target.value)}
+            placeholder={t.profile.phone2Placeholder}
+            editLabel={t.profile.edit}
+          />
+          <p className="text-[11px] text-content-muted -mt-1 pb-1">{t.profile.phone2Hint}</p>
 
           <div className="border-t border-stroke-default pt-3.5 space-y-1">
             <p className="text-[11px] text-content-muted">{t.profile.confirmChangesNote}</p>

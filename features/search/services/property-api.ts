@@ -53,6 +53,12 @@ export type ApiProperty = {
   // Les colonnes `decimal` de Postgres sont sérialisées en chaîne par le driver.
   price: string;
   location: string;
+  commune?: { id: string; name: string } | null;
+  fokontany?: { id: string; name: string } | null;
+  address?: string | null;
+  // Colonnes `decimal` Postgres → chaîne, comme `price` ci-dessus.
+  latitude?: string | null;
+  longitude?: string | null;
   available: boolean;
   moderationStatus: PropertyModerationStatus;
   rejectionReason?: string | null;

@@ -19,6 +19,7 @@ function toUser(api: ApiUser): User {
     email: api.email ?? undefined,
     avatarUrl: api.avatarUrl ?? undefined,
     address: api.address ?? undefined,
+    phone2: api.phone2 ?? undefined,
     role: api.role,
     themePreference: api.themePreference,
     feedDisplay: api.feedDisplay,
@@ -77,6 +78,7 @@ export const authService = {
     if (payload.lastName) form.append('lastName', payload.lastName);
     if (payload.email) form.append('email', payload.email);
     if (payload.address) form.append('address', payload.address);
+    if (payload.phone2) form.append('phone2', payload.phone2);
     if (payload.newPassword) form.append('newPassword', payload.newPassword);
     if (payload.avatar) form.append('avatar', payload.avatar);
     const res = await authApi.updateProfile(form);

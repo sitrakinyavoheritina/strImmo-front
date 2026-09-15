@@ -10,6 +10,7 @@ export type ApiUser = {
   lastName: string;
   avatarUrl: string | null;
   address: string | null;
+  phone2: string | null;
   role: UserRole;
   themePreference: ThemePreference;
   feedDisplay: FeedDisplayPreference;

@@ -7,6 +7,7 @@ import { ArrowLeft, Check, CheckCheck, ImagePlus, Send } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { Avatar } from '@/components/ui/avatar';
+import { ImageLightbox } from '@/components/ui/image-lightbox';
 import {
   useConversation,
   useConversations,
@@ -40,18 +41,36 @@ type ListItem =
   | { type: 'message'; key: string; message: Message };
 
 function Bubble({ message, isMine }: { message: Message; isMine: boolean }) {
+  const { t } = useTranslation();
   const isRead = Boolean(message.readAt);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   return (
     <div className={`max-w-[75%] flex flex-col gap-1 ${isMine ? 'items-end self-end' : 'items-start self-start'}`}>
       {message.imageUrl ? (
-        <Image
-          src={message.imageUrl}
-          alt=""
-          width={220}
-          height={220}
-          className="rounded-2xl object-cover"
-          style={{ width: 220, height: 220 }}
-        />
+        <>
+          <button
+            type="button"
+            onClick={() => setIsPreviewOpen(true)}
+            aria-label={t.messages.viewPhotoAlt}
+            className="block rounded-2xl overflow-hidden cursor-zoom-in"
+          >
+            <Image
+              src={message.imageUrl}
+              alt=""
+              width={220}
+              height={220}
+              className="rounded-2xl object-cover"
+              style={{ width: 220, height: 220 }}
+            />
+          </button>
+          {isPreviewOpen && (
+            <ImageLightbox
+              src={message.imageUrl}
+              onClose={() => setIsPreviewOpen(false)}
+              closeLabel={t.messages.closePhotoPreview}
+            />
+          )}
+        </>
       ) : (
         <div
           className={`rounded-2xl px-3 py-2 text-sm ${

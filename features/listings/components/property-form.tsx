@@ -5,8 +5,13 @@ import { Pencil } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { Chip, Toggle, FieldLabel, FormInput } from '@/components/ui/form-controls';
+import { SearchableSelect } from '@/components/ui/searchable-select';
 import { ListingPhotoPicker } from './listing-photo-picker';
+import { MapPositionPicker } from './map-position-picker';
 import { generateTitle } from '../utils/listing-summary';
+import { useCommunes } from '../hooks/use-communes';
+import { useFokontany } from '../hooks/use-fokontany';
+import { useGeocodeFokontany } from '../hooks/use-geocode-fokontany';
 import type {
   BathroomLocation,
   LandStatus,
@@ -23,22 +28,26 @@ const DESCRIPTION_MAX_LENGTH = 200;
 const ROOM_TYPES: RoomType[] = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6plus'];
 const PROPERTY_TYPES: { value: PropertyType; labelKey: 'typeHouse' | 'typeApartment' | 'typeVilla' | 'typeLand' }[] = [
   { value: 'house', labelKey: 'typeHouse' },
+  { value: 'land', labelKey: 'typeLand' },
   { value: 'apartment', labelKey: 'typeApartment' },
   { value: 'villa', labelKey: 'typeVilla' },
-  { value: 'land', labelKey: 'typeLand' },
 ];
 
 type FormErrors = Partial<
-  Record<'title' | 'description' | 'price' | 'location' | 'bedrooms' | 'surfaceM2' | 'commission' | 'caution', string>
+  Record<
+    'title' | 'description' | 'price' | 'commune' | 'fokontany' | 'bedrooms' | 'surfaceM2' | 'commission' | 'caution',
+    string
+  >
 >;
 
 export type PropertyFormHandle = { submit: () => void };
 
 type PropertyFormProps = {
-  /** 1 = infos essentielles (type, localisation, photos, prix), 2 = détails (champs spécifiques
-   *  au type de bien, titre, description). Un seul composant monté pour les deux étapes — l'état
-   *  de tous les champs est conservé en allant/venant (voir app/annonce/nouvelle/page.tsx). */
-  step: 1 | 2;
+  /** 1 = type de bien (louer/acheter, maison/terrain/...), 2 = localisation (commune/fokontany/
+   *  carte/adresse), photos et prix, 3 = détails (champs spécifiques au type de bien, titre,
+   *  description). Un seul composant monté pour les trois étapes — l'état de tous les champs est
+   *  conservé en allant/venant (voir app/annonce/nouvelle/page.tsx). */
+  step: 1 | 2 | 3;
   onNext: () => void;
   onPreview: (values: PropertyFormValues, photos: File[]) => void;
   /** Pré-remplit le formulaire au retour depuis l'aperçu via "Modifier". */
@@ -60,7 +69,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   // agence — même règle appliquée côté serveur (strImmo/src/properties/properties.service.ts).
   const requiresCommission = user?.role === 'agent' || user?.role === 'agency';
 
-  const [kind, setKind] = useState<ListingKind>(initialValues?.kind ?? 'sale');
+  const [kind, setKind] = useState<ListingKind>(initialValues?.kind ?? 'rent');
   const [propertyType, setPropertyType] = useState<PropertyType>(initialValues?.propertyType ?? 'house');
   const [title, setTitle] = useState(initialValues?.title ?? '');
   const [isTitleEditing, setIsTitleEditing] = useState(Boolean(initialValues?.title));
@@ -72,8 +81,38 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   const [caution, setCaution] = useState(
     initialValues?.caution !== undefined ? String(initialValues.caution) : ''
   );
-  const [location, setLocation] = useState(initialValues?.location ?? '');
+  // Localisation précise (commune → fokontany → position sur la carte) — remplace l'ancien champ
+  // texte libre. `location` (le texte affichable "<fokontany>, <commune>") n'est plus saisi
+  // directement : calculé ci-dessous pour l'aperçu, recalculé côté serveur à la publication (voir
+  // property-mapper.ts, strImmo/src/properties/properties.service.ts:resolveLocation).
+  const [communeId, setCommuneId] = useState(initialValues?.communeId);
+  const [fokontanyId, setFokontanyId] = useState(initialValues?.fokontanyId);
+  const [address, setAddress] = useState(initialValues?.address ?? '');
+  // Autre numéro à contacter pour cette annonce précise — préremplie avec le contact secondaire
+  // du compte (réglages du profil) s'il y en a un, modifiable ici sans toucher ce réglage de
+  // compte (voir strImmo/src/properties/properties.service.ts:create, même valeur par défaut
+  // appliquée côté serveur si ce champ est laissé tel quel). Reste vide si l'annonce éditée en a
+  // explicitement un autre (ou aucun) — `initialValues` prime toujours sur la valeur du compte.
+  const [phone2, setPhone2] = useState(initialValues?.phone2 ?? user?.phone2 ?? '');
+  const [latitude, setLatitude] = useState(initialValues?.latitude);
+  const [longitude, setLongitude] = useState(initialValues?.longitude);
   const [photos, setPhotos] = useState<File[]>(initialPhotos ?? []);
+
+  const { data: communes } = useCommunes();
+  const { data: fokontanyList } = useFokontany(communeId);
+  const communeName = communes?.find((commune) => commune.id === communeId)?.name;
+  const fokontanyName = fokontanyList?.find((fokontany) => fokontany.id === fokontanyId)?.name;
+  const { data: geocodeHint } = useGeocodeFokontany(fokontanyName, communeName);
+  const location = fokontanyName && communeName ? `${fokontanyName}, ${communeName}` : '';
+
+  // Choisir une autre commune vide le fokontany déjà choisi (n'appartient plus forcément à la
+  // nouvelle commune) — jamais déclenché par le pré-remplissage initial (voir `initialValues`
+  // ci-dessus), seulement par un vrai changement fait par l'utilisateur.
+  function handleCommuneChange(id: string) {
+    setCommuneId(id);
+    setFokontanyId(undefined);
+    clearError('commune');
+  }
 
   const houseDefaults = initialValues?.propertyType === 'house' ? initialValues : undefined;
   const landDefaults = initialValues?.propertyType === 'land' ? initialValues : undefined;
@@ -119,6 +158,12 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
       price: Number(price) || 0,
       kind,
       location,
+      communeId,
+      fokontanyId,
+      address: address.trim() || undefined,
+      phone2: phone2.trim() || undefined,
+      latitude,
+      longitude,
       photoUrls: [],
       available: true,
       commission: requiresCommission ? Number(commission) || 0 : undefined,
@@ -177,7 +222,8 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
     if (!displayedTitle.trim()) next.title = t.listing.titleRequired;
     if (!description.trim()) next.description = t.listing.descriptionRequired;
     if (!price || Number(price) <= 0) next.price = t.listing.priceRequired;
-    if (!location.trim()) next.location = t.listing.locationRequired;
+    if (!communeId) next.commune = t.listing.communeRequired;
+    if (!fokontanyId) next.fokontany = t.listing.fokontanyRequired;
     if (requiresCommission) {
       if (!commission || Number(commission) <= 0) next.commission = t.listing.commissionRequired;
       if (!caution || Number(caution) <= 0) next.caution = t.listing.cautionRequired;
@@ -192,7 +238,6 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   function validateStep1(): FormErrors {
     const next: FormErrors = {};
     if (!price || Number(price) <= 0) next.price = t.listing.priceRequired;
-    if (!location.trim()) next.location = t.listing.locationRequired;
     if (requiresCommission) {
       if (!commission || Number(commission) <= 0) next.commission = t.listing.commissionRequired;
       if (!caution || Number(caution) <= 0) next.caution = t.listing.cautionRequired;
@@ -200,10 +245,26 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
     return next;
   }
 
-  function handleNext() {
+  function handleNext1() {
     const nextErrors = validateStep1();
     setErrors((prev) => ({ ...prev, ...nextErrors }));
     if (Object.keys(nextErrors).length > 0 || photos.length < MIN_PHOTOS) return;
+    onNext();
+  }
+
+  function validateStep2(): FormErrors {
+    const next: FormErrors = {};
+    if (!communeId) next.commune = t.listing.communeRequired;
+    if (!fokontanyId) next.fokontany = t.listing.fokontanyRequired;
+    return next;
+  }
+
+  // Étape 2 (localisation) : la position sur la carte a toujours une valeur par défaut (voir
+  // MapPositionPicker) et l'adresse est facultative — seuls commune/fokontany sont requis ici.
+  function handleNext2() {
+    const nextErrors = validateStep2();
+    setErrors((prev) => ({ ...prev, ...nextErrors }));
+    if (Object.keys(nextErrors).length > 0) return;
     onNext();
   }
 
@@ -214,7 +275,9 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
     onPreview({ ...buildValues(), title: displayedTitle }, photos);
   }
 
-  useImperativeHandle(ref, () => ({ submit: step === 1 ? handleNext : handlePreview }));
+  useImperativeHandle(ref, () => ({
+    submit: step === 1 ? handleNext1 : step === 2 ? handleNext2 : handlePreview,
+  }));
 
   return (
     <div className="space-y-4">
@@ -251,19 +314,6 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
               ))}
             </div>
           </div>
-
-          <FormInput
-            label={t.listing.formLocation}
-            value={location}
-            onChange={(value) => {
-              setLocation(value);
-              clearError('location');
-            }}
-            placeholder={t.listing.formLocationPlaceholder}
-            error={errors.location}
-          />
-
-          <ListingPhotoPicker photos={photos} onChange={setPhotos} min={MIN_PHOTOS} max={MAX_PHOTOS} />
 
           <FormInput
             label={propertyType === 'land' ? t.listing.pricePerSqm : kind === 'rent' ? t.listing.rentLabel : t.listing.priceLabel}
@@ -306,10 +356,68 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
               />
             </>
           )}
+
+          <FormInput
+            label={t.listing.formPhone2}
+            value={phone2}
+            onChange={setPhone2}
+            placeholder={t.listing.formPhone2Placeholder}
+          />
+
+          <ListingPhotoPicker photos={photos} onChange={setPhotos} min={MIN_PHOTOS} max={MAX_PHOTOS} />
         </>
       )}
 
-      {step === 2 && propertyType === 'house' && (
+      {step === 2 && (
+        <>
+          {/* Ville/Commune → Fokontany → carte → adresse, tous les champs de localisation
+              regroupés dans la même étape, dans cet ordre. */}
+          <SearchableSelect
+            label={t.listing.formCommune}
+            value={communeId}
+            onChange={handleCommuneChange}
+            options={(communes ?? []).map((commune) => ({
+              id: commune.id,
+              label: commune.name,
+              sublabel: commune.district,
+            }))}
+            placeholder={t.listing.formCommunePlaceholder}
+            searchPlaceholder={t.listing.communeSearchPlaceholder}
+            emptyMessage={t.listing.communeEmptyMessage}
+            error={errors.commune}
+          />
+
+          <SearchableSelect
+            label={t.listing.formFokontany}
+            value={fokontanyId}
+            onChange={(id) => {
+              setFokontanyId(id);
+              clearError('fokontany');
+            }}
+            options={(fokontanyList ?? []).map((fokontany) => ({ id: fokontany.id, label: fokontany.name }))}
+            placeholder={communeId ? t.listing.formFokontanyPlaceholder : t.listing.formFokontanyDisabledPlaceholder}
+            searchPlaceholder={t.listing.fokontanySearchPlaceholder}
+            emptyMessage={t.listing.fokontanyEmptyMessage}
+            disabled={!communeId}
+            error={errors.fokontany}
+          />
+
+          <MapPositionPicker
+            latitude={latitude}
+            longitude={longitude}
+            onChange={({ latitude: lat, longitude: lng }) => {
+              setLatitude(lat);
+              setLongitude(lng);
+            }}
+            centerHintLatitude={geocodeHint?.latitude}
+            centerHintLongitude={geocodeHint?.longitude}
+            address={address}
+            onAddressChange={setAddress}
+          />
+        </>
+      )}
+
+      {step === 3 && propertyType === 'house' && (
         <HouseFields
           bedrooms={bedrooms}
           setBedrooms={(v) => {
@@ -330,7 +438,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
         />
       )}
 
-      {step === 2 && (propertyType === 'apartment' || propertyType === 'villa') && (
+      {step === 3 && (propertyType === 'apartment' || propertyType === 'villa') && (
         <ResidentialFields
           propertyType={propertyType}
           surfaceM2={surfaceM2}
@@ -354,7 +462,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
         />
       )}
 
-      {step === 2 && propertyType === 'land' && (
+      {step === 3 && propertyType === 'land' && (
         <LandFields
           legalStatus={legalStatus}
           setLegalStatus={setLegalStatus}
@@ -371,7 +479,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
         />
       )}
 
-      {step === 2 && (
+      {step === 3 && (
         <>
           <div>
             <div className="flex items-center justify-between mb-1.5">

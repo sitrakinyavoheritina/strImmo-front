@@ -4,27 +4,7 @@ import { useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  ArrowLeft,
-  Heart,
-  MapPin,
-  Ruler,
-  BedDouble,
-  Home,
-  Car,
-  Bike,
-  Droplet,
-  Bath,
-  Zap,
-  Sofa,
-  Sparkles,
-  Building2,
-  Landmark,
-  CheckCircle2,
-  MessageCircle,
-  Phone,
-  type LucideIcon,
-} from 'lucide-react';
+import { ArrowLeft, Check, Copy, Heart, MapPin, MessageCircle, Phone } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useLikesStore } from '@/lib/state/use-likes-store';
 import { useAuthStore } from '@/lib/state/use-auth-store';
@@ -33,30 +13,13 @@ import { useProperty } from '@/features/search/hooks/use-property';
 import { useLikeProperty } from '@/features/search/hooks/use-like-property';
 import { useApproveProperty, useRejectProperty } from '@/features/search/hooks/use-moderate-property';
 import { PROPERTY_TYPE_LABEL_KEY } from '@/features/search/utils/get-key-features';
+import { getPropertyDetailStats } from '@/features/search/utils/get-property-detail-stats';
 import { formatPrice } from '@/features/search/utils/format-price';
 import { Button } from '@/components/ui/button';
 import { RightRail } from '@/features/feed/components/right-rail';
 import { InlineChatPanel } from '@/features/property-detail/components/inline-chat-panel';
+import { PropertyMap } from '@/features/property-detail/components/property-map';
 import { CardOptionsMenu } from '@/features/feed/components/card-options-menu';
-
-interface Stat {
-  icon: LucideIcon;
-  value: string;
-  label: string;
-}
-
-interface Amenity {
-  icon: LucideIcon;
-  text: string;
-}
-
-const WATER_SOURCE_LABEL_KEY = { jirama: 'jirama', well: 'well', other: 'other' } as const;
-const LEGAL_STATUS_LABEL_KEY = {
-  titled: 'legalStatusTitled',
-  cadastre: 'legalStatusCadastre',
-  fitanolorana: 'legalStatusFitanolorana',
-  other: 'other',
-} as const;
 
 export default function AnnoncePage() {
   const { id } = useParams<{ id: string }>();
@@ -164,39 +127,7 @@ export default function AnnoncePage() {
   const isAdminUser = isAdmin(user);
   const canModerate = isAdminUser && property.moderationStatus === 'pending';
 
-  const stats: Stat[] = [];
-  const amenities: Amenity[] = [];
-
-  if (property.propertyType === 'house') {
-    stats.push({ icon: BedDouble, value: String(property.bedrooms), label: t.propertyDetail.bedroomsLabel });
-    if (property.hasCarAccess) amenities.push({ icon: Car, text: t.search.carAccess });
-    if (property.hasMotorbikeAccess) amenities.push({ icon: Bike, text: t.search.hasMotorbikeAccess });
-    amenities.push({ icon: Droplet, text: t.search[WATER_SOURCE_LABEL_KEY[property.waterSource]] });
-    amenities.push({ icon: Bath, text: property.bathroomLocation === 'interior' ? t.search.interior : t.search.exterior });
-    if (property.hasIndividualMeter) amenities.push({ icon: Zap, text: t.search.hasIndividualMeter });
-  } else if (property.propertyType === 'villa' || property.propertyType === 'apartment') {
-    stats.push({ icon: Ruler, value: `${property.surfaceM2} m²`, label: t.propertyDetail.areaLabel });
-    stats.push({ icon: Home, value: property.roomType.replace('plus', '+'), label: t.search.roomTypeLabel });
-    if (property.parkingSpots > 0) {
-      stats.push({ icon: Car, value: String(property.parkingSpots), label: t.search.parkingSpots });
-    }
-    if (property.isIndependent) {
-      amenities.push({
-        icon: Home,
-        text: property.propertyType === 'villa' ? t.search.villaIndependent : t.search.apartmentIndependent,
-      });
-    }
-    if (property.isFurnished) amenities.push({ icon: Sofa, text: t.search.isFurnished });
-    if (property.hasComfort) amenities.push({ icon: Sparkles, text: t.search.comfort });
-    if (property.hasCaretakerAnnex) amenities.push({ icon: Building2, text: t.search.hasCaretakerAnnex });
-  } else {
-    amenities.push({ icon: Landmark, text: t.search[LEGAL_STATUS_LABEL_KEY[property.legalStatus]] });
-    if (property.hasCarAccess) amenities.push({ icon: Car, text: t.search.carAccess });
-    if (property.isResidentialArea) amenities.push({ icon: Home, text: t.search.isResidentialArea });
-    if (property.hasWaterAvailable) amenities.push({ icon: Droplet, text: t.search.hasWaterAvailable });
-    if (property.hasElectricityAvailable) amenities.push({ icon: Zap, text: t.search.hasElectricityAvailable });
-    if (property.isBuildReady) amenities.push({ icon: CheckCircle2, text: t.search.isBuildReady });
-  }
+  const { stats, amenities } = getPropertyDetailStats(property, t);
 
   return (
     <div className="flex">
@@ -284,21 +215,31 @@ export default function AnnoncePage() {
 
           {/* Discuter : bouton juste sous la photo, ouvre la discussion directement ici (pas de
               modal, pas d'autre page) — remplit l'espace disponible sous les vignettes. Absent
-              pour un admin : il ne discute pas avec le vendeur, il modère (voir plus bas). */}
+              pour un admin : il ne discute pas avec le vendeur, il modère (voir plus bas). En
+              dessous de lg: le bouton lui-même est remplacé par la barre fixe en bas d'écran
+              (Contacter + Discuter, voir plus bas) — seul le panneau de discussion ouvert reste
+              ici, sur les deux tailles. */}
           {!isAdminUser && property.authorName &&
             (!isChatOpen ? (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => (isAuthenticated ? setManualChatOpen(true) : requireAuth())}
-                className="shrink-0 mt-2 w-full"
-              >
-                <MessageCircle size={14} className="shrink-0" />
-                <span className="truncate">
-                  {t.propertyDetail.chatWith} {property.authorName}
-                </span>
-              </Button>
+              // `hidden lg:block` sur ce wrapper plutôt que directement sur le Button : le Button
+              // porte déjà sa propre classe `inline-flex` de base, qui entre en conflit de
+              // spécificité avec un `hidden` posé sur le même élément (constaté explicitement : le
+              // bouton restait visible en mobile malgré la classe `hidden`) — un wrapper neutre
+              // sans classe d'affichage concurrente évite le problème.
+              <div className="hidden lg:block">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => (isAuthenticated ? setManualChatOpen(true) : requireAuth())}
+                  className="shrink-0 mt-2 w-full"
+                >
+                  <MessageCircle size={14} className="shrink-0" />
+                  <span className="truncate">
+                    {t.propertyDetail.chatWith} {property.authorName}
+                  </span>
+                </Button>
+              </div>
             ) : (
               <InlineChatPanel
                 propertyId={property.id}
@@ -389,17 +330,21 @@ export default function AnnoncePage() {
           </div>
 
           {stats.length > 0 && (
-            <div className="mt-3 sm:mt-4">
-              <h2 className="text-sm font-bold text-content-main mb-2">{t.propertyDetail.detailsTitle}</h2>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="mt-2 sm:mt-3">
+              <h2 className="text-sm font-bold text-content-main mb-1">{t.propertyDetail.detailsTitle}</h2>
+              {/* 3 colonnes, icône/valeur/libellé sur une seule ligne (pas empilés) : au plus 3
+                  caractéristiques possibles (voir get-property-detail-stats.ts), tiennent donc
+                  sur une seule ligne de cartes elles-mêmes réduites à une seule ligne de texte
+                  chacune — demandé explicitement pour prendre le moins de place possible. */}
+              <div className="grid grid-cols-3 gap-1">
                 {stats.map((stat) => (
                   <div
                     key={stat.label}
-                    className="bg-surface-app lg:bg-surface-card border border-stroke-default rounded-xl p-2.5 text-center"
+                    className="flex items-center justify-center gap-1 bg-surface-app lg:bg-surface-card border border-stroke-default rounded-md py-1 px-1"
                   >
-                    <stat.icon size={18} className="mx-auto text-brand-primary" />
-                    <div className="text-sm font-bold text-content-main mt-0.5">{stat.value}</div>
-                    <div className="text-[10px] text-content-muted">{stat.label}</div>
+                    <stat.icon size={12} className="shrink-0 text-brand-primary" />
+                    <span className="text-xs font-bold text-content-main whitespace-nowrap">{stat.value}</span>
+                    <span className="text-xs text-content-muted truncate">{stat.label}</span>
                   </div>
                 ))}
               </div>
@@ -427,36 +372,172 @@ export default function AnnoncePage() {
             </div>
           )}
 
+          {/* Position précise (voir map-position-picker.tsx) + indication complémentaire
+              ("repère" — ex. "Lot II B 123, près de..."), enregistrées à la création mais
+              jamais affichées ici jusqu'ici — absentes sur une annonce créée avant l'ajout de
+              cette fonctionnalité, d'où les deux conditions séparées. */}
+          {(property.latitude != null && property.longitude != null) || property.address ? (
+            <div className="mt-3">
+              <h2 className="text-sm font-bold text-content-main mb-1.5">{t.propertyDetail.locationSectionTitle}</h2>
+              {property.latitude != null && property.longitude != null && (
+                <PropertyMap latitude={property.latitude} longitude={property.longitude} />
+              )}
+              {property.address && (
+                <p className="mt-2 flex items-start gap-1.5 text-sm text-content-main">
+                  <MapPin size={14} className="shrink-0 mt-0.5 text-content-muted" />
+                  {property.address}
+                </p>
+              )}
+            </div>
+          ) : null}
+
           {/* Toujours visible sans avoir à chercher : collé en bas du panneau (lg:sticky), même
               si stats/équipements/description au-dessus ont besoin de défiler en interne. Le prix
               est remonté sous le titre (voir plus haut) — seul le bouton d'action reste ici. Absent
-              pour un admin : il n'appelle pas le vendeur, il modère (voir plus haut). */}
+              pour un admin : il n'appelle pas le vendeur, il modère (voir plus haut). En dessous de
+              lg: remplacé par la barre fixe en bas d'écran (voir plus bas). */}
           {!isAdminUser && property.contactPhone && (
-            <div className="lg:sticky lg:bottom-0 lg:bg-surface-card mt-3 pt-3 border-t border-stroke-default">
-              {isAuthenticated ? (
-                <a href={`tel:${property.contactPhone}`} className="block w-full">
-                  <Button size="sm" className="w-full">
-                    <Phone size={14} className="shrink-0" />
-                    <span className="truncate">
-                      {t.propertyDetail.contact} — {property.contactPhone}
-                    </span>
-                  </Button>
-                </a>
-              ) : (
-                // Le numéro n'est pas révélé tant qu'on n'est pas connecté — inutile de le
-                // mettre dans le DOM pour un utilisateur qui ne peut de toute façon pas encore
-                // l'utiliser.
-                <Button type="button" size="sm" onClick={requireAuth} className="w-full">
-                  <Phone size={14} className="shrink-0" />
-                  <span className="truncate">{t.propertyDetail.contact}</span>
-                </Button>
-              )}
+            <div className="hidden lg:block lg:sticky lg:bottom-0 lg:bg-surface-card mt-3 pt-3 border-t border-stroke-default">
+              <ContactActions
+                contactPhone={property.contactPhone}
+                phone2={property.phone2}
+                isAuthenticated={isAuthenticated}
+                requireAuth={requireAuth}
+                contactLabel={t.propertyDetail.contact}
+                copyLabel={t.propertyDetail.copyNumber}
+                copiedLabel={t.propertyDetail.numberCopied}
+              />
             </div>
+          )}
+
+          {/* Réserve la place occupée par la barre fixe ci-dessous (mobile uniquement) pour que
+              la description ne se retrouve pas cachée derrière une fois tout en bas du scroll. */}
+          {!isAdminUser && (property.contactPhone || (property.authorName && !isChatOpen)) && (
+            <div className="h-32 lg:hidden" />
           )}
         </div>
       </div>
       </div>
+
+      {/* En dessous de lg: : "Contacter" et "Écrire directement à..." (dans cet ordre) fixés en
+          bas de l'écran, toujours visibles pendant le scroll — remplace les deux versions
+          affichées en flux normal ci-dessus (masquées via `hidden lg:block`). `bottom-16` (pas
+          `bottom-0`) : la bande d'icônes mobile (MobileNavStrip, voir app-shell.tsx) occupe déjà
+          les 64px du bas avec le même `fixed bottom-0` — sans ce décalage les deux se
+          superposaient exactement (constaté explicitement : le second bouton de cette barre
+          restait invisible, caché derrière). "Contacter" reste affiché même discussion ouverte —
+          seul "Écrire directement à..." disparaît alors (remplacé par le panneau de discussion
+          ouvert juste au-dessus, sous la photo) : masquer toute la barre à ce moment-là rendait
+          "Contacter" totalement inaccessible pendant qu'on discute (constaté explicitement :
+          "le contact disparaît en bas de la page"). Absente pour un admin, comme les deux actions
+          qu'elle contient. */}
+      {!isAdminUser && (property.contactPhone || (property.authorName && !isChatOpen)) && (
+        <div className="lg:hidden fixed inset-x-0 bottom-16 z-40 bg-surface-card border-t border-stroke-default px-3 py-2.5 space-y-2 shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
+          {property.contactPhone && (
+            <ContactActions
+              contactPhone={property.contactPhone}
+              phone2={property.phone2}
+              isAuthenticated={isAuthenticated}
+              requireAuth={requireAuth}
+              contactLabel={t.propertyDetail.contact}
+              copyLabel={t.propertyDetail.copyNumber}
+              copiedLabel={t.propertyDetail.numberCopied}
+            />
+          )}
+          {property.authorName && !isChatOpen && (
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => (isAuthenticated ? setManualChatOpen(true) : requireAuth())}
+              className="w-full"
+            >
+              <MessageCircle size={14} className="shrink-0" />
+              <span className="truncate">
+                {t.propertyDetail.chatWith} {property.authorName}
+              </span>
+            </Button>
+          )}
+        </div>
+      )}
       <RightRail />
     </div>
   );
 }
+
+/** Numéro(s) de contact — le principal (celui du compte) plus l'éventuel numéro secondaire propre
+ * à cette annonce (voir property-form.tsx), sous un unique titre "Contacter". Chacun sur sa
+ * propre ligne, bien séparés — copie le numéro dans le presse-papiers au clic (pas d'appel
+ * direct : un clic sur un lien `tel:` ne fait souvent rien d'utile hors d'un vrai téléphone,
+ * demandé explicitement après un essai où le clic ne faisait visiblement rien). Factorisé ici
+ * pour ne pas dupliquer cette logique entre la version desktop (colonne d'infos) et la barre fixe
+ * mobile ci-dessus. */
+function ContactActions({
+  contactPhone,
+  phone2,
+  isAuthenticated,
+  requireAuth,
+  contactLabel,
+  copyLabel,
+  copiedLabel,
+}: {
+  contactPhone?: string;
+  phone2?: string;
+  isAuthenticated: boolean;
+  requireAuth: () => void;
+  contactLabel: string;
+  copyLabel: string;
+  copiedLabel: string;
+}) {
+  const [copiedNumber, setCopiedNumber] = useState<string | null>(null);
+
+  async function handleCopy(number: string) {
+    try {
+      await navigator.clipboard.writeText(number);
+      setCopiedNumber(number);
+      setTimeout(() => setCopiedNumber((current) => (current === number ? null : current)), 1500);
+    } catch {
+      // Presse-papiers indisponible (permission refusée, contexte non sécurisé...) — le numéro
+      // reste de toute façon affiché en clair, copiable manuellement.
+    }
+  }
+
+  if (!isAuthenticated) {
+    // Les numéros ne sont pas révélés tant qu'on n'est pas connecté — inutile de les mettre dans
+    // le DOM pour un utilisateur qui ne peut de toute façon pas encore les utiliser.
+    return (
+      <Button type="button" size="sm" onClick={requireAuth} className="w-full">
+        <Phone size={14} className="shrink-0" />
+        <span className="truncate">{contactLabel}</span>
+      </Button>
+    );
+  }
+
+  const numbers = [contactPhone, phone2].filter((value): value is string => Boolean(value));
+
+  return (
+    <div className="space-y-1.5">
+      <p className="text-xs font-semibold text-content-muted">{contactLabel}</p>
+      {numbers.map((number, index) => {
+        const isCopied = copiedNumber === number;
+        return (
+          <button
+            key={number}
+            type="button"
+            onClick={() => handleCopy(number)}
+            aria-label={copyLabel}
+            className={`flex items-center justify-center gap-2 w-full py-2 px-4 rounded-xl text-sm font-semibold transition active:scale-[0.98] ${
+              index === 0
+                ? 'bg-brand-primary hover:bg-brand-primary-hover text-white shadow-md shadow-brand-primary/20'
+                : 'bg-surface-app hover:bg-stroke-default border border-stroke-default text-content-main'
+            }`}
+          >
+            {isCopied ? <Check size={14} className="shrink-0" /> : <Copy size={14} className="shrink-0" />}
+            <span className="truncate">{isCopied ? copiedLabel : number}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+

@@ -48,6 +48,9 @@ export interface UpdateProfilePayload {
   lastName?: string;
   email?: string;
   address?: string;
+  /** Contact secondaire du compte — sert de valeur par défaut pour `phone2` de chaque nouvelle
+   *  annonce (voir property-form.tsx), modifiable ensuite annonce par annonce. */
+  phone2?: string;
   newPassword?: string;
   avatar?: File | null;
 }
@@ -64,6 +67,7 @@ export interface User {
   email?: string;
   avatarUrl?: string;
   address?: string;
+  phone2?: string;
   role: UserRole;
   themePreference: ThemePreference;
   feedDisplay: FeedDisplayPreference;
