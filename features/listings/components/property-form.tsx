@@ -559,7 +559,7 @@ type HouseFieldsProps = {
   setHasIndividualMeter: (value: boolean) => void;
 };
 
-function HouseFields({
+export function HouseFields({
   bedrooms,
   setBedrooms,
   bedroomsError,
@@ -619,7 +619,7 @@ type ResidentialFieldsProps = {
   setHasCaretakerAnnex: (value: boolean) => void;
 };
 
-function ResidentialFields({
+export function ResidentialFields({
   propertyType,
   surfaceM2,
   setSurfaceM2,
@@ -688,7 +688,7 @@ const LAND_STATUSES: { value: LandStatus; labelKey: 'legalStatusTitled' | 'legal
   { value: 'other', labelKey: 'other' },
 ];
 
-function LandFields({
+export function LandFields({
   legalStatus,
   setLegalStatus,
   hasCarAccess,

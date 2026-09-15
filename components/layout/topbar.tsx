@@ -40,9 +40,11 @@ export function Topbar() {
             navigation mobile (voir nav-items.ts) — le dupliquer dans la topbar créait deux icônes
             "Messages" visibles en même temps sur la plupart des largeurs d'écran. */}
         {/* Absent pour un admin : /notifications ne fait pas partie de ses routes autorisées
-            (voir AdminRouteGuard). */}
+            (voir AdminRouteGuard). Visible à toutes les tailles (plus seulement à partir de
+            `md:`) — juste à côté du bouton "Ajouter", demandé explicitement pour retrouver la
+            cloche sur mobile comme sur desktop. */}
         {!isAdminUser && (
-          <nav className="hidden md:flex items-center gap-4 shrink-0">
+          <nav className="flex items-center gap-4 shrink-0">
             <Link
               href="/notifications"
               aria-label={t.topbar.notifications}

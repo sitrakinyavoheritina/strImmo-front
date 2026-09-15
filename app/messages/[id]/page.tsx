@@ -16,6 +16,7 @@ import {
   useSendMessage,
 } from '@/features/messages/hooks/use-messages';
 import { getSocket } from '@/lib/realtime/socket-client';
+import { useMarkConversationNotificationsRead } from '@/features/notifications/hooks/use-notifications';
 import type { Message } from '@/features/messages/types/message.types';
 
 // En dessous de ce délai depuis le dernier envoi, on n'émet pas un nouveau "typing" (évite de
@@ -113,6 +114,7 @@ export default function ConversationPage() {
   const { mutateAsync: sendMessage, isPending } = useSendMessage(id);
   const { mutateAsync: sendImage, isPending: isSendingImage } = useSendImageMessage(id);
   useMarkConversationRead(id, messages);
+  useMarkConversationNotificationsRead(id);
 
   const [draft, setDraft] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);

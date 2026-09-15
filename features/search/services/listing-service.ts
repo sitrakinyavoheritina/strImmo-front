@@ -1,5 +1,5 @@
 import { propertyApi } from './property-api';
-import { buildCreatePropertyFormData, mapApiPropertyToProperty } from './property-mapper';
+import { buildCreatePropertyFormData, buildUpdatePropertyPayload, mapApiPropertyToProperty } from './property-mapper';
 import type { PropertyFilters, PropertyFormValues } from '../types/listing.types';
 
 export const listingService = {
@@ -8,8 +8,13 @@ export const listingService = {
 
   getById: (id: string) => propertyApi.getById(id).then(mapApiPropertyToProperty),
 
+  nearby: (lat: number, lng: number, limit?: number) => propertyApi.nearby(lat, lng, limit),
+
   create: (values: PropertyFormValues, photos: File[]) =>
     propertyApi.create(buildCreatePropertyFormData(values, photos)).then(mapApiPropertyToProperty),
+
+  update: (id: string, values: PropertyFormValues) =>
+    propertyApi.update(id, buildUpdatePropertyPayload(values)).then(mapApiPropertyToProperty),
 
   remove: (id: string) => propertyApi.remove(id),
 

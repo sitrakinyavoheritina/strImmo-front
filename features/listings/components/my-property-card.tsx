@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Trash2 } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { formatPrice } from '@/features/search/utils/format-price';
 import { useDeleteProperty } from '@/features/search/hooks/use-delete-property';
@@ -78,6 +78,13 @@ export function MyPropertyCard({ property }: { property: Property }) {
             <span className="font-semibold">{t.myPropertiesPage.rejectionReasonPrefix}</span> {property.rejectionReason}
           </p>
         )}
+      </Link>
+      <Link
+        href={`/annonce/${property.id}/modifier`}
+        aria-label={t.listing.editListingTitle}
+        className="shrink-0 p-2 text-content-muted hover:text-brand-primary transition"
+      >
+        <Pencil size={17} />
       </Link>
       <button
         type="button"

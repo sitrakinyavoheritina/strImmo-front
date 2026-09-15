@@ -271,6 +271,38 @@ export default function AnnoncePage() {
               {property.propertyType === 'land' && <span className="text-content-muted text-xs sm:text-sm"> / m²</span>}
             </div>
 
+            {/* Motif de refus — visible par le propriétaire sur sa propre fiche, pas seulement
+                dans la liste "Mes Biens" (où c'était déjà affiché) : demandé explicitement pour
+                qu'il le voie aussi en ouvrant directement l'annonce. Absent pour tout autre
+                visiteur (dont un admin, qui a ses propres actions de modération juste en dessous). */}
+            {property.moderationStatus === 'rejected' && property.rejectionReason && userId === property.ownerId && (
+              <div className="mt-3 bg-danger/10 border border-danger/20 rounded-xl p-3">
+                <p className="text-sm font-semibold text-danger">{t.propertyDetail.rejectionNotice}</p>
+                <p className="text-sm text-content-main mt-1">
+                  <span className="font-semibold">{t.myPropertiesPage.rejectionReasonPrefix}</span> {property.rejectionReason}
+                </p>
+                {/* Corriger et soumettre à nouveau — la modification repasse automatiquement
+                    l'annonce "en attente" côté serveur (voir properties.service.ts:update).
+                    Demandé explicitement : "comment le propriétaire fait sa rectification". */}
+                <Link href={`/annonce/${id}/modifier`} className="inline-block mt-2">
+                  <Button size="sm" variant="outline" className="!border-danger/40 !text-danger hover:!bg-danger/10">
+                    {t.listing.editListingTitle}
+                  </Button>
+                </Link>
+              </div>
+            )}
+
+            {/* Même bouton pour le propriétaire hors refus (pending/approved) — la correction
+                après refus n'est qu'un cas particulier de pouvoir modifier son annonce. */}
+            {property.moderationStatus !== 'rejected' && userId === property.ownerId && !isAdminUser && (
+              <Link
+                href={`/annonce/${id}/modifier`}
+                className="inline-block mt-2 text-sm font-semibold text-brand-primary hover:text-brand-primary-hover"
+              >
+                {t.listing.editListingTitle}
+              </Link>
+            )}
+
             {/* Actions de modération (admin/superadmin, annonce encore "pending") — mêmes actions
                 que sur la liste /validation, en plus ici pour un admin qui ouvre la fiche depuis
                 cette liste (photo/titre) sans avoir à revenir en arrière pour valider. */}

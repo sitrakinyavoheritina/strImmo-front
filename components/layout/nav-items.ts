@@ -1,6 +1,6 @@
 import {
   Home,
-  Map,
+  Newspaper,
   Building2,
   MessageCircle,
   Menu,
@@ -44,13 +44,14 @@ export function getNavItems(isAdminUser: boolean): NavItem[] {
       { href: '/admin', icon: LayoutDashboard, labelKey: 'dashboard' },
       { href: '/validation', icon: ShieldCheck, labelKey: 'validation' },
       { href: '/admin/annonces', icon: List, labelKey: 'annonces' },
+      { href: '/admin/actus', icon: Newspaper, labelKey: 'news' },
       { href: '/parametres', icon: Menu, labelKey: 'menu' },
     ];
   }
   return [
     { href: '/', icon: Home, labelKey: 'home' },
     { href: '/messages', icon: MessageCircle, labelKey: 'messages' },
-    { href: '/cartes', icon: Map, labelKey: 'maps' },
+    { href: '/actus', icon: Newspaper, labelKey: 'news' },
     { href: '/mes-biens', icon: Building2, labelKey: 'myProperties' },
     { href: '/parametres', icon: Menu, labelKey: 'menu' },
   ];

@@ -44,6 +44,19 @@ export type ApiLandDetails = {
   isBuildReady: boolean;
 };
 
+// Forme allégée renvoyée par GET /properties/nearby — voir property-api.ts:nearby.
+export type ApiNearbyProperty = {
+  id: string;
+  title: string;
+  price: number;
+  kind: ListingKind;
+  location: string;
+  latitude: number;
+  longitude: number;
+  coverUrl: string | null;
+  distanceKm: number;
+};
+
 export type ApiProperty = {
   id: string;
   propertyType: PropertyType;
@@ -94,10 +107,20 @@ export const propertyApi = {
 
   getById: (id: string) => apiClient.get<ApiProperty>(`/properties/${id}`).then((r) => r.data),
 
+  // Widget "près de vous" (RightRail) — forme allégée, pas le contrat `ApiProperty` complet (pas
+  // de photos/galerie, juste la couverture, voir strImmo/src/properties/properties.service.ts:findNearby).
+  nearby: (lat: number, lng: number, limit?: number) =>
+    apiClient
+      .get<ApiNearbyProperty[]>('/properties/nearby', { params: { lat, lng, limit } })
+      .then((r) => r.data),
+
   create: (formData: FormData) =>
     apiClient
       .post<ApiProperty>('/properties', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
       .then((r) => r.data),
+
+  update: (id: string, payload: Record<string, unknown>) =>
+    apiClient.patch<ApiProperty>(`/properties/${id}`, payload).then((r) => r.data),
 
   remove: (id: string) => apiClient.delete<void>(`/properties/${id}`).then((r) => r.data),
 

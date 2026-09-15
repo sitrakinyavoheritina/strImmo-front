@@ -124,3 +124,55 @@ export function buildCreatePropertyFormData(values: PropertyFormValues, photos: 
 
   return form;
 }
+
+// Port du sous-ensemble modifiable après publication (voir
+// strImmo/src/properties/dto/update-property.dto.ts) — pas de `propertyType` (immuable une fois
+// l'annonce créée, les tables de détails par type en dépendent) ni de photos (route JSON, pas
+// multipart ; les modifier nécessiterait la même logique que la création, pas ajoutée pour
+// l'instant). JSON classique avec les vrais types (nombres/booléens), contrairement au FormData de
+// la création où tout part en chaîne de caractères.
+export function buildUpdatePropertyPayload(values: PropertyFormValues): Record<string, unknown> {
+  const payload: Record<string, unknown> = {
+    title: values.title,
+    description: values.description,
+    price: values.price,
+    kind: values.kind,
+    communeId: values.communeId,
+    fokontanyId: values.fokontanyId,
+    address: values.address,
+    latitude: values.latitude,
+    longitude: values.longitude,
+  };
+
+  if (values.propertyType === 'house') {
+    Object.assign(payload, {
+      bedrooms: values.bedrooms,
+      hasCarAccess: values.hasCarAccess,
+      hasMotorbikeAccess: values.hasMotorbikeAccess,
+      waterSource: values.waterSource,
+      bathroomLocation: values.bathroomLocation,
+      hasIndividualMeter: values.hasIndividualMeter,
+    });
+  } else if (values.propertyType === 'villa' || values.propertyType === 'apartment') {
+    Object.assign(payload, {
+      surfaceM2: values.surfaceM2,
+      isIndependent: values.isIndependent,
+      roomType: values.roomType,
+      parkingSpots: values.parkingSpots,
+      isFurnished: values.isFurnished,
+      hasComfort: values.hasComfort,
+      hasCaretakerAnnex: values.hasCaretakerAnnex,
+    });
+  } else {
+    Object.assign(payload, {
+      legalStatus: values.legalStatus,
+      hasCarAccess: values.hasCarAccess,
+      isResidentialArea: values.isResidentialArea,
+      hasWaterAvailable: values.hasWaterAvailable,
+      hasElectricityAvailable: values.hasElectricityAvailable,
+      isBuildReady: values.isBuildReady,
+    });
+  }
+
+  return payload;
+}
