@@ -9,6 +9,7 @@ import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 import { useUpdateProfile } from '@/features/auth/hooks/use-update-profile';
 import { Avatar } from '@/components/ui/avatar';
 import { EditableRow } from '@/components/ui/editable-row';
+import { EmailVerificationRow } from '@/features/auth/components/email-verification-row';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
 import { Button } from '@/components/ui/button';
 
@@ -189,6 +190,7 @@ export default function ModifierProfilPage() {
             error={errors.email}
             editLabel={t.profile.edit}
           />
+          {user.email && <EmailVerificationRow email={user.email} />}
           <EditableRow
             label={t.profile.address}
             value={address}
@@ -214,10 +216,12 @@ export default function ModifierProfilPage() {
             editLabel={t.profile.edit}
           />
 
-          <div className="py-2.5 border-b border-stroke-default">
-            <span className="block text-xs font-medium text-content-muted">{t.auth.phone}</span>
-            <p className="mt-0.5 text-sm text-content-main">{user.phone}</p>
-          </div>
+          {user.phone && (
+            <div className="py-2.5 border-b border-stroke-default">
+              <span className="block text-xs font-medium text-content-muted">{t.auth.phone}</span>
+              <p className="mt-0.5 text-sm text-content-main">{user.phone}</p>
+            </div>
+          )}
           <EditableRow
             label={t.profile.phone2}
             value={phone2}

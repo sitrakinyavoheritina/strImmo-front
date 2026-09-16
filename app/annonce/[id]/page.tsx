@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Check, Copy, Heart, MapPin, MessageCircle, Phone } from 'lucide-react';
+import { ArrowLeft, Check, Copy, Heart, MapPin, MessageCircle, Pencil, Phone, Trash2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useLikesStore } from '@/lib/state/use-likes-store';
 import { useAuthStore } from '@/lib/state/use-auth-store';
@@ -12,6 +12,7 @@ import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useProperty } from '@/features/search/hooks/use-property';
 import { useLikeProperty } from '@/features/search/hooks/use-like-property';
 import { useApproveProperty, useRejectProperty } from '@/features/search/hooks/use-moderate-property';
+import { useDeleteProperty } from '@/features/search/hooks/use-delete-property';
 import { PROPERTY_TYPE_LABEL_KEY } from '@/features/search/utils/get-key-features';
 import { getPropertyDetailStats } from '@/features/search/utils/get-property-detail-stats';
 import { formatPrice } from '@/features/search/utils/format-price';
@@ -38,6 +39,9 @@ export default function AnnoncePage() {
   const [isRejectFormOpen, setIsRejectFormOpen] = useState(false);
   const [rejectReason, setRejectReason] = useState('');
   const [moderationError, setModerationError] = useState<string | null>(null);
+  const { mutate: removeProperty, isPending: isDeleting } = useDeleteProperty();
+  const [isDeleteConfirming, setIsDeleteConfirming] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
   // Arrivée depuis le bouton "message" d'une carte du fil (?chat=1, voir feed-property-card.tsx) :
   // ouvre directement la discussion plutôt que de forcer un second clic sur "Discuter". Dérivé du
   // rendu (pas un state+effect) pour rester correct si la session finit de se réhydrater après le
@@ -98,6 +102,20 @@ export default function AnnoncePage() {
     );
   }
 
+  // Supprimer l'annonce depuis la fiche détail — même mutation et mêmes libellés que la carte
+  // "Mes Biens" (my-property-card.tsx), confirmation en deux temps identique. Redirige vers
+  // /mes-biens une fois supprimée : cette fiche n'a plus rien à afficher.
+  function handleConfirmDelete() {
+    setDeleteError(false);
+    removeProperty(id, {
+      onSuccess: () => router.push('/mes-biens'),
+      onError: () => {
+        setIsDeleteConfirming(false);
+        setDeleteError(true);
+      },
+    });
+  }
+
   if (isLoading) {
     return (
       <div className="flex">
@@ -132,14 +150,44 @@ export default function AnnoncePage() {
   return (
     <div className="flex">
       <div className="flex-1 min-w-0 max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-3 sm:py-6 lg:h-[calc(100vh-3.5rem)] lg:flex lg:flex-col">
-      <button
-        type="button"
-        onClick={() => router.back()}
-        className="shrink-0 inline-flex items-center gap-1 text-sm font-semibold text-content-muted hover:text-content-main mb-2 sm:mb-3"
-      >
-        <ArrowLeft size={16} />
-        {t.propertyDetail.back}
-      </button>
+      {/* Actions propriétaire (modifier / supprimer) en haut à droite, à côté du retour — demandé
+          explicitement plutôt qu'enfouies plus bas dans le panneau d'infos. Absentes pour un
+          admin : il modère, il ne gère pas sa propre annonce (voir plus bas). */}
+      <div className="shrink-0 flex items-center justify-between gap-2 mb-2 sm:mb-3">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-1 text-sm font-semibold text-content-muted hover:text-content-main"
+        >
+          <ArrowLeft size={16} />
+          {t.propertyDetail.back}
+        </button>
+        {userId === property.ownerId && !isAdminUser && (
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onClick={() => setIsDeleteConfirming(true)}
+              className="!bg-danger/10 !border-danger/40 !text-danger hover:!bg-danger/20"
+            >
+              <Trash2 size={14} className="shrink-0" />
+              {t.myPropertiesPage.delete}
+            </Button>
+            <Link href={`/annonce/${id}/modifier`}>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="!bg-brand-primary-soft !border-brand-primary/40 !text-brand-primary hover:!bg-brand-primary/20"
+              >
+                <Pencil size={14} className="shrink-0" />
+                {t.listing.editListingTitle}
+              </Button>
+            </Link>
+          </div>
+        )}
+      </div>
 
       {/* À partir de lg:, photo et panneau d'infos se partagent toute la hauteur d'écran
           restante — plus besoin de scroller la page pour tout voir. Le prix/contact reste collé
@@ -281,26 +329,7 @@ export default function AnnoncePage() {
                 <p className="text-sm text-content-main mt-1">
                   <span className="font-semibold">{t.myPropertiesPage.rejectionReasonPrefix}</span> {property.rejectionReason}
                 </p>
-                {/* Corriger et soumettre à nouveau — la modification repasse automatiquement
-                    l'annonce "en attente" côté serveur (voir properties.service.ts:update).
-                    Demandé explicitement : "comment le propriétaire fait sa rectification". */}
-                <Link href={`/annonce/${id}/modifier`} className="inline-block mt-2">
-                  <Button size="sm" variant="outline" className="!border-danger/40 !text-danger hover:!bg-danger/10">
-                    {t.listing.editListingTitle}
-                  </Button>
-                </Link>
               </div>
-            )}
-
-            {/* Même bouton pour le propriétaire hors refus (pending/approved) — la correction
-                après refus n'est qu'un cas particulier de pouvoir modifier son annonce. */}
-            {property.moderationStatus !== 'rejected' && userId === property.ownerId && !isAdminUser && (
-              <Link
-                href={`/annonce/${id}/modifier`}
-                className="inline-block mt-2 text-sm font-semibold text-brand-primary hover:text-brand-primary-hover"
-              >
-                {t.listing.editListingTitle}
-              </Link>
             )}
 
             {/* Actions de modération (admin/superadmin, annonce encore "pending") — mêmes actions
@@ -492,6 +521,14 @@ export default function AnnoncePage() {
           )}
         </div>
       )}
+      {isDeleteConfirming && (
+        <DeleteConfirmModal
+          onCancel={() => setIsDeleteConfirming(false)}
+          onConfirm={handleConfirmDelete}
+          isDeleting={isDeleting}
+          error={deleteError}
+        />
+      )}
       <RightRail />
     </div>
   );
@@ -573,3 +610,47 @@ function ContactActions({
   );
 }
 
+/** Confirmation de suppression en modal (pas de texte inline à côté du bouton, demandé
+ * explicitement) — même overlay que filter-modal.tsx (fond assombri/flouté, clic dehors = annule,
+ * `stopPropagation` sur le panneau). Boutons/libellés identiques à my-property-card.tsx (même
+ * action, même confirmation, ailleurs dans l'app). */
+function DeleteConfirmModal({
+  onCancel,
+  onConfirm,
+  isDeleting,
+  error,
+}: {
+  onCancel: () => void;
+  onConfirm: () => void;
+  isDeleting: boolean;
+  error: boolean;
+}) {
+  const { t } = useTranslation();
+  return (
+    <div
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+      onClick={onCancel}
+    >
+      <div
+        className="w-full max-w-sm bg-surface-card rounded-2xl shadow-lg p-5"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <p className="text-sm font-semibold text-content-main">{t.myPropertiesPage.deleteConfirm}</p>
+        {error && <p className="mt-2 text-xs text-danger">{t.myPropertiesPage.deleteError}</p>}
+        <div className="mt-4 flex items-center gap-3">
+          <Button type="button" variant="outline" className="flex-1" onClick={onCancel}>
+            {t.myPropertiesPage.deleteCancelButton}
+          </Button>
+          <Button
+            type="button"
+            disabled={isDeleting}
+            onClick={onConfirm}
+            className="flex-1 !bg-danger hover:!bg-danger-hover"
+          >
+            {t.myPropertiesPage.deleteConfirmButton}
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}

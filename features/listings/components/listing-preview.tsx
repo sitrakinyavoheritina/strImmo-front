@@ -20,7 +20,12 @@ export function ListingPreview({ values, photos }: { values: PropertyFormValues;
   // effets une fois par exercice, ce qui révoquerait ces URL blob avant que l'aperçu n'ait fini de
   // les afficher. Au plus 8 petites photos déjà compressées le temps de ce formulaire — le
   // navigateur les libère de toute façon au déchargement de la page.
-  const photoUrls = useMemo(() => photos.map((file) => URL.createObjectURL(file)), [photos]);
+  // En mode édition, aucune nouvelle photo n'est sélectionnée (`photos` reste vide, les photos
+  // n'étant pas modifiables) — on retombe alors sur les URL distantes déjà publiées.
+  const photoUrls = useMemo(
+    () => (photos.length > 0 ? photos.map((file) => URL.createObjectURL(file)) : values.photoUrls),
+    [photos, values.photoUrls]
+  );
   const { stats, amenities } = getPropertyDetailStats(values, t);
 
   return (

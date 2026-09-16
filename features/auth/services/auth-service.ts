@@ -1,5 +1,6 @@
 import { authApi, type ApiUser } from './auth-api';
 import type {
+  CompleteProfilePayload,
   LoginPayload,
   RegisterPayload,
   RegisterResult,
@@ -15,11 +16,12 @@ function toUser(api: ApiUser): User {
     firstName: api.firstName,
     lastName: api.lastName,
     fullName: `${api.firstName} ${api.lastName}`.trim(),
-    phone: api.phone,
+    phone: api.phone ?? undefined,
     email: api.email ?? undefined,
     avatarUrl: api.avatarUrl ?? undefined,
     address: api.address ?? undefined,
     phone2: api.phone2 ?? undefined,
+    isEmailVerified: api.isEmailVerified ?? false,
     role: api.role,
     themePreference: api.themePreference,
     feedDisplay: api.feedDisplay,
@@ -29,6 +31,28 @@ function toUser(api: ApiUser): User {
 export const authService = {
   login: async (payload: LoginPayload): Promise<{ user: User; token: string }> => {
     const res = await authApi.login(payload);
+    return { user: toUser(res.user), token: res.access_token };
+  },
+
+  loginWithGoogle: async (idToken: string): Promise<{ user: User; token: string }> => {
+    const res = await authApi.loginWithGoogle(idToken);
+    return { user: toUser(res.user), token: res.access_token };
+  },
+
+  // Choix du rôle + téléphone (+ documents) après une connexion Google — voir
+  // strImmo/src/auth/auth.service.ts:completeProfile. Un seul nouveau token à jour (le rôle a pu
+  // changer depuis la création automatique lors du premier login Google).
+  completeProfile: async (payload: CompleteProfilePayload): Promise<{ user: User; token: string }> => {
+    const form = new FormData();
+    form.append('role', payload.role);
+    form.append('phone', payload.phone);
+    if (payload.agencyName) form.append('agencyName', payload.agencyName);
+    if (payload.address) form.append('address', payload.address);
+    if (payload.cinRecto) form.append('cinRecto', payload.cinRecto);
+    if (payload.cinVerso) form.append('cinVerso', payload.cinVerso);
+    if (payload.nif) form.append('nif', payload.nif);
+    if (payload.stat) form.append('stat', payload.stat);
+    const res = await authApi.completeProfile(form);
     return { user: toUser(res.user), token: res.access_token };
   },
 
@@ -87,4 +111,13 @@ export const authService = {
 
   updatePreferences: (payload: { themePreference?: ThemePreference; feedDisplay?: FeedDisplayPreference }) =>
     authApi.updatePreferences(payload),
+
+  forgotPassword: (identifier: string) => authApi.forgotPassword(identifier),
+
+  resetPassword: (payload: { identifier: string; code: string; newPassword: string }) =>
+    authApi.resetPassword(payload),
+
+  sendEmailVerification: () => authApi.sendEmailVerification(),
+
+  verifyEmail: (code: string) => authApi.verifyEmail(code),
 };

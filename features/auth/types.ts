@@ -42,6 +42,20 @@ export type RegisterResult =
   | { status: 'authenticated'; user: User; token: string }
   | { status: 'pending' };
 
+// Complète un compte créé via "Se connecter avec Google" (voir /completer-profil,
+// strImmo/src/auth/auth.service.ts:completeProfile) — mêmes champs que l'inscription classique
+// selon le rôle choisi, sans mot de passe (déjà géré côté serveur pour un compte Google).
+export interface CompleteProfilePayload {
+  role: 'owner' | 'tenant' | 'agent' | 'agency';
+  phone: string;
+  agencyName?: string;
+  address?: string;
+  cinRecto?: File | null;
+  cinVerso?: File | null;
+  nif?: File | null;
+  stat?: File | null;
+}
+
 export interface UpdateProfilePayload {
   currentPassword: string;
   firstName?: string;
@@ -63,11 +77,16 @@ export interface User {
   firstName: string;
   lastName: string;
   fullName: string;
-  phone: string;
+  /** Absent tant qu'un compte créé via "Se connecter avec Google" n'a pas complété son profil
+   *  (Google ne fournit jamais de numéro) — c'est ce qui signale qu'il faut rediriger vers
+   *  /completer-profil, voir use-google-auth.ts et strImmo/src/auth/auth.service.ts:
+   *  loginWithGoogle/completeProfile. */
+  phone?: string;
   email?: string;
   avatarUrl?: string;
   address?: string;
   phone2?: string;
+  isEmailVerified: boolean;
   role: UserRole;
   themePreference: ThemePreference;
   feedDisplay: FeedDisplayPreference;

@@ -53,6 +53,12 @@ type PropertyFormProps = {
   /** Pré-remplit le formulaire au retour depuis l'aperçu via "Modifier". */
   initialValues?: PropertyFormValues;
   initialPhotos?: File[];
+  /** 'edit' réutilise exactement la même interface que la création (demandé explicitement,
+   *  plutôt qu'un formulaire de modification distinct) mais verrouille ce qui n'est pas
+   *  modifiable une fois l'annonce publiée : le type de bien (voir
+   *  strImmo/src/properties/properties.service.ts:update, qui rejette tout changement) et les
+   *  photos (route de modification en JSON, pas en multipart — voir update-property.dto.ts). */
+  mode?: 'create' | 'edit';
 };
 
 // Formulaire de création d'annonce en 2 étapes suivies d'une prévisualisation, port de
@@ -60,7 +66,7 @@ type PropertyFormProps = {
 // `propertyType` choisi à l'étape 1. Expose `submit()` via ref pour que le pied de page fixe de
 // l'écran parent déclenche la validation de l'étape courante sans dupliquer l'état du formulaire.
 export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(function PropertyForm(
-  { step, onNext, onPreview, initialValues, initialPhotos },
+  { step, onNext, onPreview, initialValues, initialPhotos, mode = 'create' },
   ref
 ) {
   const { t } = useTranslation();
@@ -97,6 +103,10 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   const [latitude, setLatitude] = useState(initialValues?.latitude);
   const [longitude, setLongitude] = useState(initialValues?.longitude);
   const [photos, setPhotos] = useState<File[]>(initialPhotos ?? []);
+  // Disponibilité — toujours disponible à la création ; en édition, aucune bascule dans ce
+  // formulaire (voir le bouton dédié sur la fiche détail), la valeur existante est simplement
+  // reconduite telle quelle.
+  const [available] = useState(initialValues?.available ?? true);
 
   const { data: communes } = useCommunes();
   const { data: fokontanyList } = useFokontany(communeId);
@@ -164,8 +174,8 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
       phone2: phone2.trim() || undefined,
       latitude,
       longitude,
-      photoUrls: [],
-      available: true,
+      photoUrls: mode === 'edit' ? (initialValues?.photoUrls ?? []) : [],
+      available,
       commission: requiresCommission ? Number(commission) || 0 : undefined,
       caution: requiresCommission ? Number(caution) || 0 : undefined,
     };
@@ -248,7 +258,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   function handleNext1() {
     const nextErrors = validateStep1();
     setErrors((prev) => ({ ...prev, ...nextErrors }));
-    if (Object.keys(nextErrors).length > 0 || photos.length < MIN_PHOTOS) return;
+    if (Object.keys(nextErrors).length > 0 || (mode === 'create' && photos.length < MIN_PHOTOS)) return;
     onNext();
   }
 
@@ -271,7 +281,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   function handlePreview() {
     const nextErrors = validate();
     setErrors(nextErrors);
-    if (Object.keys(nextErrors).length > 0 || photos.length < MIN_PHOTOS) return;
+    if (Object.keys(nextErrors).length > 0 || (mode === 'create' && photos.length < MIN_PHOTOS)) return;
     onPreview({ ...buildValues(), title: displayedTitle }, photos);
   }
 
@@ -308,11 +318,16 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
             <FieldLabel>{t.search.propertyType}</FieldLabel>
             <div className="flex flex-wrap gap-2">
               {PROPERTY_TYPES.map(({ value, labelKey }) => (
-                <Chip key={value} active={propertyType === value} onClick={() => setPropertyType(value)}>
+                <Chip
+                  key={value}
+                  active={propertyType === value}
+                  onClick={() => mode === 'create' && setPropertyType(value)}
+                >
                   {t.search[labelKey]}
                 </Chip>
               ))}
             </div>
+            {mode === 'edit' && <p className="mt-1 text-[11px] text-content-muted">{t.listing.propertyTypeImmutable}</p>}
           </div>
 
           <FormInput
@@ -364,7 +379,25 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
             placeholder={t.listing.formPhone2Placeholder}
           />
 
-          <ListingPhotoPicker photos={photos} onChange={setPhotos} min={MIN_PHOTOS} max={MAX_PHOTOS} />
+          {mode === 'edit' ? (
+            <div>
+              <FieldLabel>{t.listing.photos}</FieldLabel>
+              <div className="flex gap-2 overflow-x-auto scroll-touch">
+                {(initialValues?.photoUrls ?? []).map((url) => (
+                  <div
+                    key={url}
+                    className="relative w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-lg overflow-hidden border border-stroke-default"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element -- miniature déjà hébergée, pas besoin d'optimisation ici */}
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                  </div>
+                ))}
+              </div>
+              <p className="mt-1.5 text-[11px] text-content-muted">{t.listing.photosImmutableNotice}</p>
+            </div>
+          ) : (
+            <ListingPhotoPicker photos={photos} onChange={setPhotos} min={MIN_PHOTOS} max={MAX_PHOTOS} />
+          )}
         </>
       )}
 

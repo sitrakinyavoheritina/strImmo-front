@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Clock, CheckCircle2, XCircle, ArrowRight, List } from 'lucide-react';
+import { Clock, CheckCircle2, XCircle, ArrowRight, List, Users } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
@@ -100,6 +100,15 @@ export default function AdminDashboardPage() {
         >
           <List size={18} className="shrink-0 text-brand-primary" />
           <p className="font-semibold text-content-main flex-1">{t.adminDashboard.allListingsCta}</p>
+          <ArrowRight size={18} className="shrink-0 text-content-muted" />
+        </Link>
+
+        <Link
+          href="/admin/utilisateurs"
+          className="mt-2 flex items-center gap-3 bg-surface-card border border-stroke-default/80 rounded-xl p-4 hover:border-brand-primary/40 transition"
+        >
+          <Users size={18} className="shrink-0 text-brand-primary" />
+          <p className="font-semibold text-content-main flex-1">{t.adminDashboard.usersCta}</p>
           <ArrowRight size={18} className="shrink-0 text-content-muted" />
         </Link>
 

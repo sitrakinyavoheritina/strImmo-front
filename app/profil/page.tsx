@@ -83,10 +83,12 @@ export default function ProfilPage() {
         <div className="mt-4">
           <h2 className="text-sm font-bold text-content-main mb-2">{t.profile.myInformation}</h2>
           <div className="bg-surface-card border border-stroke-default/80 rounded-xl divide-y divide-stroke-default">
-            <div className="flex items-center gap-3 px-4 py-3 text-sm text-content-main">
-              <Phone size={16} className="text-content-muted" />
-              {user.phone}
-            </div>
+            {user.phone && (
+              <div className="flex items-center gap-3 px-4 py-3 text-sm text-content-main">
+                <Phone size={16} className="text-content-muted" />
+                {user.phone}
+              </div>
+            )}
             {user.email && (
               <div className="flex items-center gap-3 px-4 py-3 text-sm text-content-main">
                 <Mail size={16} className="text-content-muted" />

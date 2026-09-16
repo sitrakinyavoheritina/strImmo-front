@@ -10,6 +10,10 @@ const nextConfig: NextConfig = {
       // Anciennes photos encore hébergées sur Cloudinary (avant la migration vers R2) — certaines
       // annonces existantes en base y pointent toujours.
       { protocol: "https", hostname: "res.cloudinary.com" },
+      // Photo de profil Google — renvoyée telle quelle par Google dans `picture` et reprise comme
+      // avatarUrl pour un compte créé via "Se connecter avec Google" (voir
+      // strImmo/src/auth/auth.service.ts:loginWithGoogle).
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
     ],
   },
 };

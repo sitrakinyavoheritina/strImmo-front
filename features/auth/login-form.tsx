@@ -6,6 +6,7 @@ import { useTranslation } from '@/lib/i18n/use-translation';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
 import { Button } from '@/components/ui/button';
 import { useLogin } from './hooks/use-login';
+import { GoogleSignInButton } from './components/google-sign-in-button';
 
 // Le bascule Téléphone/Email n'affecte que le clavier/placeholder attendu — `identifier` est
 // toujours le seul champ envoyé au backend (voir schemas.ts et strImmo/src/auth/dto/login.dto.ts).
@@ -61,7 +62,12 @@ export const LoginForm: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.password}</label>
+          <div className="flex items-center justify-between mb-0.5 sm:mb-1">
+            <label className="text-xs font-medium text-content-main">{t.auth.password}</label>
+            <Link href="/mot-de-passe-oublie" className="text-xs font-semibold text-brand-primary hover:text-brand-primary-hover">
+              {t.auth.forgotPassword}
+            </Link>
+          </div>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -86,6 +92,14 @@ export const LoginForm: React.FC = () => {
           {isLoading ? t.auth.loggingIn : t.auth.login}
         </Button>
       </form>
+
+      <div className="flex items-center gap-3">
+        <span className="flex-1 h-px bg-stroke-default" />
+        <span className="text-[11px] font-medium text-content-muted uppercase">{t.auth.orDivider}</span>
+        <span className="flex-1 h-px bg-stroke-default" />
+      </div>
+
+      <GoogleSignInButton />
 
       <div className="text-center border-t border-stroke-default pt-3 sm:pt-5">
         <p className="text-xs text-content-muted">

@@ -142,6 +142,7 @@ export function buildUpdatePropertyPayload(values: PropertyFormValues): Record<s
     address: values.address,
     latitude: values.latitude,
     longitude: values.longitude,
+    available: values.available,
   };
 
   if (values.propertyType === 'house') {
