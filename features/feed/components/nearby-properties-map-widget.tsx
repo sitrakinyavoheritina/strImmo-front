@@ -1,20 +1,25 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useNearbyProperties } from '@/features/search/hooks/use-nearby-properties';
+import { useNearbyPositionStore } from '@/lib/state/use-nearby-position-store';
 
 const ZOOM = 12;
 
 /** Remplace l'ancien aperçu statique (favorites-map-widget.tsx, quelques punaises figées sur un
  * dégradé de couleur, sans lien avec de vraies données) par une vraie carte Mapbox centrée sur
  * l'utilisateur, montrant les annonces les plus proches de sa position — cliquer sur un marqueur
- * ouvre directement sa fiche détail. Position demandée automatiquement au montage (pas de bouton à
- * cliquer avant) — seule exception à la convention "jamais de géolocalisation silencieuse"
- * (map-position-picker.tsx), demandée explicitement ici pour ce widget. */
+ * ouvre directement sa fiche détail. Position demandée automatiquement à la toute première
+ * ouverture de l'accueil (pas de bouton à cliquer avant) — seule exception à la convention "jamais
+ * de géolocalisation silencieuse" (map-position-picker.tsx), demandée explicitement ici pour ce
+ * widget. La position elle-même vit dans useNearbyPositionStore (pas un `useState` local) : ce
+ * composant se démonte/remonte à chaque fois qu'on quitte puis revient sur l'accueil, sans ce
+ * store partagé la géolocalisation et le chargement des annonces proches recommenceraient à
+ * chaque fois plutôt que de rester acquis pour le reste de la session — demandé explicitement. */
 export function NearbyPropertiesMapWidget() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -22,12 +27,17 @@ export function NearbyPropertiesMapWidget() {
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const markersRef = useRef<mapboxgl.Marker[]>([]);
 
-  const [position, setPosition] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const position = useNearbyPositionStore((state) => state.position);
+  const error = useNearbyPositionStore((state) => state.error);
+  const setPosition = useNearbyPositionStore((state) => state.setPosition);
+  const setError = useNearbyPositionStore((state) => state.setError);
 
   const { data: nearby } = useNearbyProperties(position?.latitude, position?.longitude);
 
   useEffect(() => {
+    // Déjà acquise lors d'un précédent passage sur l'accueil cette session — pas la peine de
+    // redemander la position ni de rafficher le chargement.
+    if (position || error) return;
     if (!navigator.geolocation) {
       // Différé d'un micro-tick : un `setState` synchrone dans le corps de l'effet (pas dans un
       // callback asynchrone comme `getCurrentPosition` ci-dessous) déclenche un rendu en cascade
