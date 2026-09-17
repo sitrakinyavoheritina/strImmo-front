@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  allowedDevOrigins: ["51.195.221.82"],
   images: {
     remotePatterns: [
       // Photos/avatars hébergés sur Cloudflare R2 (voir strImmo/src/storage/storage.service.ts,
