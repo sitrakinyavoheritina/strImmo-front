@@ -1,7 +1,9 @@
 'use client';
 
+import Link from 'next/link';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
+import { useTranslation } from '@/lib/i18n/use-translation';
 import { CategoryGrid } from './category-grid';
 import { RecentListingsWidget } from './recent-listings-widget';
 import { NearbyPropertiesMapWidget } from './nearby-properties-map-widget';
@@ -11,6 +13,7 @@ import { NearbyPropertiesMapWidget } from './nearby-properties-map-widget';
  *  admin/superadmin (il ne parcourt pas les annonces comme un acheteur), donc rien n'est rendu
  *  pour lui, quelle que soit la page où ce composant est monté — demandé explicitement. */
 export function RightRail() {
+  const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   if (isAdmin(user)) return null;
 
@@ -19,6 +22,15 @@ export function RightRail() {
       <CategoryGrid />
       <RecentListingsWidget />
       <NearbyPropertiesMapWidget />
+      {/* Pied de cette colonne (pas un footer de site entier, qui n'existe pas encore) — seul
+          endroit de l'accueil où glisser ce lien pour l'instant, demandé explicitement en bas de
+          "Près de chez vous". */}
+      <Link
+        href="/politique-de-confidentialite"
+        className="text-xs text-content-muted hover:text-brand-primary transition text-center"
+      >
+        {t.profile.privacyPolicy}
+      </Link>
     </aside>
   );
 }

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Pencil, Home, Heart, Globe, Moon, LayoutGrid, LogOut } from 'lucide-react';
+import { Pencil, Home, Heart, Globe, Moon, LayoutGrid, LogOut, Shield } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
@@ -179,6 +179,12 @@ export default function ParametresPage() {
               </div>
             )}
           </div>
+        </div>
+
+        {/* Visible que le visiteur soit connecté ou non, admin ou non — un document légal doit
+            rester accessible à tout le monde, pas seulement à un compte actif. */}
+        <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-1.5">
+          <MenuRow href="/politique-de-confidentialite" icon={Shield} label={t.profile.privacyPolicy} />
         </div>
 
         {isAuthenticated && (

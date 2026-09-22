@@ -23,6 +23,13 @@ const translations = {
       offline: 'Vous êtes hors ligne. Certaines actions peuvent ne pas fonctionner.',
       backOnline: 'Connexion internet rétablie.',
     },
+    pwa: {
+      installTitle: "Installer l'application Onina",
+      installDescription: 'Accédez à Onina en un geste depuis votre écran d\'accueil.',
+      installButton: 'Installer',
+      installIOSInstructions: "Appuyez sur l'icône Partager (⎋), puis « Sur l'écran d'accueil ».",
+      installDismiss: 'Ne plus afficher',
+    },
     mobileNav: {
       home: 'Accueil',
       search: 'Recherche',
@@ -141,6 +148,7 @@ const translations = {
       viewProfile: 'Voir le profil',
       edit: 'Modifier le profil',
       logout: 'Se déconnecter',
+      privacyPolicy: 'Politique de confidentialité',
       phone: 'Téléphone',
       save: 'Enregistrer',
       myAccount: 'Mon compte',
@@ -629,6 +637,13 @@ const translations = {
       offline: "Tsy misy internet ianao izao. Mety tsy handeha ny sasany amin'ny asa.",
       backOnline: 'Tafaverina ny fifandraisana internet.',
     },
+    pwa: {
+      installTitle: 'Ampidino ny rindrankajy Onina',
+      installDescription: "Idiro haingana i Onina avy amin'ny efi-pijery fandraisan'ny findainao.",
+      installButton: 'Ampidino',
+      installIOSInstructions: "Tsindrio ny kisary Partager (⎋), avy eo « Ao amin'ny efi-pijery fandraisana ».",
+      installDismiss: 'Aza aseho intsony',
+    },
     mobileNav: {
       home: 'Fandraisana',
       search: 'Fikarohana',
@@ -747,6 +762,7 @@ const translations = {
       viewProfile: 'Jereo ny kaontiko',
       edit: 'Hanova ny mombamomba',
       logout: 'Hivoaka',
+      privacyPolicy: 'Politika fitandroana ny tsiambaratelo',
       phone: 'Finday',
       save: 'Tehirizo',
       myAccount: 'Kaontiko',
