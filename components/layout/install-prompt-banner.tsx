@@ -41,7 +41,7 @@ export function InstallPromptBanner() {
           sur iOS elle porte l'instruction elle-même, la tronquer la rendrait illisible. */}
       <div className="flex-1 min-w-0">
         <p className="font-semibold truncate">{t.pwa.installTitle}</p>
-        <p className="text-xs text-content-muted">
+        <p className="text-[0.85rem] text-content-muted">
           {isIOS ? t.pwa.installIOSInstructions : t.pwa.installDescription}
         </p>
       </div>
@@ -49,7 +49,7 @@ export function InstallPromptBanner() {
         <button
           type="button"
           onClick={handleInstallClick}
-          className="shrink-0 py-1.5 px-3 rounded-lg bg-brand-primary hover:bg-brand-primary-hover text-white text-xs font-semibold transition"
+          className="shrink-0 py-1.5 px-3 rounded-lg bg-brand-primary hover:bg-brand-primary-hover text-white text-[0.85rem] font-semibold transition"
         >
           {t.pwa.installButton}
         </button>

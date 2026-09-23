@@ -127,7 +127,7 @@ export function SearchSection() {
           <button
             type="button"
             onClick={handleClickSearchTab}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.85rem] font-bold uppercase tracking-wide transition ${
               tab === 'search' ? 'bg-brand-secondary text-white' : 'text-content-muted hover:bg-surface-app'
             }`}
           >
@@ -137,7 +137,7 @@ export function SearchSection() {
           <button
             type="button"
             onClick={handleClickAiTab}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide transition ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[0.85rem] font-bold uppercase tracking-wide transition ${
               tab === 'ai' ? 'bg-brand-secondary text-white' : 'text-content-muted hover:bg-surface-app'
             }`}
           >
@@ -156,7 +156,7 @@ export function SearchSection() {
               <button
                 type="button"
                 onClick={() => update('kind', filters.kind === 'rent' ? undefined : 'rent')}
-                className={`px-3 py-1.5 text-xs font-semibold transition ${
+                className={`px-3 py-1.5 text-[0.85rem] font-semibold transition ${
                   filters.kind === 'rent' ? 'bg-brand-primary text-white' : 'text-content-muted hover:bg-surface-app'
                 }`}
               >
@@ -165,7 +165,7 @@ export function SearchSection() {
               <button
                 type="button"
                 onClick={() => update('kind', filters.kind === 'sale' ? undefined : 'sale')}
-                className={`px-3 py-1.5 text-xs font-semibold transition border-l border-stroke-default ${
+                className={`px-3 py-1.5 text-[0.85rem] font-semibold transition border-l border-stroke-default ${
                   filters.kind === 'sale' ? 'bg-brand-primary text-white' : 'text-content-muted hover:bg-surface-app'
                 }`}
               >
@@ -174,7 +174,7 @@ export function SearchSection() {
             </div>
 
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-xs font-semibold text-content-muted shrink-0">{t.search.propertyType} :</span>
+              <span className="text-[0.85rem] font-semibold text-content-muted shrink-0">{t.search.propertyType} :</span>
               <Chip active={!filters.propertyType} onClick={() => selectPropertyType(undefined)}>
                 {t.search.allTypes}
               </Chip>

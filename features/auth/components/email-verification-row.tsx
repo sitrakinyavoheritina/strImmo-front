@@ -26,7 +26,7 @@ export function EmailVerificationRow({ email }: { email: string }) {
 
   if (user.isEmailVerified) {
     return (
-      <p className="flex items-center gap-1.5 text-xs text-brand-primary mt-1">
+      <p className="flex items-center gap-1.5 text-[0.85rem] text-brand-primary mt-1">
         <CheckCircle2 size={13} />
         {t.profile.emailVerified}
       </p>
@@ -73,7 +73,7 @@ export function EmailVerificationRow({ email }: { email: string }) {
           type="button"
           onClick={handleSendCode}
           disabled={isSending || !email}
-          className="text-xs font-semibold text-brand-primary hover:text-brand-primary-hover transition disabled:opacity-50"
+          className="text-[0.85rem] font-semibold text-brand-primary hover:text-brand-primary-hover transition disabled:opacity-50"
         >
           {isSending ? t.profile.sendingVerificationCode : `${t.profile.emailNotVerified} · ${t.profile.verifyEmail}`}
         </button>
@@ -85,19 +85,19 @@ export function EmailVerificationRow({ email }: { email: string }) {
             placeholder={t.profile.verificationCodePlaceholder}
             inputMode="numeric"
             maxLength={6}
-            className="flex-1 min-w-0 px-2.5 py-1.5 bg-surface-app border border-stroke-default rounded-lg text-xs text-content-main placeholder-content-muted outline-none focus:border-brand-primary transition tracking-widest"
+            className="flex-1 min-w-0 px-2.5 py-1.5 bg-surface-app border border-stroke-default rounded-lg text-[0.85rem] text-content-main placeholder-content-muted outline-none focus:border-brand-primary transition tracking-widest"
           />
           <button
             type="submit"
             disabled={isVerifying}
-            className="shrink-0 text-xs font-semibold text-brand-primary hover:text-brand-primary-hover transition disabled:opacity-50"
+            className="shrink-0 text-[0.85rem] font-semibold text-brand-primary hover:text-brand-primary-hover transition disabled:opacity-50"
           >
             {isVerifying ? t.profile.verifyingCode : t.profile.confirmCode}
           </button>
         </form>
       )}
-      {message && <p className="mt-1 text-[11px] text-content-muted">{message}</p>}
-      {error && <p className="mt-1 text-[11px] text-danger">{error}</p>}
+      {message && <p className="mt-1 text-[12px] text-content-muted">{message}</p>}
+      {error && <p className="mt-1 text-[12px] text-danger">{error}</p>}
     </div>
   );
 }

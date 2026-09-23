@@ -26,7 +26,22 @@ import type {
 const MIN_PHOTOS = 3;
 const MAX_PHOTOS = 8;
 const DESCRIPTION_MAX_LENGTH = 200;
+
+// Prix (Ariary) et surface (m²) doivent rester des nombres entiers — ni l'un ni l'autre ne
+// s'utilise avec une décimale dans la pratique (l'ariary n'a pas de sous-unité courante), et
+// `surfaceM2` est de toute façon stockée en `int` côté base (voir land-details.entity.ts,
+// residential-details.entity.ts). `FormInput` rend un simple champ texte (voir form-controls.tsx),
+// rien n'empêchait avant de taper une décimale ou une lettre — filtré ici au clavier plutôt que
+// juste validé à la soumission, pour ne jamais laisser un caractère invalide s'afficher.
+function onlyDigits(value: string): string {
+  return value.replace(/[^0-9]/g, '');
+}
 const ROOM_TYPES: RoomType[] = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6plus'];
+// Chambres (Maison) — mêmes boutons que le nombre de pièces d'une Villa/Appartement (ROOM_TYPES
+// ci-dessus), demandé explicitement plutôt qu'un champ texte libre. `bedrooms` reste un nombre
+// simple côté données (pas un enum comme `roomType`) : "6+" soumet directement 6, il n'existe pas
+// de représentation "6 ou plus" à part entière.
+const BEDROOM_OPTIONS = [1, 2, 3, 4, 5, 6];
 const PROPERTY_TYPES: { value: PropertyType; labelKey: 'typeHouse' | 'typeApartment' | 'typeVilla' | 'typeLand' }[] = [
   { value: 'house', labelKey: 'typeHouse' },
   { value: 'land', labelKey: 'typeLand' },
@@ -43,8 +58,6 @@ type FormErrors = Partial<
     | 'fokontany'
     | 'bedrooms'
     | 'surfaceM2'
-    | 'commission'
-    | 'caution'
     | 'minSubdivisionM2',
     string
   >
@@ -96,6 +109,11 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   );
   const [caution, setCaution] = useState(
     initialValues?.caution !== undefined ? String(initialValues.caution) : ''
+  );
+  // Facultatif même pour intermédiaire/agence (contrairement à commission/caution ci-dessus,
+  // obligatoires pour eux) — jamais de validation "requis" associée, voir plus bas.
+  const [visitFee, setVisitFee] = useState(
+    initialValues?.visitFee !== undefined ? String(initialValues.visitFee) : ''
   );
   // Localisation précise (commune → fokontany → position sur la carte) — remplace l'ancien champ
   // texte libre. `location` (le texte affichable "<fokontany>, <commune>") n'est plus saisi
@@ -159,6 +177,13 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
         ? String(landDefaults.surfaceM2)
         : ''
   );
+  // Un seul gestionnaire pour les deux champs "Surface" (Villa/Appartement et Terrain, jamais
+  // affichés en même temps — voir plus bas) : mêmes deux lignes de chaque côté, évite de dupliquer
+  // le filtre `onlyDigits`.
+  function handleSurfaceM2Change(value: string) {
+    setSurfaceM2(onlyDigits(value));
+    clearError('surfaceM2');
+  }
   const [isIndependent, setIsIndependent] = useState(residentialDefaults?.isIndependent ?? false);
   const [roomType, setRoomType] = useState<RoomType>(residentialDefaults?.roomType ?? 'T3');
   const [parkingSpots, setParkingSpots] = useState(residentialDefaults ? String(residentialDefaults.parkingSpots) : '');
@@ -199,8 +224,13 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
       longitude,
       photoUrls: mode === 'edit' ? (initialValues?.photoUrls ?? []) : [],
       available,
+      // Commission réservée à intermédiaire/agence (jamais un propriétaire, une commission
+      // rémunère une intermédiation) ; caution et droit de visite, eux, concernent tout le monde
+      // désormais — un propriétaire loue aussi contre une caution — remonté explicitement. Les
+      // trois sont facultatifs (0 par défaut, jamais bloquant), plus aucun n'est "obligatoire".
       commission: requiresCommission ? Number(commission) || 0 : undefined,
-      caution: requiresCommission ? Number(caution) || 0 : undefined,
+      caution: Number(caution) || 0,
+      visitFee: Number(visitFee) || 0,
     };
 
     if (propertyType === 'house') {
@@ -262,10 +292,6 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
     if (!price || Number(price) <= 0) next.price = t.listing.priceRequired;
     if (!communeId) next.commune = t.listing.communeRequired;
     if (!fokontanyId) next.fokontany = t.listing.fokontanyRequired;
-    if (requiresCommission) {
-      if (!commission || Number(commission) <= 0) next.commission = t.listing.commissionRequired;
-      if (!caution || Number(caution) <= 0) next.caution = t.listing.cautionRequired;
-    }
     if (propertyType === 'house' && (!bedrooms || Number(bedrooms) <= 0)) next.bedrooms = t.listing.bedroomsRequired;
     if (
       (propertyType === 'villa' || propertyType === 'apartment' || propertyType === 'land') &&
@@ -282,10 +308,6 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   function validateStep1(): FormErrors {
     const next: FormErrors = {};
     if (!price || Number(price) <= 0) next.price = t.listing.priceRequired;
-    if (requiresCommission) {
-      if (!commission || Number(commission) <= 0) next.commission = t.listing.commissionRequired;
-      if (!caution || Number(caution) <= 0) next.caution = t.listing.cautionRequired;
-    }
     return next;
   }
 
@@ -361,7 +383,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
                 </Chip>
               ))}
             </div>
-            {mode === 'edit' && <p className="mt-1 text-[11px] text-content-muted">{t.listing.propertyTypeImmutable}</p>}
+            {mode === 'edit' && <p className="mt-1 text-[12px] text-content-muted">{t.listing.propertyTypeImmutable}</p>}
           </div>
 
           {propertyType === 'land' && (
@@ -390,7 +412,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
             }
             value={price}
             onChange={(value) => {
-              setPrice(value);
+              setPrice(onlyDigits(value));
               clearError('price');
             }}
             placeholder="0"
@@ -399,41 +421,49 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
             error={errors.price}
           />
 
-          {requiresCommission && (
-            <>
+          {/* Côte à côte pour économiser de la place — demandé explicitement. */}
+          <div className="grid grid-cols-2 gap-3">
+            <FormInput
+              label={t.listing.caution}
+              value={caution}
+              onChange={(value) => setCaution(onlyDigits(value))}
+              placeholder="0"
+              type="number"
+              suffix="Ar"
+            />
+            <FormInput
+              label={t.listing.visitFee}
+              value={visitFee}
+              onChange={(value) => setVisitFee(onlyDigits(value))}
+              placeholder="0"
+              type="number"
+              suffix="Ar"
+            />
+          </div>
+
+          {/* Commission côte à côte avec le contact 2 — réservée à intermédiaire/agence (rémunère
+              une intermédiation, n'a pas de sens pour un propriétaire qui traite en direct),
+              contrairement à caution et droit de visite juste au-dessus, désormais communs à
+              tout le monde. Aucun des trois n'est obligatoire (0 par défaut si laissé vide, voir
+              buildValues plus haut). */}
+          <div className={requiresCommission ? 'grid grid-cols-2 gap-3' : ''}>
+            <FormInput
+              label={t.listing.formPhone2}
+              value={phone2}
+              onChange={setPhone2}
+              placeholder={t.listing.formPhone2Placeholder}
+            />
+            {requiresCommission && (
               <FormInput
                 label={t.listing.commission}
                 value={commission}
-                onChange={(value) => {
-                  setCommission(value);
-                  clearError('commission');
-                }}
+                onChange={(value) => setCommission(onlyDigits(value))}
                 placeholder="0"
                 type="number"
                 suffix="Ar"
-                error={errors.commission}
               />
-              <FormInput
-                label={t.listing.caution}
-                value={caution}
-                onChange={(value) => {
-                  setCaution(value);
-                  clearError('caution');
-                }}
-                placeholder="0"
-                type="number"
-                suffix="Ar"
-                error={errors.caution}
-              />
-            </>
-          )}
-
-          <FormInput
-            label={t.listing.formPhone2}
-            value={phone2}
-            onChange={setPhone2}
-            placeholder={t.listing.formPhone2Placeholder}
-          />
+            )}
+          </div>
 
           {mode === 'edit' ? (
             <div>
@@ -449,7 +479,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
                   </div>
                 ))}
               </div>
-              <p className="mt-1.5 text-[11px] text-content-muted">{t.listing.photosImmutableNotice}</p>
+              <p className="mt-1.5 text-[12px] text-content-muted">{t.listing.photosImmutableNotice}</p>
             </div>
           ) : (
             <ListingPhotoPicker photos={photos} onChange={setPhotos} min={MIN_PHOTOS} max={MAX_PHOTOS} />
@@ -531,10 +561,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
         <ResidentialFields
           propertyType={propertyType}
           surfaceM2={surfaceM2}
-          setSurfaceM2={(v) => {
-            setSurfaceM2(v);
-            clearError('surfaceM2');
-          }}
+          setSurfaceM2={handleSurfaceM2Change}
           surfaceM2Error={errors.surfaceM2}
           isIndependent={isIndependent}
           setIsIndependent={setIsIndependent}
@@ -554,10 +581,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
       {step === 3 && propertyType === 'land' && (
         <LandFields
           surfaceM2={surfaceM2}
-          setSurfaceM2={(v) => {
-            setSurfaceM2(v);
-            clearError('surfaceM2');
-          }}
+          setSurfaceM2={handleSurfaceM2Change}
           surfaceM2Error={errors.surfaceM2}
           legalStatus={legalStatus}
           setLegalStatus={setLegalStatus}
@@ -577,7 +601,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
           setIsSubdivisible={setIsSubdivisible}
           minSubdivisionM2={minSubdivisionM2}
           setMinSubdivisionM2={(v) => {
-            setMinSubdivisionM2(v);
+            setMinSubdivisionM2(onlyDigits(v));
             clearError('minSubdivisionM2');
           }}
           minSubdivisionM2Error={errors.minSubdivisionM2}
@@ -617,13 +641,13 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
                 {displayedTitle}
               </p>
             )}
-            {errors.title && <p className="mt-1 text-xs text-danger">{errors.title}</p>}
+            {errors.title && <p className="mt-1 text-[0.85rem] text-danger">{errors.title}</p>}
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <FieldLabel>{t.listing.formDescription}</FieldLabel>
-              <span className="text-xs text-content-muted">
+              <span className="text-[0.85rem] text-content-muted">
                 {description.length}/{DESCRIPTION_MAX_LENGTH}
               </span>
             </div>
@@ -640,7 +664,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
                 errors.description ? 'border-danger' : 'border-stroke-default'
               }`}
             />
-            {errors.description && <p className="mt-1 text-xs text-danger">{errors.description}</p>}
+            {errors.description && <p className="mt-1 text-[0.85rem] text-danger">{errors.description}</p>}
           </div>
         </>
       )}
@@ -682,9 +706,21 @@ export function HouseFields({
   const { t } = useTranslation();
   return (
     <div className="space-y-3">
-      <FormInput label={t.listing.bedroomsCount} value={bedrooms} onChange={setBedrooms} placeholder="0" type="number" error={bedroomsError} />
-      <Toggle label={t.search.carAccess} checked={hasCarAccess} onChange={setHasCarAccess} />
-      <Toggle label={t.search.hasMotorbikeAccess} checked={hasMotorbikeAccess} onChange={setHasMotorbikeAccess} />
+      <div>
+        <FieldLabel>{t.listing.bedroomsCount}</FieldLabel>
+        <div className="flex flex-wrap gap-2">
+          {BEDROOM_OPTIONS.map((count, index) => (
+            <Chip key={count} active={Number(bedrooms) === count} onClick={() => setBedrooms(String(count))}>
+              {index === BEDROOM_OPTIONS.length - 1 ? `${count}+` : String(count)}
+            </Chip>
+          ))}
+        </div>
+        {bedroomsError && <p className="mt-1 text-[0.85rem] text-danger">{bedroomsError}</p>}
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Toggle label={t.search.carAccess} checked={hasCarAccess} onChange={setHasCarAccess} />
+        <Toggle label={t.search.hasMotorbikeAccess} checked={hasMotorbikeAccess} onChange={setHasMotorbikeAccess} />
+      </div>
       <div>
         <FieldLabel>{t.search.waterSource}</FieldLabel>
         <div className="flex gap-2">

@@ -37,6 +37,7 @@ export function mapApiPropertyToProperty(api: ApiProperty): Property {
     phone2: api.phone2 ?? undefined,
     commission: api.commission != null ? Number(api.commission) : undefined,
     caution: api.caution != null ? Number(api.caution) : undefined,
+    visitFee: api.visitFee != null ? Number(api.visitFee) : undefined,
     viewCount: api.viewCount,
     authorName:
       api.user?.firstName || api.user?.lastName
@@ -93,6 +94,7 @@ export function buildCreatePropertyFormData(values: PropertyFormValues, photos: 
   if (values.phone2) form.append('phone2', values.phone2);
   if (values.commission !== undefined) form.append('commission', String(values.commission));
   if (values.caution !== undefined) form.append('caution', String(values.caution));
+  if (values.visitFee !== undefined) form.append('visitFee', String(values.visitFee));
 
   if (values.propertyType === 'house') {
     form.append('bedrooms', String(values.bedrooms));
@@ -150,6 +152,12 @@ export function buildUpdatePropertyPayload(values: PropertyFormValues): Record<s
     latitude: values.latitude,
     longitude: values.longitude,
     available: values.available,
+    // Absents jusqu'ici de ce payload (donc jamais modifiables après publication, contrairement à
+    // la création) — remonté explicitement. `undefined` pour un propriétaire (jamais ces champs) :
+    // `JSON.stringify` les omet du corps envoyé, pas besoin de les exclure explicitement ici.
+    commission: values.commission,
+    caution: values.caution,
+    visitFee: values.visitFee,
   };
 
   if (values.propertyType === 'house') {

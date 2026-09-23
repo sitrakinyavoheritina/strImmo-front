@@ -8,12 +8,7 @@ import { useProperties } from '@/features/search/hooks/use-properties';
 import { Avatar } from '@/components/ui/avatar';
 import { FeedList } from '@/features/feed/components/feed-list';
 import { RightRail } from '@/features/feed/components/right-rail';
-
-const ROLE_LABEL_KEY = {
-  owner: 'roleOwner',
-  agent: 'roleAgent',
-  agency: 'roleAgency',
-} as const;
+import { ROLE_LABEL_KEY } from '@/features/auth/utils/role-label';
 
 /** Profil public d'un propriétaire/intermédiaire/agence — atteint en cliquant sur son nom/avatar
  * depuis une carte du fil ou la fiche détail d'une annonce (voir feed-property-card.tsx,
@@ -69,7 +64,7 @@ export default function PublicProfilePage() {
             <div className="flex-1 min-w-0">
               <p className="font-bold text-content-main truncate">{author.authorName}</p>
               {author.publisherType && (
-                <p className="text-xs text-content-muted">{t.auth[ROLE_LABEL_KEY[author.publisherType]]}</p>
+                <p className="text-[0.85rem] text-content-muted">{t.auth[ROLE_LABEL_KEY[author.publisherType]]}</p>
               )}
             </div>
           </div>
@@ -77,7 +72,7 @@ export default function PublicProfilePage() {
           <div className="mt-4">
             <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-3.5 text-center max-w-[200px]">
               <p className="text-xl font-bold text-content-main">{properties?.length ?? 0}</p>
-              <p className="text-xs text-content-muted mt-0.5">{t.publicProfilePage.listingsAvailable}</p>
+              <p className="text-[0.85rem] text-content-muted mt-0.5">{t.publicProfilePage.listingsAvailable}</p>
             </div>
           </div>
 

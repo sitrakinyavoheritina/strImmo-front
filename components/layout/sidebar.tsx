@@ -39,7 +39,7 @@ export function Sidebar() {
               <Icon size={20} strokeWidth={isActive ? 2.4 : 2} />
               {t.sidebar[labelKey]}
               {href === '/messages' && unreadCount > 0 && (
-                <span className="ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-brand-primary text-white text-[11px] font-bold flex items-center justify-center">
+                <span className="ml-auto min-w-[20px] h-5 px-1.5 rounded-full bg-brand-primary text-white text-[12px] font-bold flex items-center justify-center">
                   {unreadCount}
                 </span>
               )}

@@ -19,9 +19,11 @@ function toUser(api: ApiUser): User {
     phone: api.phone ?? undefined,
     email: api.email ?? undefined,
     avatarUrl: api.avatarUrl ?? undefined,
+    coverUrl: api.coverUrl ?? undefined,
     address: api.address ?? undefined,
     phone2: api.phone2 ?? undefined,
     isEmailVerified: api.isEmailVerified ?? false,
+    hasPassword: api.hasPassword ?? true,
     role: api.role,
     themePreference: api.themePreference,
     feedDisplay: api.feedDisplay,
@@ -95,13 +97,16 @@ export const authService = {
     if (payload.stat) form.append('stat', payload.stat);
     if (payload.nifNumber) form.append('nifNumber', payload.nifNumber);
     if (payload.statNumber) form.append('statNumber', payload.statNumber);
+    if (payload.website) form.append('website', payload.website);
+    if (payload.facebookUrl) form.append('facebookUrl', payload.facebookUrl);
+    if (payload.description) form.append('description', payload.description);
     await authApi.registerAgency(form);
     return { status: 'pending' };
   },
 
   updateProfile: async (payload: UpdateProfilePayload): Promise<User> => {
     const form = new FormData();
-    form.append('currentPassword', payload.currentPassword);
+    if (payload.currentPassword) form.append('currentPassword', payload.currentPassword);
     if (payload.firstName) form.append('firstName', payload.firstName);
     if (payload.lastName) form.append('lastName', payload.lastName);
     if (payload.email) form.append('email', payload.email);
@@ -109,6 +114,7 @@ export const authService = {
     if (payload.phone2) form.append('phone2', payload.phone2);
     if (payload.newPassword) form.append('newPassword', payload.newPassword);
     if (payload.avatar) form.append('avatar', payload.avatar);
+    if (payload.cover) form.append('cover', payload.cover);
     const res = await authApi.updateProfile(form);
     return toUser(res);
   },

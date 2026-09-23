@@ -28,7 +28,7 @@ export function CategoryGrid() {
           <Link
             key={href}
             href={href}
-            className="flex flex-col items-center gap-1.5 rounded-xl border border-stroke-default bg-surface-card py-3 text-xs font-medium text-content-main hover:border-brand-primary hover:text-brand-primary transition"
+            className="flex flex-col items-center gap-1.5 rounded-xl border border-stroke-default bg-surface-card py-3 text-[0.85rem] font-medium text-content-main hover:border-brand-primary hover:text-brand-primary transition"
           >
             <Icon size={20} />
             {t.feed[labelKey]}

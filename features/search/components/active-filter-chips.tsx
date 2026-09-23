@@ -104,7 +104,7 @@ export function ActiveFilterChips({
           key={chip.key}
           type="button"
           onClick={() => onRemove(chip.key)}
-          className="flex items-center gap-1.5 shrink-0 bg-brand-primary-soft text-brand-primary text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-stroke-default transition"
+          className="flex items-center gap-1.5 shrink-0 bg-brand-primary-soft text-brand-primary text-[0.85rem] font-semibold px-3 py-1.5 rounded-full hover:bg-stroke-default transition"
         >
           {chip.label}
           <X size={12} />

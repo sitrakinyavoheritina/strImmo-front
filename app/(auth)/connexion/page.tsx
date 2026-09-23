@@ -17,7 +17,7 @@ function ConnexionContent() {
       {isPending && (
         <div className="mb-3 sm:mb-4 rounded-xl border border-brand-primary/30 bg-brand-primary-soft px-3 py-2.5 text-sm text-brand-primary text-left">
           <p className="font-semibold">{t.auth.pendingApprovalTitle}</p>
-          <p className="mt-0.5 text-xs">{t.auth.pendingApprovalMessage}</p>
+          <p className="mt-0.5 text-[0.85rem]">{t.auth.pendingApprovalMessage}</p>
         </div>
       )}
       {isReset && (

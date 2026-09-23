@@ -72,7 +72,7 @@ export function NewsForm({ initialValues, onSubmit, isSubmitting, submitLabel }:
           {coverPreviewUrl ? (
             <Image src={coverPreviewUrl} alt="" fill className="object-cover" />
           ) : (
-            <span className="flex flex-col items-center gap-1.5 text-content-muted text-xs font-medium">
+            <span className="flex flex-col items-center gap-1.5 text-content-muted text-[0.85rem] font-medium">
               <ImagePlus size={22} />
               {t.adminNewsPage.coverPlaceholder}
             </span>
@@ -105,7 +105,7 @@ export function NewsForm({ initialValues, onSubmit, isSubmitting, submitLabel }:
         />
       </div>
 
-      {error && <p className="text-xs text-danger">{error}</p>}
+      {error && <p className="text-[0.85rem] text-danger">{error}</p>}
 
       <Button type="submit" disabled={isSubmitting} className="w-full">
         {isSubmitting ? t.adminNewsPage.saving : submitLabel}

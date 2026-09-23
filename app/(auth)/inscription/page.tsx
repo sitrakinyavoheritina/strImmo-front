@@ -17,7 +17,7 @@ export default function InscriptionPage() {
 
       <div className="mt-5 flex items-center gap-3">
         <span className="flex-1 h-px bg-stroke-default" />
-        <span className="text-[11px] font-medium text-content-muted uppercase">{t.auth.orDivider}</span>
+        <span className="text-[12px] font-medium text-content-muted uppercase">{t.auth.orDivider}</span>
         <span className="flex-1 h-px bg-stroke-default" />
       </div>
 

@@ -21,7 +21,7 @@ export function LanguageMenu() {
         onClick={() => setIsOpen((v) => !v)}
         aria-label={LOCALE_LABELS[locale]}
         aria-expanded={isOpen}
-        className="w-9 h-9 rounded-full bg-surface-app border border-stroke-default text-content-main text-[11px] font-bold flex items-center justify-center uppercase active:scale-95 transition"
+        className="w-9 h-9 rounded-full bg-surface-app border border-stroke-default text-content-main text-[12px] font-bold flex items-center justify-center uppercase active:scale-95 transition"
       >
         {locale}
       </button>

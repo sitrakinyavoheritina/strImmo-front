@@ -45,7 +45,7 @@ export function PendingPropertyCard({ property }: { property: Property }) {
     return (
       <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-3 space-y-2">
         <p className="text-sm font-semibold text-content-main truncate">{property.title}</p>
-        <label className="block text-xs font-semibold text-content-muted" htmlFor={`reject-reason-${property.id}`}>
+        <label className="block text-[0.85rem] font-semibold text-content-muted" htmlFor={`reject-reason-${property.id}`}>
           {t.validationPage.rejectReasonLabel}
         </label>
         <textarea
@@ -56,7 +56,7 @@ export function PendingPropertyCard({ property }: { property: Property }) {
           rows={2}
           className="w-full rounded-lg border border-stroke-default bg-surface-app px-2.5 py-1.5 text-sm text-content-main placeholder-content-muted outline-none focus:border-brand-primary resize-none"
         />
-        <div className="flex items-center gap-3 text-xs">
+        <div className="flex items-center gap-3 text-[0.85rem]">
           <button
             type="button"
             onClick={handleConfirmReject}
@@ -77,7 +77,7 @@ export function PendingPropertyCard({ property }: { property: Property }) {
             {t.validationPage.rejectCancel}
           </button>
         </div>
-        {error && <p className="text-xs text-danger">{error}</p>}
+        {error && <p className="text-[0.85rem] text-danger">{error}</p>}
       </div>
     );
   }
@@ -92,12 +92,12 @@ export function PendingPropertyCard({ property }: { property: Property }) {
       </Link>
       <Link href={`/annonce/${property.id}`} className="flex-1 min-w-0">
         <p className="text-sm font-semibold text-content-main truncate">{property.title}</p>
-        <p className="text-xs text-content-muted truncate">{property.location}</p>
+        <p className="text-[0.85rem] text-content-muted truncate">{property.location}</p>
         <p className="text-sm font-bold text-brand-secondary-text mt-0.5">
           {formatPrice(property.price)}
           {getPriceSuffix(property) && <span className="font-normal text-content-muted">{getPriceSuffix(property)}</span>}
         </p>
-        {error && <p className="text-xs text-danger mt-0.5">{error}</p>}
+        {error && <p className="text-[0.85rem] text-danger mt-0.5">{error}</p>}
       </Link>
       <div className="shrink-0 flex flex-col gap-1.5">
         <button

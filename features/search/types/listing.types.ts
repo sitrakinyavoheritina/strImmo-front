@@ -50,6 +50,9 @@ type PropertyBase = {
   phone2?: string;
   commission?: number;
   caution?: number;
+  /** Frais facturé par un intermédiaire/une agence pour faire visiter le bien — facultatif même
+   *  pour eux (contrairement à commission/caution), jamais présent pour un propriétaire. */
+  visitFee?: number;
   viewCount: number;
   // Renseignés seulement quand le backend renvoie `user` (toujours sur le détail, nom/avatar/rôle
   // seulement sur la liste — voir property-api.ts) — absents sinon.

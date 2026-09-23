@@ -26,7 +26,7 @@ export const LoginForm: React.FC = () => {
 
       <form className="space-y-3 sm:space-y-5" onSubmit={onSubmit}>
         <div>
-          <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">
+          <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">
             {t.auth.identifier}
           </label>
           <input
@@ -39,13 +39,13 @@ export const LoginForm: React.FC = () => {
               errors.identifier ? 'border-red-500' : 'border-stroke-default'
             }`}
           />
-          {errors.identifier && <p className="mt-0.5 text-xs text-danger">{errors.identifier.message}</p>}
+          {errors.identifier && <p className="mt-0.5 text-[0.85rem] text-danger">{errors.identifier.message}</p>}
         </div>
 
         <div>
           <div className="flex items-center justify-between mb-0.5 sm:mb-1">
-            <label className="text-xs font-medium text-content-main">{t.auth.password}</label>
-            <Link href="/mot-de-passe-oublie" className="text-xs font-semibold text-brand-primary hover:text-brand-primary-hover">
+            <label className="text-[0.85rem] font-medium text-content-main">{t.auth.password}</label>
+            <Link href="/mot-de-passe-oublie" className="text-[0.85rem] font-semibold text-brand-primary hover:text-brand-primary-hover">
               {t.auth.forgotPassword}
             </Link>
           </div>
@@ -61,12 +61,12 @@ export const LoginForm: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-content-muted hover:text-content-main font-medium"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-[0.85rem] text-content-muted hover:text-content-main font-medium"
             >
               {showPassword ? t.auth.hide : t.auth.show}
             </button>
           </div>
-          {errors.password && <p className="mt-0.5 text-xs text-danger">{errors.password.message}</p>}
+          {errors.password && <p className="mt-0.5 text-[0.85rem] text-danger">{errors.password.message}</p>}
         </div>
 
         <Button type="submit" disabled={isLoading} variant="secondary" className="w-full">
@@ -76,14 +76,14 @@ export const LoginForm: React.FC = () => {
 
       <div className="flex items-center gap-3">
         <span className="flex-1 h-px bg-stroke-default" />
-        <span className="text-[11px] font-medium text-content-muted uppercase">{t.auth.orDivider}</span>
+        <span className="text-[12px] font-medium text-content-muted uppercase">{t.auth.orDivider}</span>
         <span className="flex-1 h-px bg-stroke-default" />
       </div>
 
       <GoogleSignInButton />
 
       <div className="text-center border-t border-stroke-default pt-3 sm:pt-5 space-y-2">
-        <p className="text-xs text-content-muted">{t.auth.noAccount}</p>
+        <p className="text-[0.85rem] text-content-muted">{t.auth.noAccount}</p>
         <Link
           href="/inscription"
           className="block w-full py-2.5 px-4 text-sm font-semibold rounded-xl bg-surface-app hover:bg-stroke-default border border-stroke-default text-content-main transition active:scale-[0.98]"

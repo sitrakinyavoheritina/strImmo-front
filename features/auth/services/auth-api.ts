@@ -10,9 +10,11 @@ export type ApiUser = {
   firstName: string;
   lastName: string;
   avatarUrl: string | null;
+  coverUrl: string | null;
   address: string | null;
   phone2: string | null;
   isEmailVerified: boolean;
+  hasPassword: boolean;
   role: UserRole;
   themePreference: ThemePreference;
   feedDisplay: FeedDisplayPreference;

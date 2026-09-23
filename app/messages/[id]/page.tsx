@@ -249,7 +249,7 @@ export default function ConversationPage() {
               item.type === 'separator' ? (
                 <span
                   key={item.key}
-                  className="self-center bg-stroke-default/60 text-content-muted text-xs font-medium px-3 py-1 rounded-full my-1"
+                  className="self-center bg-stroke-default/60 text-content-muted text-[0.85rem] font-medium px-3 py-1 rounded-full my-1"
                 >
                   {item.label}
                 </span>
@@ -268,7 +268,7 @@ export default function ConversationPage() {
         </div>
       )}
 
-      {errorMessage && <p className="shrink-0 text-xs text-danger px-4 pb-1">{errorMessage}</p>}
+      {errorMessage && <p className="shrink-0 text-[0.85rem] text-danger px-4 pb-1">{errorMessage}</p>}
 
       <div className="shrink-0 flex items-end gap-2 px-3 py-3 border-t border-stroke-default">
         <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handlePickImage} />

@@ -235,12 +235,12 @@ export function FeaturedStories({
                 </span>
               </div>
               <div className="p-1.5 space-y-0.5">
-                <p className="text-xs font-bold text-brand-primary line-clamp-1">{formatPrice(property.price)}</p>
+                <p className="text-[0.85rem] font-bold text-brand-primary line-clamp-1">{formatPrice(property.price)}</p>
                 {showTitle && (
-                  <p className="text-[11px] font-semibold text-content-main line-clamp-1">{property.title}</p>
+                  <p className="text-[12px] font-semibold text-content-main line-clamp-1">{property.title}</p>
                 )}
-                <p className="flex items-center gap-0.5 text-[10px] text-content-muted">
-                  <MapPin size={9} className="shrink-0 text-brand-primary" />
+                <p className="flex items-center gap-0.5 text-[12px] text-content-muted">
+                  <MapPin size={10} className="shrink-0 text-brand-primary" />
                   <span className="truncate">{property.location}</span>
                 </p>
                 {spec && (

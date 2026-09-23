@@ -38,6 +38,8 @@ export type AgentFormData = z.infer<typeof agentSchema>;
 
 // Agence : email requis (contrairement à owner/tenant), mot de passe `minLength 8`, plus les
 // informations de la société. NIF/STAT gérés hors zod (fichiers requis, vérifiés séparément).
+// website/facebookUrl/description : vitrine publique facultative — jamais requis (voir
+// AgencyProfile côté backend), `.or(z.literal(''))` laisse le champ vide passer sans erreur.
 export const agencySchema = z.object({
   firstName: z.string().min(2, 'Le prénom est requis'),
   lastName: z.string().min(2, 'Le nom est requis'),
@@ -46,6 +48,9 @@ export const agencySchema = z.object({
   password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
   agencyName: z.string().min(2, "Le nom de l'agence est requis"),
   address: z.string().min(2, "L'adresse est requise"),
+  website: z.string().url('URL invalide').optional().or(z.literal('')),
+  facebookUrl: z.string().url('URL invalide').optional().or(z.literal('')),
+  description: z.string().optional().or(z.literal('')),
 });
 
 export type AgencyFormData = z.infer<typeof agencySchema>;

@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowLeft, Pencil } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
@@ -30,6 +31,7 @@ export default function ModifierProfilPage() {
   const hasHydrated = useAuthHasHydrated();
   const { submit, isLoading, errorMessage } = useUpdateProfile();
   const avatarInputId = useId();
+  const coverInputId = useId();
 
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -40,6 +42,8 @@ export default function ModifierProfilPage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState<string | null>(null);
   const [editingFields, setEditingFields] = useState<Set<FieldKey>>(new Set());
   const [errors, setErrors] = useState<FormErrors>({});
 
@@ -74,6 +78,13 @@ export default function ModifierProfilPage() {
     setAvatarPreviewUrl(URL.createObjectURL(file));
   }
 
+  function handleChangeCover(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setCoverFile(file);
+    setCoverPreviewUrl(URL.createObjectURL(file));
+  }
+
   if (!isAuthenticated || !user) {
     return (
       <div className="max-w-md mx-auto px-4 py-16 text-center">
@@ -85,6 +96,11 @@ export default function ModifierProfilPage() {
     );
   }
 
+  // Capturé ici (portée où TypeScript a déjà écarté `null`, juste après le garde ci-dessus) plutôt
+  // que relu comme `user.hasPassword` dans validate()/handleSubmit() : ces deux fonctions sont
+  // imbriquées dans le corps du composant, où TS ne propage pas ce rétrécissement de type.
+  const hasPassword = user.hasPassword;
+
   function validate(): FormErrors {
     const next: FormErrors = {};
     if (!firstName.trim()) next.firstName = t.auth.firstNameRequired;
@@ -93,7 +109,9 @@ export default function ModifierProfilPage() {
     if (editingFields.has('password') && newPassword && newPassword.length < 8) {
       next.password = t.auth.passwordTooShort;
     }
-    if (!currentPassword) next.currentPassword = t.profile.currentPasswordRequired;
+    // Un compte créé via Google (`!user.hasPassword`) n'a jamais eu de vrai mot de passe à
+    // retaper — le champ est masqué plus bas (voir le JSX), rien à valider ici pour lui.
+    if (hasPassword && !currentPassword) next.currentPassword = t.profile.currentPasswordRequired;
     return next;
   }
 
@@ -104,7 +122,7 @@ export default function ModifierProfilPage() {
     if (Object.keys(nextErrors).some((key) => nextErrors[key as keyof FormErrors])) return;
 
     const ok = await submit({
-      currentPassword,
+      currentPassword: hasPassword ? currentPassword : undefined,
       firstName: firstName || undefined,
       lastName: lastName || undefined,
       email: email || undefined,
@@ -112,6 +130,7 @@ export default function ModifierProfilPage() {
       phone2: phone2 || undefined,
       newPassword: editingFields.has('password') && newPassword ? newPassword : undefined,
       avatar: avatarFile,
+      cover: coverFile,
     });
     if (ok) router.push('/profil');
   }
@@ -132,7 +151,24 @@ export default function ModifierProfilPage() {
         <FormErrorBanner message={errorMessage} />
 
         <form className="space-y-1" onSubmit={handleSubmit}>
-          <div className="flex justify-center pb-3">
+          {/* Photo de couverture — distincte de l'avatar juste en dessous, facultative comme lui. */}
+          <div className="relative">
+            <div className="relative h-24 sm:h-28 rounded-xl overflow-hidden bg-gradient-to-br from-brand-primary to-brand-primary-hover">
+              {(coverPreviewUrl ?? user.coverUrl) && (
+                <Image src={coverPreviewUrl ?? user.coverUrl!} alt="" fill className="object-cover" />
+              )}
+            </div>
+            <label
+              htmlFor={coverInputId}
+              aria-label={t.profile.coverChange}
+              className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/55 flex items-center justify-center cursor-pointer transition"
+            >
+              <Pencil size={14} className="text-white" />
+            </label>
+            <input id={coverInputId} type="file" accept="image/*" className="sr-only" onChange={handleChangeCover} />
+          </div>
+
+          <div className="flex justify-center py-3">
             <div className="relative">
               <Avatar name={`${firstName} ${lastName}`.trim() || user.fullName} imageUrl={avatarPreviewUrl ?? user.avatarUrl} size={88} />
               <label
@@ -218,7 +254,7 @@ export default function ModifierProfilPage() {
 
           {user.phone && (
             <div className="py-2.5 border-b border-stroke-default">
-              <span className="block text-xs font-medium text-content-muted">{t.auth.phone}</span>
+              <span className="block text-[0.85rem] font-medium text-content-muted">{t.auth.phone}</span>
               <p className="mt-0.5 text-sm text-content-main">{user.phone}</p>
             </div>
           )}
@@ -231,25 +267,31 @@ export default function ModifierProfilPage() {
             placeholder={t.profile.phone2Placeholder}
             editLabel={t.profile.edit}
           />
-          <p className="text-[11px] text-content-muted -mt-1 pb-1">{t.profile.phone2Hint}</p>
+          <p className="text-[12px] text-content-muted -mt-1 pb-1">{t.profile.phone2Hint}</p>
 
-          <div className="border-t border-stroke-default pt-3.5 space-y-1">
-            <p className="text-[11px] text-content-muted">{t.profile.confirmChangesNote}</p>
-            <label className="block text-xs font-medium text-content-main mb-1">{t.profile.currentPassword}</label>
-            <input
-              type="password"
-              placeholder="••••••••"
-              value={currentPassword}
-              onChange={(event) => {
-                setCurrentPassword(event.target.value);
-                clearError('currentPassword');
-              }}
-              className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
-                errors.currentPassword ? 'border-danger' : 'border-stroke-default'
-              }`}
-            />
-            {errors.currentPassword && <p className="mt-0.5 text-xs text-danger">{errors.currentPassword}</p>}
-          </div>
+          {/* Absent pour un compte créé via "Se connecter avec Google" (voir User.hasPassword) :
+              son mot de passe est un hash aléatoire que personne ne connaît ni ne peut retaper —
+              le lui demander quand même bloquerait toute modification de profil pour toujours,
+              remonté explicitement par l'utilisateur. */}
+          {hasPassword && (
+            <div className="border-t border-stroke-default pt-3.5 space-y-1">
+              <p className="text-[12px] text-content-muted">{t.profile.confirmChangesNote}</p>
+              <label className="block text-[0.85rem] font-medium text-content-main mb-1">{t.profile.currentPassword}</label>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={currentPassword}
+                onChange={(event) => {
+                  setCurrentPassword(event.target.value);
+                  clearError('currentPassword');
+                }}
+                className={`w-full px-3 py-2.5 bg-surface-app border rounded-xl text-sm text-content-main focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
+                  errors.currentPassword ? 'border-danger' : 'border-stroke-default'
+                }`}
+              />
+              {errors.currentPassword && <p className="mt-0.5 text-[0.85rem] text-danger">{errors.currentPassword}</p>}
+            </div>
+          )}
 
           <Button type="submit" disabled={isLoading} className="w-full mt-3.5">
             {isLoading ? t.profile.saving : t.profile.save}

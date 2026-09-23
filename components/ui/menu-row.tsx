@@ -25,7 +25,7 @@ export function MenuRow({
     <>
       <Icon size={18} />
       <span className="flex-1 text-left">{label}</span>
-      {badge && <span className="text-xs text-content-muted">{badge}</span>}
+      {badge && <span className="text-[0.85rem] text-content-muted">{badge}</span>}
       {href && !disabled && <ChevronRight size={16} className="text-content-muted" />}
     </>
   );

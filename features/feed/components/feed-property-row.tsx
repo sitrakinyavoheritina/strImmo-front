@@ -72,7 +72,7 @@ export function FeedPropertyRow({ property }: { property: Property }) {
             un coin opposé, avec un grand vide entre les deux). */}
         <div className="flex items-center justify-between gap-2">
           {property.publisherType ? (
-            <span className="text-xs font-bold uppercase text-content-muted">
+            <span className="text-[0.85rem] font-bold uppercase text-content-muted">
               {t.search[PUBLISHER_LABEL_KEY[property.publisherType]]}
             </span>
           ) : (
@@ -86,7 +86,7 @@ export function FeedPropertyRow({ property }: { property: Property }) {
             >
               {property.kind === 'rent' ? t.property.forRent : t.property.forSale}
             </span>
-            <span className="text-xs text-content-muted">{formatRelativeTime(property.createdAt)}</span>
+            <span className="text-[0.85rem] text-content-muted">{formatRelativeTime(property.createdAt)}</span>
           </div>
         </div>
 
@@ -97,7 +97,7 @@ export function FeedPropertyRow({ property }: { property: Property }) {
           <h3 className="text-sm font-semibold text-content-main line-clamp-2">{property.title}</h3>
         </Link>
 
-        <p className="text-xs text-content-main flex items-start gap-1 mt-0.5 min-w-0">
+        <p className="text-[0.85rem] text-content-main flex items-start gap-1 mt-0.5 min-w-0">
           <MapPin size={11} className="shrink-0 mt-0.5 text-brand-primary" />
           <span className="line-clamp-2">{property.location}</span>
         </p>
@@ -114,13 +114,13 @@ export function FeedPropertyRow({ property }: { property: Property }) {
           {property.authorName ? (
             <Link href={`/profil/${property.ownerId}`} className="flex items-center gap-1.5 min-w-0 hover:underline">
               <Avatar name={property.authorName} imageUrl={property.authorAvatarUrl} size={18} />
-              <span className="text-xs font-semibold text-content-main truncate">@{property.authorName}</span>
+              <span className="text-[0.85rem] font-semibold text-content-main truncate">@{property.authorName}</span>
             </Link>
           ) : (
             <span />
           )}
           {!isAdminUser && (
-            <div className="flex items-center gap-2.5 text-xs font-medium text-content-muted shrink-0">
+            <div className="flex items-center gap-2.5 text-[0.85rem] font-medium text-content-muted shrink-0">
               <button
                 type="button"
                 onClick={handleLikeClick}

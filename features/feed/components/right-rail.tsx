@@ -27,7 +27,7 @@ export function RightRail() {
           "Près de chez vous". */}
       <Link
         href="/politique-de-confidentialite"
-        className="text-xs text-content-muted hover:text-brand-primary transition text-center"
+        className="text-[0.85rem] text-content-muted hover:text-brand-primary transition text-center"
       >
         {t.profile.privacyPolicy}
       </Link>

@@ -32,6 +32,10 @@ export type RegisterAgencyPayload = RegisterBaseFields & {
   stat?: File | null;
   nifNumber?: string;
   statNumber?: string;
+  // Vitrine publique de l'agence — tout facultatif (voir AgencyProfile côté backend).
+  website?: string;
+  facebookUrl?: string;
+  description?: string;
 };
 
 export type RegisterPayload =
@@ -63,7 +67,9 @@ export interface CompleteProfilePayload {
 }
 
 export interface UpdateProfilePayload {
-  currentPassword: string;
+  /** Absent uniquement pour un compte sans vrai mot de passe (voir User.hasPassword) — requis pour
+   *  tous les autres, validé côté formulaire (voir profil/modifier/page.tsx:validate). */
+  currentPassword: string | undefined;
   firstName?: string;
   lastName?: string;
   email?: string;
@@ -73,6 +79,7 @@ export interface UpdateProfilePayload {
   phone2?: string;
   newPassword?: string;
   avatar?: File | null;
+  cover?: File | null;
 }
 
 export type ThemePreference = 'system' | 'light' | 'dark';
@@ -90,9 +97,14 @@ export interface User {
   phone?: string;
   email?: string;
   avatarUrl?: string;
+  coverUrl?: string;
   address?: string;
   phone2?: string;
   isEmailVerified: boolean;
+  /** `false` uniquement pour un compte créé via "Se connecter avec Google" qui n'a jamais lui-même
+   *  choisi de mot de passe (voir strImmo/src/auth/entities/user.entity.ts) — /profil/modifier
+   *  n'exige alors pas le mot de passe actuel, qu'il ne peut de toute façon pas connaître. */
+  hasPassword: boolean;
   role: UserRole;
   themePreference: ThemePreference;
   feedDisplay: FeedDisplayPreference;

@@ -62,7 +62,7 @@ export default function ActuDetailPage() {
           </div>
         )}
 
-        <p className="text-xs text-content-muted">{formatPublishedDate(article.publishedAt, locale)}</p>
+        <p className="text-[0.85rem] text-content-muted">{formatPublishedDate(article.publishedAt, locale)}</p>
         <h1 className="text-xl sm:text-2xl font-bold text-content-main mt-1">{article.title}</h1>
         <p className="text-sm text-content-muted mt-2">{article.summary}</p>
 

@@ -62,9 +62,9 @@ export function NewConversationModal({ onClose }: { onClose: () => void }) {
 
         <div className="mt-3 max-h-72 overflow-y-auto -mx-1 px-1">
           {debouncedQuery.trim().length < 2 ? (
-            <p className="text-xs text-content-muted text-center py-4">{t.messages.newConversationHint}</p>
+            <p className="text-[0.85rem] text-content-muted text-center py-4">{t.messages.newConversationHint}</p>
           ) : isFetching ? (
-            <p className="text-xs text-content-muted text-center py-4">{t.search.searching}</p>
+            <p className="text-[0.85rem] text-content-muted text-center py-4">{t.search.searching}</p>
           ) : contacts && contacts.length > 0 ? (
             <div className="divide-y divide-stroke-default">
               {contacts.map((contact) => (
@@ -80,17 +80,17 @@ export function NewConversationModal({ onClose }: { onClose: () => void }) {
                     <p className="font-semibold text-sm text-content-main truncate">
                       {contact.agencyName ?? contact.fullName}
                     </p>
-                    <p className="text-xs text-content-muted">{t.auth[ROLE_LABEL_KEY[contact.role]]}</p>
+                    <p className="text-[0.85rem] text-content-muted">{t.auth[ROLE_LABEL_KEY[contact.role]]}</p>
                   </div>
                 </button>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-content-muted text-center py-4">{t.messages.newConversationEmpty}</p>
+            <p className="text-[0.85rem] text-content-muted text-center py-4">{t.messages.newConversationEmpty}</p>
           )}
         </div>
 
-        {error && <p className="mt-2 text-xs text-danger">{t.messages.newConversationError}</p>}
+        {error && <p className="mt-2 text-[0.85rem] text-danger">{t.messages.newConversationError}</p>}
       </div>
     </div>
   );

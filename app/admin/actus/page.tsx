@@ -69,7 +69,7 @@ export default function AdminActusPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-content-main truncate">{article.title}</p>
-                <p className="text-xs text-content-muted">{formatPublishedDate(article.publishedAt, locale)}</p>
+                <p className="text-[0.85rem] text-content-muted">{formatPublishedDate(article.publishedAt, locale)}</p>
               </div>
               <Link
                 href={`/admin/actus/${article.id}`}
@@ -79,7 +79,7 @@ export default function AdminActusPage() {
                 <Pencil size={15} />
               </Link>
               {pendingDeleteId === article.id ? (
-                <div className="flex items-center gap-1.5 text-xs font-semibold shrink-0">
+                <div className="flex items-center gap-1.5 text-[0.85rem] font-semibold shrink-0">
                   <button
                     type="button"
                     onClick={() => handleDelete(article.id)}

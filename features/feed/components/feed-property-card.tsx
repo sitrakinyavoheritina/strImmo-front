@@ -79,7 +79,7 @@ export function FeedPropertyCard({ property }: { property: Property }) {
           </span>
           <span className="text-white text-[15px] font-bold shrink-0">
             {formatPrice(property.price)}
-            {getPriceSuffix(property) && <span className="text-xs font-normal text-white/75">{getPriceSuffix(property)}</span>}
+            {getPriceSuffix(property) && <span className="text-[0.85rem] font-normal text-white/75">{getPriceSuffix(property)}</span>}
           </span>
         </div>
       </Link>
@@ -89,11 +89,11 @@ export function FeedPropertyCard({ property }: { property: Property }) {
           {/* `content-main` (pas `content-muted`) : la localisation reste une information clé de
               l'annonce, pas un simple détail secondaire — demandé explicitement après un retour
               sur sa lisibilité en thème sombre. */}
-          <p className="text-xs text-content-main flex items-center gap-1 min-w-0">
+          <p className="text-[0.85rem] text-content-main flex items-center gap-1 min-w-0">
             <MapPin size={12} className="shrink-0 text-brand-primary" />
             <span className="truncate">{property.location}</span>
           </p>
-          <span className="text-xs text-content-muted shrink-0">{formatRelativeTime(property.createdAt)}</span>
+          <span className="text-[0.85rem] text-content-muted shrink-0">{formatRelativeTime(property.createdAt)}</span>
         </div>
         <h3 className="text-sm font-semibold text-content-main line-clamp-1">{property.title}</h3>
       </div>
@@ -102,7 +102,7 @@ export function FeedPropertyCard({ property }: { property: Property }) {
         {property.authorName ? (
           <Link href={`/profil/${property.ownerId}`} className="flex items-center gap-1.5 min-w-0 hover:underline">
             <Avatar name={property.authorName} imageUrl={property.authorAvatarUrl} size={22} />
-            <span className="text-xs font-semibold text-content-main truncate">@{property.authorName}</span>
+            <span className="text-[0.85rem] font-semibold text-content-main truncate">@{property.authorName}</span>
           </Link>
         ) : (
           <span />
@@ -110,7 +110,7 @@ export function FeedPropertyCard({ property }: { property: Property }) {
         {/* Rien pour un admin : il ne "j'aime"/enregistre/contacte pas une annonce, il modère
             (voir /admin) — demandé explicitement. */}
         {!isAdminUser && (
-          <div className="flex items-center gap-3 text-xs font-medium text-content-muted shrink-0">
+          <div className="flex items-center gap-3 text-[0.85rem] font-medium text-content-muted shrink-0">
             <button
               type="button"
               onClick={handleLikeClick}

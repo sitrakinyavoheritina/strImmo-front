@@ -34,8 +34,8 @@ export function MyPropertyCard({ property }: { property: Property }) {
   if (confirming) {
     return (
       <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-3 space-y-1.5">
-        <p className="text-xs text-content-muted">{t.myPropertiesPage.deleteConfirm}</p>
-        <div className="flex items-center gap-3 text-xs">
+        <p className="text-[0.85rem] text-content-muted">{t.myPropertiesPage.deleteConfirm}</p>
+        <div className="flex items-center gap-3 text-[0.85rem]">
           <button
             type="button"
             onClick={handleConfirmDelete}
@@ -48,7 +48,7 @@ export function MyPropertyCard({ property }: { property: Property }) {
             {t.myPropertiesPage.deleteCancelButton}
           </button>
         </div>
-        {error && <p className="text-xs text-danger">{t.myPropertiesPage.deleteError}</p>}
+        {error && <p className="text-[0.85rem] text-danger">{t.myPropertiesPage.deleteError}</p>}
       </div>
     );
   }
@@ -68,13 +68,13 @@ export function MyPropertyCard({ property }: { property: Property }) {
           {t.myPropertiesPage[STATUS_LABEL_KEY[property.moderationStatus]]}
         </span>
         <p className="text-sm font-semibold text-content-main truncate mt-0.5">{property.title}</p>
-        <p className="text-xs text-content-muted truncate">{property.location}</p>
+        <p className="text-[0.85rem] text-content-muted truncate">{property.location}</p>
         <p className="text-sm font-bold text-brand-secondary-text mt-0.5">
           {formatPrice(property.price)}
           {getPriceSuffix(property) && <span className="font-normal text-content-muted">{getPriceSuffix(property)}</span>}
         </p>
         {property.moderationStatus === 'rejected' && property.rejectionReason && (
-          <p className="text-xs text-danger mt-0.5 truncate">
+          <p className="text-[0.85rem] text-danger mt-0.5 truncate">
             <span className="font-semibold">{t.myPropertiesPage.rejectionReasonPrefix}</span> {property.rejectionReason}
           </p>
         )}

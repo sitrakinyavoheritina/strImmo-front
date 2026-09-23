@@ -108,14 +108,14 @@ export function NearbyPropertiesMapWidget() {
       {position ? (
         <>
           <div ref={containerRef} className="h-48 rounded-xl overflow-hidden border border-stroke-default" />
-          {nearby && nearby.length === 0 && <p className="mt-1.5 text-xs text-content-muted">{t.feed.nearbyEmpty}</p>}
+          {nearby && nearby.length === 0 && <p className="mt-1.5 text-[0.85rem] text-content-muted">{t.feed.nearbyEmpty}</p>}
         </>
       ) : !error ? (
-        <div className="flex items-center justify-center h-48 rounded-xl border border-stroke-default bg-surface-app text-content-muted text-xs font-semibold">
+        <div className="flex items-center justify-center h-48 rounded-xl border border-stroke-default bg-surface-app text-content-muted text-[0.85rem] font-semibold">
           {t.feed.locatingNearby}
         </div>
       ) : null}
-      {error && <p className="mt-1.5 text-xs text-danger">{error}</p>}
+      {error && <p className="mt-1.5 text-[0.85rem] text-danger">{error}</p>}
     </div>
   );
 }

@@ -40,7 +40,7 @@ export function QuickSearchForm() {
             même principe que la rangée du dessus (voir search-section.tsx). */}
         <div className="flex flex-wrap items-center gap-5">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-content-muted shrink-0">{t.search.priceLabel} :</span>
+            <span className="text-[0.85rem] font-semibold text-content-muted shrink-0">{t.search.priceLabel} :</span>
             <input
               type="number"
               min={0}
@@ -60,7 +60,7 @@ export function QuickSearchForm() {
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-xs font-semibold text-content-muted shrink-0">{t.search.publisherType} :</span>
+            <span className="text-[0.85rem] font-semibold text-content-muted shrink-0">{t.search.publisherType} :</span>
             <Chip active={!filters.publisherType} onClick={() => update('publisherType', undefined)}>
               {t.search.allPublishers}
             </Chip>
@@ -80,7 +80,7 @@ export function QuickSearchForm() {
 
         {/* Label sur la même ligne que l'input (pas au-dessus) : économise une ligne de hauteur. */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-content-muted shrink-0">{t.search.neighborhood} :</span>
+          <span className="text-[0.85rem] font-semibold text-content-muted shrink-0">{t.search.neighborhood} :</span>
 
           <div className="relative flex-1 min-w-[180px]">
             <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-content-muted" />

@@ -78,7 +78,7 @@ export function ConversationListPanel() {
           <div className="flex flex-col items-center gap-2 px-4 py-12 text-center">
             <MessageCircle size={28} className="text-content-muted" />
             <p className="font-semibold text-sm text-content-main">{t.messages.emptyTitle}</p>
-            <p className="text-xs text-content-muted">{t.messages.emptyDescription}</p>
+            <p className="text-[0.85rem] text-content-muted">{t.messages.emptyDescription}</p>
           </div>
         )}
       </div>

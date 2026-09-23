@@ -87,8 +87,8 @@ export function ListingPhotoPicker({ photos, onChange, min, max }: ListingPhotoP
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-xs font-semibold text-content-muted">{t.listing.photos}</span>
-        <span className={`text-xs font-semibold ${photos.length < min ? 'text-danger' : 'text-content-muted'}`}>
+        <span className="text-[0.85rem] font-semibold text-content-muted">{t.listing.photos}</span>
+        <span className={`text-[0.85rem] font-semibold ${photos.length < min ? 'text-danger' : 'text-content-muted'}`}>
           {photos.length}/{max} {photos.length < min ? `(${t.listing.photosMinHint})` : ''}
         </span>
       </div>

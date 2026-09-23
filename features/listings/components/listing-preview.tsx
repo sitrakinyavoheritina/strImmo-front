@@ -3,9 +3,10 @@
 import { useMemo, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
-import { PROPERTY_TYPE_LABEL_KEY } from '@/features/search/utils/get-key-features';
+import { PROPERTY_TYPE_LABEL_KEY, titleRepeatsTypeLabel } from '@/features/search/utils/get-key-features';
 import { getPropertyDetailStats } from '@/features/search/utils/get-property-detail-stats';
 import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
+import { PropertyFees } from './property-fees';
 import type { PropertyFormValues } from '@/features/search/types/listing.types';
 
 /** Aperçu fidèle de l'annonce telle qu'elle apparaîtra une fois publiée, avant validation finale —
@@ -36,7 +37,7 @@ export function ListingPreview({ values, photos }: { values: PropertyFormValues;
           <img src={photoUrls[activePhoto]} alt="" className="w-full h-full object-cover" />
         )}
         <span
-          className={`absolute top-2 left-2 sm:top-3 sm:left-3 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-md uppercase ${
+          className={`absolute top-2 left-2 sm:top-3 sm:left-3 text-white text-[10px] sm:text-[0.85rem] font-bold px-2 py-1 rounded-md uppercase ${
             values.kind === 'rent' ? 'bg-brand-primary' : 'bg-brand-secondary'
           }`}
         >
@@ -64,7 +65,11 @@ export function ListingPreview({ values, photos }: { values: PropertyFormValues;
       )}
 
       <div className="space-y-1">
-        <p className="text-brand-primary text-xs font-bold uppercase">{t.search[PROPERTY_TYPE_LABEL_KEY[values.propertyType]]}</p>
+        {/* Masqué quand le titre commence déjà par ce même mot (ex. "Terrain avec...") — même
+            règle que la fiche détail publiée, voir titleRepeatsTypeLabel. */}
+        {!titleRepeatsTypeLabel(values.title || '', t.search[PROPERTY_TYPE_LABEL_KEY[values.propertyType]]) && (
+          <p className="text-brand-primary text-[0.85rem] font-bold uppercase">{t.search[PROPERTY_TYPE_LABEL_KEY[values.propertyType]]}</p>
+        )}
         <h2 className="text-xl font-bold text-content-main">{values.title || t.listing.formTitlePlaceholder}</h2>
         <p className="flex items-center gap-1 text-sm text-content-muted">
           <MapPin size={13} className="text-brand-primary" />
@@ -74,6 +79,10 @@ export function ListingPreview({ values, photos }: { values: PropertyFormValues;
           {formatPrice(values.price)}
           {getPriceSuffix(values) && <span className="text-sm font-normal">{getPriceSuffix(values)}</span>}
         </p>
+
+        {/* Même bloc que la fiche détail publiée (voir app/annonce/[id]/page.tsx) — ce qui est
+            annoncé ici doit correspondre à ce qui sera réellement visible une fois publié. */}
+        <PropertyFees values={values} t={t} className="mt-1" />
       </div>
 
       {stats.length > 0 && (
@@ -88,8 +97,8 @@ export function ListingPreview({ values, photos }: { values: PropertyFormValues;
                 className="flex items-center justify-center gap-1 bg-surface-app border border-stroke-default rounded-md py-1 px-1"
               >
                 <stat.icon size={12} className="shrink-0 text-brand-primary" />
-                <span className="text-xs font-bold text-content-main whitespace-nowrap">{stat.value}</span>
-                <span className="text-xs text-content-muted truncate">{stat.label}</span>
+                <span className="text-[0.85rem] font-bold text-content-main whitespace-nowrap">{stat.value}</span>
+                <span className="text-[0.85rem] text-content-muted truncate">{stat.label}</span>
               </div>
             ))}
           </div>
@@ -101,7 +110,7 @@ export function ListingPreview({ values, photos }: { values: PropertyFormValues;
           {amenities.map((amenity) => (
             <span
               key={amenity.text}
-              className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border bg-brand-primary/10 text-brand-primary border-brand-primary/20"
+              className="inline-flex items-center gap-1.5 text-[0.85rem] font-medium px-2.5 py-1 rounded-lg border bg-brand-primary/10 text-brand-primary border-brand-primary/20"
             >
               <amenity.icon size={13} />
               {amenity.text}

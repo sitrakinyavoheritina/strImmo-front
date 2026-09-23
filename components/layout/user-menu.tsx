@@ -86,7 +86,7 @@ export function UserMenu({ user }: { user: AuthUser }) {
             </button>
 
             <div className="mt-1 pt-1 px-3 pb-1 border-t border-stroke-default">
-              <div className="flex items-center gap-1 rounded-lg border border-stroke-default bg-surface-app p-1 text-xs font-semibold">
+              <div className="flex items-center gap-1 rounded-lg border border-stroke-default bg-surface-app p-1 text-[0.85rem] font-semibold">
                 <button
                   type="button"
                   onClick={() => handleSetTheme('light')}

@@ -33,7 +33,7 @@ export function ConversationItem({
         </p>
       </div>
       {hasUnread && (
-        <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-brand-primary text-white text-[11px] font-bold flex items-center justify-center">
+        <span className="shrink-0 min-w-[20px] h-5 px-1.5 rounded-full bg-brand-primary text-white text-[12px] font-bold flex items-center justify-center">
           {conversation.unreadCount}
         </span>
       )}

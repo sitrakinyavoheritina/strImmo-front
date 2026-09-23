@@ -77,7 +77,7 @@ export function SearchableSelect({
         </span>
         <ChevronDown size={16} className={`shrink-0 text-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
-      {error && <p className="mt-1 text-xs text-danger">{error}</p>}
+      {error && <p className="mt-1 text-[0.85rem] text-danger">{error}</p>}
 
       {isOpen && (
         <>

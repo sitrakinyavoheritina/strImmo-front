@@ -85,6 +85,7 @@ export type ApiProperty = {
   phone2: string | null;
   commission: string | null;
   caution: string | null;
+  visitFee: string | null;
   viewCount: number;
   likesCount: number;
   // Liste (`GET /properties`) : nom/avatar/rôle seulement (jamais téléphone/email/adresse, voir

@@ -54,9 +54,9 @@ export function AdminUserListItem({ user }: { user: AdminUser }) {
           )}
         </div>
 
-        {user.agencyName && <p className="text-xs text-content-muted truncate mt-0.5">{user.agencyName}</p>}
+        {user.agencyName && <p className="text-[0.85rem] text-content-muted truncate mt-0.5">{user.agencyName}</p>}
 
-        <div className="flex items-center gap-3 mt-0.5 text-xs text-content-muted">
+        <div className="flex items-center gap-3 mt-0.5 text-[0.85rem] text-content-muted">
           {user.phone && (
             <span className="inline-flex items-center gap-1">
               <Phone size={11} />
@@ -73,7 +73,7 @@ export function AdminUserListItem({ user }: { user: AdminUser }) {
           )}
         </div>
 
-        <p className="text-[11px] text-content-muted mt-0.5">
+        <p className="text-[12px] text-content-muted mt-0.5">
           {t.adminUsersPage.joinedOn} {createdAt}
         </p>
       </div>

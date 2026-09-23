@@ -17,7 +17,7 @@ export function Chip({
     <button
       type="button"
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
+      className={`px-3 py-1.5 rounded-full text-[0.85rem] font-semibold border transition ${
         active
           ? 'bg-brand-primary text-white border-brand-primary'
           : 'bg-surface-app text-content-muted border-stroke-default hover:border-brand-primary'
@@ -56,7 +56,7 @@ export function Toggle({
 }
 
 export function FieldLabel({ children }: { children: React.ReactNode }) {
-  return <label className="text-xs font-semibold text-content-muted mb-1.5 block">{children}</label>;
+  return <label className="text-[0.85rem] font-semibold text-content-muted mb-1.5 block">{children}</label>;
 }
 
 /** Regroupe visuellement un ensemble de champs, séparé du précédent par un filet. */
@@ -93,12 +93,12 @@ export function FormInput({ label, value, onChange, placeholder, type = 'text', 
           } ${error ? 'border-danger' : 'border-stroke-default'}`}
         />
         {suffix && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-content-muted">
+          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[0.85rem] font-semibold text-content-muted">
             {suffix}
           </span>
         )}
       </div>
-      {error && <p className="mt-1 text-xs text-danger">{error}</p>}
+      {error && <p className="mt-1 text-[0.85rem] text-danger">{error}</p>}
     </div>
   );
 }

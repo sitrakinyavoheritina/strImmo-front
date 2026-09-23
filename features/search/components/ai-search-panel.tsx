@@ -72,7 +72,7 @@ export function AiSearchPanel() {
             {message.content}
           </div>
         ))}
-        {isPending && <p className="text-xs text-content-muted">{t.chat.typing}</p>}
+        {isPending && <p className="text-[0.85rem] text-content-muted">{t.chat.typing}</p>}
       </div>
 
       {lastProperties.length > 0 && (

@@ -22,13 +22,13 @@ export function SearchResultCard({ property }: { property: Property }) {
       </div>
 
       <div className="p-1.5 space-y-0.5">
-        <p className="text-xs font-bold text-content-main truncate">
+        <p className="text-[0.85rem] font-bold text-content-main truncate">
           {formatPrice(property.price)}
           {getPriceSuffix(property) && (
             <span className="text-[10px] font-normal text-content-muted">{getPriceSuffix(property)}</span>
           )}
         </p>
-        <h3 className="text-[11px] font-semibold text-content-main line-clamp-1">{property.title}</h3>
+        <h3 className="text-[12px] font-semibold text-content-main line-clamp-1">{property.title}</h3>
         <p className="text-[10px] text-content-muted flex items-center gap-0.5 truncate">
           <MapPin size={10} className="shrink-0 text-brand-primary" /> <span className="truncate">{property.location}</span>
         </p>

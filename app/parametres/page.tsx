@@ -49,8 +49,10 @@ export default function ParametresPage() {
     }
   }
 
+  // "Système" retiré du choix affiché — demandé explicitement, ne garder que Clair/Sombre. La
+  // valeur "system" reste un état interne valide (voir ThemePreference, use-theme-preference.ts,
+  // gère toujours le cas où un compte l'a encore en localStorage) : simplement plus proposée ici.
   const THEME_OPTIONS: { value: ThemePreference; label: string }[] = [
-    { value: 'system', label: t.profile.themeSystem },
     { value: 'light', label: t.profile.themeLight },
     { value: 'dark', label: t.profile.themeDark },
   ];
@@ -85,7 +87,7 @@ export default function ParametresPage() {
             <Avatar name={user.fullName} imageUrl={user.avatarUrl} size={48} />
             <div className="flex-1 min-w-0">
               <p className="font-bold text-content-main truncate">{user.fullName}</p>
-              <p className="text-xs text-content-muted">{t.profile.viewProfile}</p>
+              <p className="text-[0.85rem] text-content-muted">{t.profile.viewProfile}</p>
             </div>
           </Link>
         ) : (
@@ -131,7 +133,7 @@ export default function ParametresPage() {
                 <Moon size={18} className="text-content-main shrink-0" />
                 <span className="flex-1 text-sm font-medium text-content-main">{t.profile.darkMode}</span>
               </div>
-              <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-xs font-semibold">
+              <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-[0.85rem] font-semibold">
                 {THEME_OPTIONS.map(({ value, label }) => (
                   <button
                     key={value}
@@ -159,7 +161,7 @@ export default function ParametresPage() {
                   <LayoutGrid size={18} className="text-content-main shrink-0" />
                   <span className="flex-1 text-sm font-medium text-content-main">{t.profile.feedDisplay}</span>
                 </div>
-                <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-xs font-semibold">
+                <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-[0.85rem] font-semibold">
                   {FEED_DISPLAY_OPTIONS.map(({ value, label }) => (
                     <button
                       key={value}

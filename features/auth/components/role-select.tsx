@@ -28,7 +28,7 @@ export function RoleSelect() {
             <Icon size={20} />
           </span>
           <p className="font-semibold text-content-main text-sm">{t.auth[titleKey]}</p>
-          <p className="text-xs text-content-muted mt-0.5">{t.auth[descKey]}</p>
+          <p className="text-[0.85rem] text-content-muted mt-0.5">{t.auth[descKey]}</p>
         </Link>
       ))}
     </div>

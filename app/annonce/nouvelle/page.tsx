@@ -86,7 +86,7 @@ export default function NouvelleAnnoncePage() {
 
         {step !== 'preview' && (
           <>
-            <p className="text-content-muted text-xs font-medium mt-1">
+            <p className="text-content-muted text-[0.85rem] font-medium mt-1">
               {step === 'step1' ? t.listing.step1Subtitle : step === 'step2' ? t.listing.step2Subtitle : t.listing.step3Subtitle}
             </p>
             <div className="mt-2.5 flex items-center gap-1.5">

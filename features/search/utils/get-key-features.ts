@@ -28,6 +28,16 @@ function roomTypeLabel(roomType: string): string {
   return roomType.replace('plus', '+');
 }
 
+// Le titre suggéré par `generateTitle` (features/listings/utils/listing-summary.ts) commence
+// toujours par le nom du type de bien ("Terrain avec...", "Maison avec...") — l'afficher en plus
+// dans l'étiquette de catégorie juste au-dessus (ex. "TERRAIN") répète alors le même mot deux fois
+// de suite. Un titre saisi à la main par l'utilisateur peut très bien commencer pareil (usage
+// courant en petites annonces immobilières), d'où une détection à l'affichage plutôt qu'une règle
+// dans la génération du titre elle-même.
+export function titleRepeatsTypeLabel(title: string, typeLabel: string): boolean {
+  return title.trim().toLowerCase().startsWith(typeLabel.trim().toLowerCase());
+}
+
 // Jusqu'à 2 caractéristiques courtes affichées sur la carte de résultat — port simplifié de
 // Onina-mobile/src/features/listings/utils/listing-summary.ts:getKeyFeatures (adapté pour lire
 // une annonce déjà publiée plutôt qu'un formulaire en cours de saisie).

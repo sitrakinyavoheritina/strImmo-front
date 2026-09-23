@@ -26,7 +26,7 @@ export function FileInput({
 
   return (
     <div>
-      <label className="block text-xs font-medium text-content-main mb-1">{label}</label>
+      <label className="block text-[0.85rem] font-medium text-content-main mb-1">{label}</label>
       <label
         htmlFor={inputId}
         className="flex items-center gap-3 px-3 py-2.5 bg-surface-app border border-dashed border-stroke-default rounded-xl text-sm cursor-pointer hover:border-brand-primary transition"

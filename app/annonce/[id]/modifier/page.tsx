@@ -105,12 +105,12 @@ export default function ModifierAnnoncePage() {
         {step === 'preview' ? t.listing.preview : t.listing.editListingTitle}
       </h1>
       {property.moderationStatus === 'rejected' && (
-        <p className="text-xs text-content-muted mt-1">{t.listing.editRejectedNotice}</p>
+        <p className="text-[0.85rem] text-content-muted mt-1">{t.listing.editRejectedNotice}</p>
       )}
 
       {step !== 'preview' && (
         <>
-          <p className="text-content-muted text-xs font-medium mt-1">
+          <p className="text-content-muted text-[0.85rem] font-medium mt-1">
             {step === 'step1' ? t.listing.step1Subtitle : step === 'step2' ? t.listing.step2Subtitle : t.listing.step3Subtitle}
           </p>
           <div className="mt-2.5 flex items-center gap-1.5">

@@ -42,7 +42,7 @@ export default function ActusPage() {
                   </div>
                 )}
                 <div className="p-4">
-                  <p className="text-xs text-content-muted">{formatPublishedDate(article.publishedAt, locale)}</p>
+                  <p className="text-[0.85rem] text-content-muted">{formatPublishedDate(article.publishedAt, locale)}</p>
                   <h2 className="text-lg font-bold text-content-main mt-0.5">{article.title}</h2>
                   <p className="text-sm text-content-main mt-2">{article.summary}</p>
                   {article.content && (

@@ -7,7 +7,7 @@ export function LanguageSwitcher() {
   const { locale, setLocale } = useTranslation();
 
   return (
-    <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-xs font-semibold">
+    <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-[0.85rem] font-semibold">
       {LOCALES.map((code) => (
         <button
           key={code}

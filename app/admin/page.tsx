@@ -65,17 +65,17 @@ export default function AdminDashboardPage() {
           <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-3 text-center">
             <Clock size={18} className="mx-auto text-brand-primary" />
             <div className="text-lg font-bold text-content-main mt-1">{pending?.length ?? '—'}</div>
-            <div className="text-[11px] text-content-muted">{t.adminDashboard.pendingLabel}</div>
+            <div className="text-[12px] text-content-muted">{t.adminDashboard.pendingLabel}</div>
           </div>
           <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-3 text-center">
             <CheckCircle2 size={18} className="mx-auto text-emerald-600" />
             <div className="text-lg font-bold text-content-main mt-1">{approved?.length ?? '—'}</div>
-            <div className="text-[11px] text-content-muted">{t.adminDashboard.approvedLabel}</div>
+            <div className="text-[12px] text-content-muted">{t.adminDashboard.approvedLabel}</div>
           </div>
           <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-3 text-center">
             <XCircle size={18} className="mx-auto text-danger" />
             <div className="text-lg font-bold text-content-main mt-1">{rejected?.length ?? '—'}</div>
-            <div className="text-[11px] text-content-muted">{t.adminDashboard.rejectedLabel}</div>
+            <div className="text-[12px] text-content-muted">{t.adminDashboard.rejectedLabel}</div>
           </div>
         </div>
 
@@ -85,7 +85,7 @@ export default function AdminDashboardPage() {
         >
           <div>
             <p className="font-semibold text-content-main">{t.adminDashboard.pendingCta}</p>
-            <p className="text-xs text-content-muted mt-0.5">
+            <p className="text-[0.85rem] text-content-muted mt-0.5">
               {pendingCount > 0
                 ? `${pendingCount} ${t.adminDashboard.pendingLabel.toLowerCase()}`
                 : t.adminDashboard.noPending}
@@ -120,14 +120,14 @@ export default function AdminDashboardPage() {
             <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-4 space-y-2">
               {stats.byMonth.map((entry) => (
                 <div key={entry.month} className="flex items-center gap-3">
-                  <span className="text-xs text-content-muted w-16 shrink-0">{formatMonth(entry.month)}</span>
+                  <span className="text-[0.85rem] text-content-muted w-16 shrink-0">{formatMonth(entry.month)}</span>
                   <div className="flex-1 h-3 rounded-full bg-surface-app overflow-hidden">
                     <div
                       className="h-full bg-brand-primary rounded-full"
                       style={{ width: `${(entry.count / maxMonthCount) * 100}%` }}
                     />
                   </div>
-                  <span className="text-xs font-semibold text-content-main w-6 text-right shrink-0">{entry.count}</span>
+                  <span className="text-[0.85rem] font-semibold text-content-main w-6 text-right shrink-0">{entry.count}</span>
                 </div>
               ))}
             </div>
@@ -144,7 +144,7 @@ export default function AdminDashboardPage() {
               {stats.byModerator.map((entry) => (
                 <div key={entry.moderatorId} className="flex items-center justify-between gap-3 px-4 py-2.5">
                   <span className="text-sm font-medium text-content-main truncate">{entry.moderatorName}</span>
-                  <div className="flex items-center gap-3 text-xs font-semibold shrink-0">
+                  <div className="flex items-center gap-3 text-[0.85rem] font-semibold shrink-0">
                     <span className="text-emerald-600">{entry.approvedCount} {t.adminDashboard.approvedLabel.toLowerCase()}</span>
                     <span className="text-danger">{entry.rejectedCount} {t.adminDashboard.rejectedLabel.toLowerCase()}</span>
                   </div>

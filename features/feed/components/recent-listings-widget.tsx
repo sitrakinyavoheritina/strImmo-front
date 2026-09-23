@@ -29,8 +29,8 @@ export function RecentListingsWidget() {
               )}
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold text-content-main line-clamp-1">{property.title}</p>
-              <p className="text-xs text-content-muted line-clamp-1">{property.location}</p>
+              <p className="text-[0.85rem] font-semibold text-content-main line-clamp-1">{property.title}</p>
+              <p className="text-[0.85rem] text-content-muted line-clamp-1">{property.location}</p>
             </div>
           </Link>
         ))}

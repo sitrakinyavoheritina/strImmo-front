@@ -28,7 +28,7 @@ export function EditableRow({
   return (
     <div className="py-2.5 border-b border-stroke-default last:border-b-0">
       <div className="flex items-center justify-between gap-2">
-        <span className="text-xs font-medium text-content-muted">{label}</span>
+        <span className="text-[0.85rem] font-medium text-content-muted">{label}</span>
         {!editing && (
           <button
             type="button"
@@ -50,7 +50,7 @@ export function EditableRow({
               error ? 'border-danger' : 'border-stroke-default'
             }`}
           />
-          {error && <p className="mt-1 text-xs text-danger">{error}</p>}
+          {error && <p className="mt-1 text-[0.85rem] text-danger">{error}</p>}
         </>
       ) : (
         <p className="mt-0.5 text-sm text-content-main truncate">{displayValue ?? (value || '—')}</p>

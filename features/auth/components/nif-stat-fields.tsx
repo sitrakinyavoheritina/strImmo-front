@@ -39,7 +39,7 @@ export function NifStatFields({ value, onChange }: { value: NifStatValue; onChan
     <div className="space-y-2.5 border-t border-stroke-default pt-3 sm:pt-4">
       <div>
         <p className="text-sm font-bold text-content-main">{t.auth.nifStatTitle}</p>
-        <p className="text-xs text-content-muted mt-0.5">{t.auth.nifStatHint}</p>
+        <p className="text-[0.85rem] text-content-muted mt-0.5">{t.auth.nifStatHint}</p>
       </div>
 
       <div className="flex bg-surface-app p-1 rounded-xl">
@@ -48,7 +48,7 @@ export function NifStatFields({ value, onChange }: { value: NifStatValue; onChan
             key={mode}
             type="button"
             onClick={() => onChange({ ...value, mode })}
-            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${
+            className={`flex-1 py-2 text-[0.85rem] font-semibold rounded-lg transition-all ${
               value.mode === mode ? 'bg-surface-card text-content-main shadow-sm' : 'text-content-muted hover:text-content-main'
             }`}
           >
@@ -60,7 +60,7 @@ export function NifStatFields({ value, onChange }: { value: NifStatValue; onChan
       {value.mode === 'manual' ? (
         <>
           <div>
-            <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.nifNumber}</label>
+            <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.nifNumber}</label>
             <input
               type="text"
               value={value.nifNumber}
@@ -70,7 +70,7 @@ export function NifStatFields({ value, onChange }: { value: NifStatValue; onChan
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.statNumber}</label>
+            <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.statNumber}</label>
             <input
               type="text"
               value={value.statNumber}

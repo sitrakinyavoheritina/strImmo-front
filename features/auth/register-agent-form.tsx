@@ -39,7 +39,7 @@ export const RegisterAgentForm: React.FC = () => {
       <form className="space-y-2.5 sm:space-y-4" onSubmit={onSubmit}>
         <div className="grid grid-cols-2 gap-2.5 sm:gap-4">
           <div>
-            <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.firstName}</label>
+            <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.firstName}</label>
             <input
               type="text"
               placeholder={t.auth.firstNamePlaceholder}
@@ -48,10 +48,10 @@ export const RegisterAgentForm: React.FC = () => {
                 errors.firstName ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
-            {errors.firstName && <p className="mt-0.5 text-xs text-danger">{errors.firstName.message}</p>}
+            {errors.firstName && <p className="mt-0.5 text-[0.85rem] text-danger">{errors.firstName.message}</p>}
           </div>
           <div>
-            <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.lastName}</label>
+            <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.lastName}</label>
             <input
               type="text"
               placeholder={t.auth.lastNamePlaceholder}
@@ -60,12 +60,12 @@ export const RegisterAgentForm: React.FC = () => {
                 errors.lastName ? 'border-red-500' : 'border-stroke-default'
               }`}
             />
-            {errors.lastName && <p className="mt-0.5 text-xs text-danger">{errors.lastName.message}</p>}
+            {errors.lastName && <p className="mt-0.5 text-[0.85rem] text-danger">{errors.lastName.message}</p>}
           </div>
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.phone}</label>
+          <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.phone}</label>
           <input
             type="tel"
             placeholder={t.auth.phonePlaceholder}
@@ -74,11 +74,11 @@ export const RegisterAgentForm: React.FC = () => {
               errors.phone ? 'border-red-500' : 'border-stroke-default'
             }`}
           />
-          {errors.phone && <p className="mt-0.5 text-xs text-danger">{errors.phone.message}</p>}
+          {errors.phone && <p className="mt-0.5 text-[0.85rem] text-danger">{errors.phone.message}</p>}
         </div>
 
         <div>
-          <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.password}</label>
+          <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">{t.auth.password}</label>
           <div className="relative">
             <input
               type={showPassword ? 'text' : 'password'}
@@ -91,12 +91,12 @@ export const RegisterAgentForm: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute inset-y-0 right-0 pr-3 flex items-center text-xs text-content-muted hover:text-content-main font-medium"
+              className="absolute inset-y-0 right-0 pr-3 flex items-center text-[0.85rem] text-content-muted hover:text-content-main font-medium"
             >
               {showPassword ? t.auth.hide : t.auth.show}
             </button>
           </div>
-          {errors.password && <p className="mt-0.5 text-xs text-danger">{errors.password.message}</p>}
+          {errors.password && <p className="mt-0.5 text-[0.85rem] text-danger">{errors.password.message}</p>}
         </div>
 
         {SHOW_CIN_UPLOAD && (
@@ -112,13 +112,13 @@ export const RegisterAgentForm: React.FC = () => {
       </form>
 
       <div className="text-center border-t border-stroke-default pt-3 sm:pt-5 space-y-1.5">
-        <p className="text-xs text-content-muted">
+        <p className="text-[0.85rem] text-content-muted">
           {t.auth.hasAccount}{' '}
           <Link href="/connexion" className="font-semibold text-brand-primary hover:text-brand-primary-hover">
             {t.auth.login}
           </Link>
         </p>
-        <p className="text-xs">
+        <p className="text-[0.85rem]">
           <Link href="/inscription" className="font-semibold text-content-muted hover:text-content-main">
             {t.auth.backToRoleSelect}
           </Link>

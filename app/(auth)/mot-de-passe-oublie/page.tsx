@@ -77,7 +77,7 @@ export default function MotDePasseOubliePage() {
       <div className="bg-surface-card py-4 px-4 sm:py-8 sm:px-10 shadow-sm border border-stroke-default/80 rounded-xl sm:rounded-2xl space-y-3 sm:space-y-4">
         <FormErrorBanner message={errorMessage} />
         {infoMessage && step === 'reset' && (
-          <p className="text-xs text-content-muted bg-surface-app border border-stroke-default rounded-xl px-3 py-2.5">
+          <p className="text-[0.85rem] text-content-muted bg-surface-app border border-stroke-default rounded-xl px-3 py-2.5">
             {infoMessage}
           </p>
         )}
@@ -85,7 +85,7 @@ export default function MotDePasseOubliePage() {
         {step === 'request' ? (
           <form className="space-y-3 sm:space-y-5" onSubmit={handleRequestCode}>
             <div>
-              <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">
+              <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">
                 {t.forgotPasswordPage.identifierLabel}
               </label>
               <input
@@ -102,7 +102,7 @@ export default function MotDePasseOubliePage() {
         ) : (
           <form className="space-y-3 sm:space-y-5" onSubmit={handleResetPassword}>
             <div>
-              <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">
+              <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">
                 {t.forgotPasswordPage.codeLabel}
               </label>
               <input
@@ -115,7 +115,7 @@ export default function MotDePasseOubliePage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-content-main mb-0.5 sm:mb-1">
+              <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">
                 {t.forgotPasswordPage.newPasswordLabel}
               </label>
               <input
@@ -137,7 +137,7 @@ export default function MotDePasseOubliePage() {
                 setNewPassword('');
                 setErrorMessage(null);
               }}
-              className="w-full text-center text-xs font-semibold text-content-muted hover:text-content-main transition"
+              className="w-full text-center text-[0.85rem] font-semibold text-content-muted hover:text-content-main transition"
             >
               {t.forgotPasswordPage.changeIdentifier}
             </button>
@@ -145,7 +145,7 @@ export default function MotDePasseOubliePage() {
         )}
 
         <div className="text-center border-t border-stroke-default pt-3 sm:pt-5">
-          <Link href="/connexion" className="text-xs sm:text-sm font-semibold text-brand-primary hover:text-brand-primary-hover">
+          <Link href="/connexion" className="text-[0.85rem] sm:text-sm font-semibold text-brand-primary hover:text-brand-primary-hover">
             {t.forgotPasswordPage.backToLogin}
           </Link>
         </div>

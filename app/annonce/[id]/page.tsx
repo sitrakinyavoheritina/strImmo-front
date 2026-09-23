@@ -13,9 +13,10 @@ import { useProperty } from '@/features/search/hooks/use-property';
 import { useLikeProperty } from '@/features/search/hooks/use-like-property';
 import { useApproveProperty, useRejectProperty } from '@/features/search/hooks/use-moderate-property';
 import { useDeleteProperty } from '@/features/search/hooks/use-delete-property';
-import { PROPERTY_TYPE_LABEL_KEY } from '@/features/search/utils/get-key-features';
+import { PROPERTY_TYPE_LABEL_KEY, titleRepeatsTypeLabel } from '@/features/search/utils/get-key-features';
 import { getPropertyDetailStats } from '@/features/search/utils/get-property-detail-stats';
 import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
+import { PropertyFees } from '@/features/listings/components/property-fees';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { RightRail } from '@/features/feed/components/right-rail';
@@ -215,7 +216,7 @@ export default function AnnoncePage() {
               />
             )}
             <span
-              className={`absolute top-2 left-2 sm:top-3 sm:left-3 text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-md uppercase ${
+              className={`absolute top-2 left-2 sm:top-3 sm:left-3 text-white text-[10px] sm:text-[0.85rem] font-bold px-2 py-1 rounded-md uppercase ${
                 property.kind === 'rent' ? 'bg-brand-primary' : 'bg-brand-secondary'
               }`}
             >
@@ -270,7 +271,7 @@ export default function AnnoncePage() {
           {property.authorName && (
             <Link
               href={`/profil/${property.ownerId}`}
-              className="flex items-center gap-2 mt-3 hover:underline w-fit"
+              className="flex items-center gap-2.5 mt-3 pt-3 border-t border-stroke-default hover:underline w-fit"
             >
               <Avatar name={property.authorName} imageUrl={property.authorAvatarUrl} size={32} />
               <span className="text-sm font-semibold text-content-main truncate">{property.authorName}</span>
@@ -318,11 +319,15 @@ export default function AnnoncePage() {
             tient vraiment pas — jamais la page entière. */}
         <div className="mt-3 lg:mt-0 lg:h-full lg:overflow-y-auto lg:pr-1">
           <div>
-            <span className="text-[11px] sm:text-xs font-semibold text-brand-primary uppercase">
-              {t.search[PROPERTY_TYPE_LABEL_KEY[property.propertyType]]}
-            </span>
+            {/* Masqué quand le titre commence déjà par ce même mot (ex. "Terrain avec...") — sinon
+                le mot est répété deux fois de suite, voir titleRepeatsTypeLabel. */}
+            {!titleRepeatsTypeLabel(property.title, t.search[PROPERTY_TYPE_LABEL_KEY[property.propertyType]]) && (
+              <span className="text-[12px] sm:text-[0.85rem] font-semibold text-brand-primary uppercase">
+                {t.search[PROPERTY_TYPE_LABEL_KEY[property.propertyType]]}
+              </span>
+            )}
             <h1 className="text-lg sm:text-2xl font-bold text-content-main mt-0.5">{property.title}</h1>
-            <p className="text-content-muted text-xs sm:text-sm mt-1 flex items-center gap-1">
+            <p className="text-content-muted text-[0.85rem] sm:text-sm mt-1 flex items-center gap-1">
               <MapPin size={14} className="text-brand-primary" />
               {property.location}
             </p>
@@ -333,9 +338,15 @@ export default function AnnoncePage() {
             <div className="flex items-baseline gap-1.5 mt-1.5">
               <span className="text-xl sm:text-2xl font-bold text-brand-secondary-text">{formatPrice(property.price)}</span>
               {getPriceSuffix(property) && (
-                <span className="text-content-muted text-xs sm:text-sm">{getPriceSuffix(property)}</span>
+                <span className="text-content-muted text-[0.85rem] sm:text-sm">{getPriceSuffix(property)}</span>
               )}
             </div>
+
+            {/* Frais d'intermédiation — jamais présents pour un propriétaire (voir
+                PropertiesService.create/update, qui ne les accepte que d'un intermédiaire/une
+                agence), donc naturellement absents ici pour lui. Droit de visite affiché
+                seulement s'il a été renseigné (facultatif, contrairement à commission/caution). */}
+            <PropertyFees values={property} t={t} className="mt-2" />
 
             {/* Motif de refus — visible par le propriétaire sur sa propre fiche, pas seulement
                 dans la liste "Mes Biens" (où c'était déjà affiché) : demandé explicitement pour
@@ -356,7 +367,7 @@ export default function AnnoncePage() {
             {canModerate &&
               (isRejectFormOpen ? (
                 <div className="mt-3 bg-surface-app border border-stroke-default rounded-xl p-3 space-y-2">
-                  <label className="block text-xs font-semibold text-content-muted" htmlFor="reject-reason">
+                  <label className="block text-[0.85rem] font-semibold text-content-muted" htmlFor="reject-reason">
                     {t.validationPage.rejectReasonLabel}
                   </label>
                   <textarea
@@ -367,7 +378,7 @@ export default function AnnoncePage() {
                     rows={2}
                     className="w-full rounded-lg border border-stroke-default bg-surface-card px-2.5 py-1.5 text-sm text-content-main placeholder-content-muted outline-none focus:border-brand-primary resize-none"
                   />
-                  <div className="flex items-center gap-3 text-xs">
+                  <div className="flex items-center gap-3 text-[0.85rem]">
                     <button
                       type="button"
                       onClick={handleConfirmReject}
@@ -405,7 +416,7 @@ export default function AnnoncePage() {
                   </Button>
                 </div>
               ))}
-            {moderationError && <p className="text-xs text-danger mt-1.5">{moderationError}</p>}
+            {moderationError && <p className="text-[0.85rem] text-danger mt-1.5">{moderationError}</p>}
           </div>
 
           {stats.length > 0 && (
@@ -422,8 +433,8 @@ export default function AnnoncePage() {
                     className="flex items-center justify-center gap-1 bg-surface-app lg:bg-surface-card border border-stroke-default rounded-md py-1 px-1"
                   >
                     <stat.icon size={12} className="shrink-0 text-brand-primary" />
-                    <span className="text-xs font-bold text-content-main whitespace-nowrap">{stat.value}</span>
-                    <span className="text-xs text-content-muted truncate">{stat.label}</span>
+                    <span className="text-[0.85rem] font-bold text-content-main whitespace-nowrap">{stat.value}</span>
+                    <span className="text-[0.85rem] text-content-muted truncate">{stat.label}</span>
                   </div>
                 ))}
               </div>
@@ -435,7 +446,7 @@ export default function AnnoncePage() {
               {amenities.map((amenity) => (
                 <span
                   key={amenity.text}
-                  className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg border bg-brand-primary/10 text-brand-primary border-brand-primary/20"
+                  className="inline-flex items-center gap-1.5 text-[0.85rem] font-medium px-2.5 py-1 rounded-lg border bg-brand-primary/10 text-brand-primary border-brand-primary/20"
                 >
                   <amenity.icon size={13} />
                   {amenity.text}
@@ -604,7 +615,7 @@ function ContactActions({
 
   return (
     <div className="space-y-1.5">
-      <p className="text-xs font-semibold text-content-muted">{contactLabel}</p>
+      <p className="text-[0.85rem] font-semibold text-content-muted">{contactLabel}</p>
       {numbers.map((number, index) => {
         const isCopied = copiedNumber === number;
         return (
@@ -654,7 +665,7 @@ function DeleteConfirmModal({
         onClick={(event) => event.stopPropagation()}
       >
         <p className="text-sm font-semibold text-content-main">{t.myPropertiesPage.deleteConfirm}</p>
-        {error && <p className="mt-2 text-xs text-danger">{t.myPropertiesPage.deleteError}</p>}
+        {error && <p className="mt-2 text-[0.85rem] text-danger">{t.myPropertiesPage.deleteError}</p>}
         <div className="mt-4 flex items-center gap-3">
           <Button type="button" variant="outline" className="flex-1" onClick={onCancel}>
             {t.myPropertiesPage.deleteCancelButton}
