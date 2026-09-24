@@ -5,12 +5,15 @@ const nextConfig: NextConfig = {
   // information gratuite sur la techno utilisée pour quiconque prépare une attaque ciblée.
   poweredByHeader: false,
   allowedDevOrigins: ["51.195.221.82"],
+
+
   images: {
     remotePatterns: [
       // Photos/avatars hébergés sur Cloudflare R2 (voir strImmo/src/storage/storage.service.ts,
       // R2_PUBLIC_URL) — motif générique (pas le seul sous-domaine actuel) pour survivre à une
       // rotation du bucket sans retoucher ce fichier.
       { protocol: "https", hostname: "*.r2.dev" },
+
       // Domaine personnalisé du bucket R2 (R2_PUBLIC_URL=https://img.onina.mg) — celui que les
       // nouvelles photos utilisent ; les anciennes URL *.r2.dev ci-dessus restent valables.
       { protocol: "https", hostname: "img.onina.mg" },
