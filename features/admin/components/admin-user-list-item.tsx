@@ -1,9 +1,10 @@
 'use client';
 
-import { CheckCircle2, Mail, Phone } from 'lucide-react';
+import { CheckCircle2, Mail, Phone, Trash2 } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { STATUS_BADGE_CLASS } from '@/features/listings/utils/status-badge';
+import { useDeleteAdminUser } from '../hooks/use-delete-admin-user';
 import type { AdminUser } from '../types';
 import type { UserRole } from '@/features/auth/types';
 
@@ -29,6 +30,8 @@ const MODERATION_LABEL_KEY = {
 // voir status-badge.ts).
 export function AdminUserListItem({ user }: { user: AdminUser }) {
   const { t } = useTranslation();
+  const { mutate: deleteUser, isPending } = useDeleteAdminUser();
+  const canDelete = user.role !== 'admin' && user.role !== 'superadmin';
   const fullName = `${user.firstName} ${user.lastName}`.trim();
   const createdAt = new Date(user.createdAt).toLocaleDateString('fr-FR', {
     day: '2-digit',
@@ -44,6 +47,9 @@ export function AdminUserListItem({ user }: { user: AdminUser }) {
           <p className="text-sm font-semibold text-content-main truncate">{fullName || t.adminUsersPage.noName}</p>
           <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase bg-brand-primary-soft text-brand-primary">
             {t.auth[ROLE_LABEL_KEY[user.role]]}
+          </span>
+          <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase bg-surface-app text-content-muted border border-stroke-default">
+            {user.hasPassword ? t.adminUsersPage.loginPassword : t.adminUsersPage.loginGoogle}
           </span>
           {user.moderationStatus && (
             <span
@@ -77,6 +83,21 @@ export function AdminUserListItem({ user }: { user: AdminUser }) {
           {t.adminUsersPage.joinedOn} {createdAt}
         </p>
       </div>
+      {canDelete && (
+        <button
+          type="button"
+          disabled={isPending}
+          aria-label={t.adminUsersPage.deleteUser}
+          onClick={() => {
+            if (window.confirm(`${t.adminUsersPage.deleteConfirm} ${fullName || user.phone || user.email} ?`)) {
+              deleteUser(user.id);
+            }
+          }}
+          className="shrink-0 p-2 rounded-lg text-danger hover:bg-danger/10 transition disabled:opacity-50"
+        >
+          <Trash2 size={16} />
+        </button>
+      )}
     </div>
   );
 }

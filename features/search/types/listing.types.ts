@@ -123,6 +123,13 @@ export type PropertyFilters = {
   minPrice?: number;
   maxPrice?: number;
   location?: string;
+  /** Restreint à une commune précise (voir features/listings/services/location-api.ts) — plus
+   *  fiable que `location` (texte libre) pour un lien construit à partir de données structurées,
+   *  ex. le widget "communes les plus recherchées". */
+  communeId?: string;
+  /** Restreint aux annonces publiées il y a au plus ce nombre de jours (ex. 7 pour "nouveautés de
+   *  la semaine") — calculé côté serveur par rapport à maintenant à chaque requête. */
+  maxAgeDays?: number;
   /** Type de compte ayant publié l'annonce (propriétaire / intermédiaire / agence). */
   publisherType?: PublisherType;
   /** Restreint aux annonces publiées par cet utilisateur (écran "Mon compte"). */

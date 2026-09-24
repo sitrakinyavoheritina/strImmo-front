@@ -30,6 +30,14 @@ export function useRegisterSubmit() {
         setStoredTheme(result.user.themePreference);
         setStoredFeedDisplay(result.user.feedDisplay);
         router.push('/');
+      } else if (payload.role === 'agent') {
+        // Un intermédiaire n'a plus besoin d'une validation admin : session ouverte tout de suite,
+        // comme un propriétaire (le backend ne renvoie pas de token à l'inscription, d'où le login).
+        const session = await authService.login({ identifier: payload.phone, password: payload.password });
+        setSession(session.user, session.token);
+        setStoredTheme(session.user.themePreference);
+        setStoredFeedDisplay(session.user.feedDisplay);
+        router.push('/');
       } else {
         router.push('/connexion?attente=1');
       }

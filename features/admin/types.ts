@@ -12,6 +12,7 @@ export interface AdminUser {
   avatarUrl: string | null;
   role: UserRole;
   isEmailVerified: boolean;
+  hasPassword: boolean;
   isPhoneVerified: boolean;
   createdAt: string;
   moderationStatus?: 'pending' | 'approved' | 'rejected';

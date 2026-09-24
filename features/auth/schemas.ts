@@ -19,7 +19,7 @@ export const ownerTenantSchema = z.object({
   lastName: z.string().min(2, 'Le nom est requis'),
   phone: z.string().regex(PHONE_REGEX, 'Numéro de téléphone invalide'),
   email: z.string().email('Adresse email invalide').optional().or(z.literal('')),
-  password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+  password: z.string().min(4, 'Le mot de passe doit contenir au moins 4 caractères'),
 });
 
 export type OwnerTenantFormData = z.infer<typeof ownerTenantSchema>;
@@ -31,7 +31,7 @@ export const agentSchema = z.object({
   firstName: z.string().min(2, 'Le prénom est requis'),
   lastName: z.string().min(2, 'Le nom est requis'),
   phone: z.string().regex(PHONE_REGEX, 'Numéro de téléphone invalide'),
-  password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+  password: z.string().min(4, 'Le mot de passe doit contenir au moins 4 caractères'),
 });
 
 export type AgentFormData = z.infer<typeof agentSchema>;
@@ -45,7 +45,7 @@ export const agencySchema = z.object({
   lastName: z.string().min(2, 'Le nom est requis'),
   phone: z.string().regex(PHONE_REGEX, 'Numéro de téléphone invalide'),
   email: z.string().email('Adresse email invalide').min(1, "L'email est requis"),
-  password: z.string().min(8, 'Le mot de passe doit contenir au moins 8 caractères'),
+  password: z.string().min(4, 'Le mot de passe doit contenir au moins 4 caractères'),
   agencyName: z.string().min(2, "Le nom de l'agence est requis"),
   address: z.string().min(2, "L'adresse est requise"),
   website: z.string().url('URL invalide').optional().or(z.literal('')),

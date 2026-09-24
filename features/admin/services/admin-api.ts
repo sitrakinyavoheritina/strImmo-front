@@ -4,4 +4,7 @@ import type { AdminUser } from '../types';
 export const adminApi = {
   // Réservé admin/superadmin — voir strImmo/src/auth/auth.controller.ts:listUsers (403 sinon).
   listUsers: () => apiClient.get<AdminUser[]>('/auth/users').then((r) => r.data),
+
+  // Suppression définitive — le backend refuse son propre compte et tout compte admin (403).
+  deleteUser: (id: string) => apiClient.delete<{ deleted: boolean }>(`/auth/users/${id}`).then((r) => r.data),
 };

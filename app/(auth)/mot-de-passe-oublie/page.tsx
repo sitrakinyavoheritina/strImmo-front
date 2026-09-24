@@ -53,7 +53,7 @@ export default function MotDePasseOubliePage() {
       setErrorMessage(t.forgotPasswordPage.codeRequired);
       return;
     }
-    if (newPassword.length < 8) {
+    if (newPassword.length < 4) {
       setErrorMessage(t.auth.passwordTooShort);
       return;
     }

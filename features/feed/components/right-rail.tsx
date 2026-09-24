@@ -5,6 +5,7 @@ import { useAuthStore } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { CategoryGrid } from './category-grid';
+import { TopCommunesWidget } from './top-communes-widget';
 import { RecentListingsWidget } from './recent-listings-widget';
 import { NearbyPropertiesMapWidget } from './nearby-properties-map-widget';
 
@@ -20,6 +21,7 @@ export function RightRail() {
   return (
     <aside className="hidden lg:flex w-96 shrink-0 self-start sticky top-14 max-h-[calc(100vh-3.5rem)] overflow-y-auto flex-col gap-6 py-6 pl-6 pr-4">
       <CategoryGrid />
+      <TopCommunesWidget />
       <RecentListingsWidget />
       <NearbyPropertiesMapWidget />
       {/* Pied de cette colonne (pas un footer de site entier, qui n'existe pas encore) — seul

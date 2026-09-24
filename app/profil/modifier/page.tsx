@@ -106,7 +106,7 @@ export default function ModifierProfilPage() {
     if (!firstName.trim()) next.firstName = t.auth.firstNameRequired;
     if (!lastName.trim()) next.lastName = t.auth.lastNameRequired;
     if (email && !EMAIL_REGEX.test(email)) next.email = t.auth.invalidEmail;
-    if (editingFields.has('password') && newPassword && newPassword.length < 8) {
+    if (editingFields.has('password') && newPassword && newPassword.length < 4) {
       next.password = t.auth.passwordTooShort;
     }
     // Un compte créé via Google (`!user.hasPassword`) n'a jamais eu de vrai mot de passe à

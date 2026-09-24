@@ -7,5 +7,6 @@ export const chatService = {
     chatApi.sendMessage(history).then((response) => ({
       reply: response.reply,
       properties: response.properties.map(mapApiPropertyToProperty),
+      filters: response.filters,
     })),
 };

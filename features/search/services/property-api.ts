@@ -121,6 +121,14 @@ export const propertyApi = {
       .get<ApiNearbyProperty[]>('/properties/nearby', { params: { lat, lng, limit } })
       .then((r) => r.data),
 
+  // Widget "communes les plus recherchées" (RightRail) — voir properties.service.ts:getTopCommunes.
+  topCommunes: (limit?: number) =>
+    apiClient
+      .get<{ communeId: string; communeName: string; count: number }[]>('/properties/top-communes', {
+        params: { limit },
+      })
+      .then((r) => r.data),
+
   create: (formData: FormData) =>
     apiClient
       .post<ApiProperty>('/properties', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
