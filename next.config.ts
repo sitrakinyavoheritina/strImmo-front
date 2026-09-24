@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
       // R2_PUBLIC_URL) — motif générique (pas le seul sous-domaine actuel) pour survivre à une
       // rotation du bucket sans retoucher ce fichier.
       { protocol: "https", hostname: "*.r2.dev" },
+      // Domaine personnalisé du bucket R2 (R2_PUBLIC_URL=https://img.onina.mg) — celui que les
+      // nouvelles photos utilisent ; les anciennes URL *.r2.dev ci-dessus restent valables.
+      { protocol: "https", hostname: "img.onina.mg" },
       // Anciennes photos encore hébergées sur Cloudinary (avant la migration vers R2) — certaines
       // annonces existantes en base y pointent toujours.
       { protocol: "https", hostname: "res.cloudinary.com" },
