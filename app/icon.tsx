@@ -23,7 +23,7 @@ export default function Icon() {
           borderRadius: 10,
         }}
       >
-        <img src={logoDataUri} alt="" width={38} height={23} />
+        <img src={logoDataUri} alt="" width={44} height={26} />
       </div>
     ),
     { ...size }

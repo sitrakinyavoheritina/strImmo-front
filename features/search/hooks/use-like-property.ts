@@ -13,6 +13,21 @@ function patchLikesCount(
   return properties.map((property) => (property.id === id ? { ...property, likesCount } : property));
 }
 
+// Le fil d'accueil est un `useInfiniteQuery` (clé ['properties', 'infinite', ...]) : son cache est
+// `{ pages: Property[][], pageParams }`, pas un tableau — l'appliquer tel quel à `patchLikesCount`
+// levait une exception dans `onSuccess`, ce qui faisait échouer la mutation et déclenchait
+// `onError` (retour du cœur à son état d'avant) alors que le like avait bien été enregistré.
+type CachedProperties = Property[] | { pages: Property[][]; pageParams: unknown[] } | undefined;
+
+function patchCachedProperties(data: CachedProperties, id: string, likesCount: number): CachedProperties {
+  if (!data) return data;
+  if (Array.isArray(data)) return patchLikesCount(data, id, likesCount);
+  if ('pages' in data && Array.isArray(data.pages)) {
+    return { ...data, pages: data.pages.map((page) => patchLikesCount(page, id, likesCount) ?? page) };
+  }
+  return data;
+}
+
 /** Bascule le "j'aime" d'une annonce (cœur) : appelle le backend (compteur partagé, voir
  *  strImmo/src/properties/properties.controller.ts), met à jour l'état "aimé par ce navigateur"
  *  (useLikesStore, indexé par `userId` — pas de suivi par utilisateur côté serveur) et patch le
@@ -30,8 +45,8 @@ export function useLikeProperty() {
       setLiked(userId, id, !wasLiked);
     },
     onSuccess: ({ likesCount }, { id }) => {
-      queryClient.setQueriesData<Property[]>({ queryKey: ['properties'] }, (properties) =>
-        patchLikesCount(properties, id, likesCount)
+      queryClient.setQueriesData<CachedProperties>({ queryKey: ['properties'] }, (data) =>
+        patchCachedProperties(data, id, likesCount)
       );
       queryClient.setQueryData<Property>(['property', id], (property) =>
         property ? { ...property, likesCount } : property

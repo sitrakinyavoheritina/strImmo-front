@@ -52,9 +52,9 @@ export function getPropertyDetailStats(
     if (property.hasIndividualMeter) amenities.push({ icon: Zap, text: t.search.hasIndividualMeter });
   } else if (property.propertyType === 'villa' || property.propertyType === 'apartment') {
     stats.push({ icon: Ruler, value: `${property.surfaceM2} m²`, label: t.propertyDetail.areaLabel });
-    stats.push({ icon: Home, value: property.roomType.replace('plus', '+'), label: t.search.roomTypeLabel });
+    stats.push({ icon: Home, value: property.roomType.replace('plus', '+'), label: t.propertyDetail.roomsShortLabel });
     if (property.parkingSpots > 0) {
-      stats.push({ icon: Car, value: String(property.parkingSpots), label: t.search.parkingSpots });
+      stats.push({ icon: Car, value: String(property.parkingSpots), label: t.propertyDetail.parkingShortLabel });
     }
     if (property.isIndependent) {
       amenities.push({

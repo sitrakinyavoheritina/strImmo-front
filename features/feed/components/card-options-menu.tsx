@@ -6,6 +6,8 @@ import { MoreHorizontal, Bookmark, Flag, Phone, MessageCircle, Check } from 'luc
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { useFavoriteIds, useToggleFavorite } from '@/features/search/hooks/use-favorites';
+import { useReportProperty } from '@/features/search/hooks/use-report-property';
+import type { ReportReason } from '@/features/search/services/property-api';
 import type { Property } from '@/features/search/types/listing.types';
 
 /** Menu "..." : enregistrer, contacter le vendeur, discuter, signaler — utilisé sur la carte du
@@ -26,6 +28,8 @@ export function CardOptionsMenu({
   const { mutate: toggleFavorite } = useToggleFavorite();
   const [isOpen, setIsOpen] = useState(false);
   const [isReported, setIsReported] = useState(false);
+  const [isChoosingReason, setIsChoosingReason] = useState(false);
+  const { mutate: reportProperty, isPending: isReporting } = useReportProperty();
   const isSaved = favoriteIds?.includes(property.id) ?? false;
 
   // "Enregistrer" est maintenant un vrai favori côté serveur (voir use-favorites.ts) — comme pour
@@ -47,6 +51,37 @@ export function CardOptionsMenu({
     setIsOpen(false);
     router.push(isAuthenticated ? `/annonce/${property.id}?chat=1` : '/connexion');
   }
+
+  // Signaler : compte requis (un signalement est rattaché à son auteur), puis choix d'un motif —
+  // enregistré côté serveur et visible des admins (/admin/signalements).
+  function handleReportClick() {
+    if (!isAuthenticated) {
+      setIsOpen(false);
+      router.push('/connexion');
+      return;
+    }
+    setIsChoosingReason(true);
+  }
+
+  function handleReason(reason: ReportReason) {
+    reportProperty(
+      { id: property.id, reason },
+      {
+        onSuccess: () => {
+          setIsReported(true);
+          setIsChoosingReason(false);
+        },
+      },
+    );
+  }
+
+  const REASONS: { value: ReportReason; label: string }[] = [
+    { value: 'spam', label: t.feed.reportReasonSpam },
+    { value: 'false_info', label: t.feed.reportReasonFalseInfo },
+    { value: 'unavailable', label: t.feed.reportReasonUnavailable },
+    { value: 'scam', label: t.feed.reportReasonScam },
+    { value: 'other', label: t.feed.reportReasonOther },
+  ];
 
   return (
     <div className="relative">
@@ -101,15 +136,32 @@ export function CardOptionsMenu({
 
             <div className="my-1 border-t border-stroke-default" />
 
-            <button
-              type="button"
-              disabled={isReported}
-              onClick={() => setIsReported(true)}
-              className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-danger hover:bg-danger/10 transition disabled:opacity-60 disabled:cursor-default"
-            >
-              {isReported ? <Check size={15} /> : <Flag size={15} />}
-              {isReported ? t.feed.menuReported : t.feed.menuReport}
-            </button>
+            {isChoosingReason && !isReported ? (
+              <div>
+                <p className="px-3 py-1.5 text-[12px] font-semibold text-content-muted">{t.feed.reportWhy}</p>
+                {REASONS.map(({ value, label }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    disabled={isReporting}
+                    onClick={() => handleReason(value)}
+                    className="w-full text-left px-3 py-2 text-sm text-content-main hover:bg-surface-app transition disabled:opacity-60"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <button
+                type="button"
+                disabled={isReported}
+                onClick={handleReportClick}
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-danger hover:bg-danger/10 transition disabled:opacity-60 disabled:cursor-default"
+              >
+                {isReported ? <Check size={15} /> : <Flag size={15} />}
+                {isReported ? t.feed.menuReported : t.feed.menuReport}
+              </button>
+            )}
           </div>
         </>
       )}

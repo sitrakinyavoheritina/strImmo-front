@@ -21,7 +21,7 @@ export function GET() {
         }}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- rendu par Satori (next/og), pas par le navigateur */}
-        <img src={logoDataUri} alt="" width={380} height={228} />
+        <img src={logoDataUri} alt="" width={448} height={269} />
       </div>
     ),
     { ...size }

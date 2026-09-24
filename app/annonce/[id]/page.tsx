@@ -315,6 +315,9 @@ export default function AnnoncePage() {
                 propertyId={property.id}
                 authorName={property.authorName}
                 authorAvatarUrl={property.authorAvatarUrl}
+                propertyTitle={property.title}
+                propertyPrice={property.price}
+                propertyPhotoUrl={property.mainPhotoUrl}
                 onClose={closeChat}
               />
             ))}
@@ -440,8 +443,9 @@ export default function AnnoncePage() {
                     className="flex items-center justify-center gap-1 bg-surface-app lg:bg-surface-card border border-stroke-default rounded-md py-1 px-1"
                   >
                     <stat.icon size={12} className="shrink-0 text-brand-primary" />
-                    <span className="text-[0.85rem] font-bold text-content-main whitespace-nowrap">{stat.value}</span>
-                    <span className="text-[0.85rem] text-content-muted truncate">{stat.label}</span>
+                    <span className="text-[12px] text-content-muted leading-tight">
+                      {stat.label} : <span className="font-bold text-content-main">{stat.value}</span>
+                    </span>
                   </div>
                 ))}
               </div>
@@ -513,6 +517,9 @@ export default function AnnoncePage() {
           {!isAdminUser && (property.contactPhone || (property.authorName && !isChatOpen)) && (
             <div className="h-32 lg:hidden" />
           )}
+          {/* Feuille de discussion mobile (voir InlineChatPanel) : réserve sa hauteur pour que le bas
+              de la page reste atteignable en défilant. */}
+          {isChatOpen && <div className="h-[50vh] lg:hidden" />}
         </div>
       </div>
       </div>
@@ -628,6 +635,8 @@ function ContactActions({
   return (
     <div className="space-y-1.5">
       <p className="text-[0.85rem] font-semibold text-content-muted">{contactLabel}</p>
+      {/* Les deux numéros côte à côte (pas empilés) — un seul reste pleine largeur. */}
+      <div className="flex gap-2">
       {numbers.map((number, index) => {
         const isCopied = copiedNumber === number;
         return (
@@ -636,7 +645,7 @@ function ContactActions({
             type="button"
             onClick={() => handleCopy(number)}
             aria-label={copyLabel}
-            className={`flex items-center justify-center gap-2 w-full py-2 px-4 rounded-xl text-sm font-semibold transition active:scale-[0.98] ${
+            className={`flex flex-1 min-w-0 items-center justify-center gap-2 py-2 px-3 rounded-xl text-sm font-semibold transition active:scale-[0.98] ${
               index === 0
                 ? 'bg-brand-primary hover:bg-brand-primary-hover text-white shadow-md shadow-brand-primary/20'
                 : 'bg-surface-app hover:bg-stroke-default border border-stroke-default text-content-main'
@@ -647,6 +656,7 @@ function ContactActions({
           </button>
         );
       })}
+      </div>
     </div>
   );
 }

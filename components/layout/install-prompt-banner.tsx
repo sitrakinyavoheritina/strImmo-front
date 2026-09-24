@@ -5,6 +5,7 @@ import { useTranslation } from '@/lib/i18n/use-translation';
 import { useDismissedInstallPrompt } from '@/lib/pwa/use-dismissed-install-prompt';
 import { useInstallPromptEvent } from '@/lib/pwa/use-install-prompt-event';
 import { useIsIOS } from '@/lib/pwa/use-is-ios';
+import { useIsMobileViewport } from '@/lib/pwa/use-is-mobile-viewport';
 import { useIsStandalone } from '@/lib/pwa/use-is-standalone';
 
 // Bandeau global (monté une fois dans AppShell, comme OfflineBanner) proposant d'installer l'app —
@@ -21,7 +22,10 @@ export function InstallPromptBanner() {
   const isStandalone = useIsStandalone();
   const isIOS = useIsIOS();
   const { canInstall, consume } = useInstallPromptEvent();
-  const { dismissed, dismiss } = useDismissedInstallPrompt();
+  // Mobile : le bandeau revient à chaque nouvelle visite tant que l'app n'est pas installée (la
+  // croix ne le ferme que pour la session) ; ordinateur : refermé définitivement comme avant.
+  const isMobile = useIsMobileViewport();
+  const { dismissed, dismiss } = useDismissedInstallPrompt(!isMobile);
 
   if (isStandalone || dismissed || !(isIOS || canInstall)) return null;
 
@@ -57,8 +61,8 @@ export function InstallPromptBanner() {
       <button
         type="button"
         onClick={dismiss}
-        aria-label={t.pwa.installDismiss}
-        title={t.pwa.installDismiss}
+        aria-label={isMobile ? t.pwa.installClose : t.pwa.installDismiss}
+        title={isMobile ? t.pwa.installClose : t.pwa.installDismiss}
         className="shrink-0 text-content-muted hover:text-content-main transition p-1"
       >
         <X size={16} />

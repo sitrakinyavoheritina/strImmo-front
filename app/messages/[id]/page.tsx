@@ -3,6 +3,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
+import Link from 'next/link';
+import { useProperty } from '@/features/search/hooks/use-property';
+import { formatPrice } from '@/features/search/utils/format-price';
 import { ArrowLeft, Check, CheckCheck, ImagePlus, Send } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
@@ -109,6 +112,7 @@ export default function ConversationPage() {
   // dédié rien que pour l'en-tête.
   const { data: conversations } = useConversations();
   const conversation = conversations?.find((item) => item.id === id);
+  const { data: conversationProperty } = useProperty(conversation?.propertyId);
 
   const { data: messages, isLoading } = useConversation(id);
   const { mutateAsync: sendMessage, isPending } = useSendMessage(id);
@@ -239,6 +243,26 @@ export default function ConversationPage() {
           {conversation?.participantName ?? t.messages.conversationTitle}
         </span>
       </div>
+
+      {/* Bien concerné par cette discussion (conversation ouverte depuis une annonce) — sans cette
+          carte, rien n'indique de quelle annonce il s'agit. */}
+      {conversationProperty && (
+        <Link
+          href={`/annonce/${conversationProperty.id}`}
+          className="shrink-0 flex items-center gap-2.5 px-4 py-2 border-b border-stroke-default bg-surface-app hover:bg-stroke-default/40 transition"
+        >
+          <div className="relative w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-stroke-default">
+            {conversationProperty.mainPhotoUrl && (
+              <Image src={conversationProperty.mainPhotoUrl} alt="" fill className="object-cover" />
+            )}
+          </div>
+          <div className="min-w-0">
+            <p className="text-[12px] text-content-muted">{t.propertyDetail.chatAboutProperty}</p>
+            <p className="text-[0.85rem] font-semibold text-content-main truncate">{conversationProperty.title}</p>
+            <p className="text-[12px] font-bold text-brand-secondary-text">{formatPrice(conversationProperty.price)}</p>
+          </div>
+        </Link>
+      )}
 
       {isLoading ? (
         <p className="text-sm text-content-muted py-6 text-center">{t.search.searching}</p>

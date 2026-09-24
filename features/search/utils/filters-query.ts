@@ -1,6 +1,6 @@
 import type { PropertyFilters } from '../types/listing.types';
 
-const NUMBER_KEYS = ['minPrice', 'maxPrice', 'minBedrooms', 'minParkingSpots', 'maxAgeDays'] as const;
+const NUMBER_KEYS = ['minPrice', 'maxPrice', 'minBedrooms', 'minParkingSpots', 'maxAgeDays', 'maxCommission', 'maxCaution', 'maxVisitFee'] as const;
 const BOOLEAN_KEYS = [
   'hasCarAccess',
   'hasMotorbikeAccess',

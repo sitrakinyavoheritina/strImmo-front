@@ -47,9 +47,10 @@ export function ConversationListPanel() {
           onClick={() => setIsPickingContact(true)}
           aria-label={t.messages.newConversation}
           title={t.messages.newConversation}
-          className="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-brand-primary hover:bg-brand-primary-soft transition"
+          className="shrink-0 h-8 px-2.5 rounded-full flex items-center gap-1.5 text-[0.85rem] font-semibold text-brand-primary hover:bg-brand-primary-soft transition"
         >
-          <MessageCirclePlus size={20} />
+          <MessageCirclePlus size={18} />
+          {t.messages.newConversationCta}
         </button>
       </div>
 

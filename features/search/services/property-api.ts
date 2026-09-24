@@ -15,6 +15,8 @@ import type {
 // Forme brute renvoyée par strImmo (les champs spécifiques à un type de bien vivent dans une
 // sous-table à part) — le mapping vers l'union à plat se fait dans property-mapper.ts, pas ici.
 // Port direct de Onina-mobile/src/services/api/property-api.ts.
+export type ReportReason = 'spam' | 'false_info' | 'unavailable' | 'scam' | 'other';
+
 export type ApiPropertyPhoto = { id: string; url: string; isCover: boolean; position: number };
 
 export type ApiHouseDetails = {
@@ -119,6 +121,17 @@ export const propertyApi = {
   nearby: (lat: number, lng: number, limit?: number) =>
     apiClient
       .get<ApiNearbyProperty[]>('/properties/nearby', { params: { lat, lng, limit } })
+      .then((r) => r.data),
+
+  report: (id: string, reason: ReportReason) =>
+    apiClient.post<{ reported: boolean }>(`/properties/${id}/report`, { reason }).then((r) => r.data),
+
+  // Réservé admin/superadmin — voir app/admin/signalements.
+  listReports: () =>
+    apiClient
+      .get<
+        { propertyId: string; title: string; location: string; count: number; reasons: ReportReason[]; lastReportedAt: string }[]
+      >('/property-reports')
       .then((r) => r.data),
 
   // Widget "communes les plus recherchées" (RightRail) — voir properties.service.ts:getTopCommunes.

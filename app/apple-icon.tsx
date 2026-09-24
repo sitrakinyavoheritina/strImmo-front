@@ -20,7 +20,7 @@ export default function AppleIcon() {
           background: '#ffffff',
         }}
       >
-        <img src={logoDataUri} alt="" width={150} height={90} />
+        <img src={logoDataUri} alt="" width={164} height={98} />
       </div>
     ),
     { ...size }

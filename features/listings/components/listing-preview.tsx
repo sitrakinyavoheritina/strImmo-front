@@ -97,8 +97,9 @@ export function ListingPreview({ values, photos }: { values: PropertyFormValues;
                 className="flex items-center justify-center gap-1 bg-surface-app border border-stroke-default rounded-md py-1 px-1"
               >
                 <stat.icon size={12} className="shrink-0 text-brand-primary" />
-                <span className="text-[0.85rem] font-bold text-content-main whitespace-nowrap">{stat.value}</span>
-                <span className="text-[0.85rem] text-content-muted truncate">{stat.label}</span>
+                <span className="text-[12px] text-content-muted leading-tight">
+                  {stat.label} : <span className="font-bold text-content-main">{stat.value}</span>
+                </span>
               </div>
             ))}
           </div>

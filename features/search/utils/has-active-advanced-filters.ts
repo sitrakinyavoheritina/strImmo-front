@@ -1,6 +1,9 @@
 import type { PropertyFilters } from '../types/listing.types';
 
 const ADVANCED_KEYS: (keyof PropertyFilters)[] = [
+  'maxCommission',
+  'maxCaution',
+  'maxVisitFee',
   'minBedrooms',
   'hasCarAccess',
   'hasMotorbikeAccess',

@@ -197,6 +197,29 @@ export function FilterFields({ draft, onUpdate, onSelectPropertyType, isAdvanced
 
         {isAdvancedOpen && (
           <div className="space-y-2.5">
+            {/* Frais : plafonds sur commission / caution / droit de visite (voir aussi le formulaire
+                de publication). */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {(
+                [
+                  ['maxCommission', t.search.maxCommission],
+                  ['maxCaution', t.search.maxCaution],
+                  ['maxVisitFee', t.search.maxVisitFee],
+                ] as const
+              ).map(([key, label]) => (
+                <div key={key}>
+                  <FieldLabel>{label}</FieldLabel>
+                  <input
+                    type="number"
+                    min={0}
+                    placeholder="0"
+                    value={draft[key] ?? ''}
+                    onChange={(event) => onUpdate(key, event.target.value ? Number(event.target.value) : undefined)}
+                    className="w-full rounded-xl border border-stroke-default px-3 py-2.5 text-sm outline-none focus:border-brand-primary"
+                  />
+                </div>
+              ))}
+            </div>
             {!draft.propertyType && (
               <Toggle
                 label={t.search.carAccess}

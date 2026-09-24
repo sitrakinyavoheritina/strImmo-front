@@ -9,22 +9,25 @@ function subscribe(callback: () => void) {
   return () => window.removeEventListener('storage', callback);
 }
 
-function getSnapshot(): boolean {
-  return localStorage.getItem(STORAGE_KEY) === '1';
-}
-
 function getServerSnapshot(): boolean {
   return false;
 }
 
-/** Bandeau d'installation (voir InstallPromptBanner) refermé une bonne fois pour toutes — persisté
- *  comme la préférence de thème (même idiome, voir lib/theme/use-theme-preference.ts) : pas
- *  reproposé à chaque visite une fois écarté. */
-export function useDismissedInstallPrompt() {
-  const dismissed = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+/** Bandeau d'installation (voir InstallPromptBanner) refermé.
+ *  - `persistent = true` (ordinateur) : refermé une bonne fois pour toutes (localStorage), comme la
+ *    préférence de thème (même idiome, voir lib/theme/use-theme-preference.ts).
+ *  - `persistent = false` (mobile) : refermé seulement pour la session en cours (sessionStorage) —
+ *    le bandeau revient à chaque nouvelle visite tant que l'app n'est pas installée, demandé
+ *    explicitement ("l'afficher toujours s'il n'installe pas"). */
+export function useDismissedInstallPrompt(persistent = true) {
+  const dismissed = useSyncExternalStore(
+    subscribe,
+    () => (persistent ? localStorage : sessionStorage).getItem(STORAGE_KEY) === '1',
+    getServerSnapshot
+  );
   const dismiss = useCallback(() => {
-    localStorage.setItem(STORAGE_KEY, '1');
+    (persistent ? localStorage : sessionStorage).setItem(STORAGE_KEY, '1');
     window.dispatchEvent(new StorageEvent('storage'));
-  }, []);
+  }, [persistent]);
   return { dismissed, dismiss };
 }

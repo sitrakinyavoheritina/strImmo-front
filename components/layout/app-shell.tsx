@@ -6,6 +6,7 @@ import { AdminRouteGuard } from './admin-route-guard';
 import { OfflineBanner } from './offline-banner';
 import { InstallPromptBanner } from './install-prompt-banner';
 import { ServiceWorkerRegistration } from './service-worker-registration';
+import { SplashScreen } from './splash-screen';
 
 /** Habillage global du site : topbar + sidebar gauche (desktop) / bande d'icônes en bas d'écran
  * (mobile, comme l'app mobile — demandé explicitement). `MobileNavStrip` est fixée en bas ; la
@@ -14,6 +15,7 @@ import { ServiceWorkerRegistration } from './service-worker-registration';
 export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-surface-app text-content-main">
+      <SplashScreen />
       <RealtimeProvider />
       <ServiceWorkerRegistration />
       <AdminRouteGuard />

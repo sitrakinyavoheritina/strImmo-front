@@ -5,8 +5,8 @@ import { Analytics } from '@/components/analytics/analytics';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Onina - Immobilier à Madagascar',
-  description: "Trouvez votre chez-vous : Achat, vente et location d'immobiliers à Madagascar.",
+  title: 'Onina.mg — L’immobilier à Madagascar',
+  description: "L’immobilier à Madagascar. Trouvez. Fondez. Habitez. Achat, vente et location de maisons, appartements, villas et terrains.",
   appleWebApp: {
     capable: true,
     title: 'Onina',

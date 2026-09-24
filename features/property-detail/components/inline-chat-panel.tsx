@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { X, Send } from 'lucide-react';
+import Image from 'next/image';
+import { formatPrice } from '@/features/search/utils/format-price';
 import { Avatar } from '@/components/ui/avatar';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
@@ -24,9 +26,15 @@ export function InlineChatPanel({
   propertyId,
   authorName,
   authorAvatarUrl,
+  propertyTitle,
+  propertyPrice,
+  propertyPhotoUrl,
   onClose,
 }: {
   propertyId: string;
+  propertyTitle?: string;
+  propertyPrice?: number;
+  propertyPhotoUrl?: string;
   authorName: string;
   authorAvatarUrl?: string;
   onClose: () => void;
@@ -69,7 +77,10 @@ export function InlineChatPanel({
   }
 
   return (
-    <div className="mt-2 lg:flex-1 lg:min-h-0 min-h-[280px] border border-stroke-default rounded-xl flex flex-col overflow-hidden bg-surface-app lg:bg-surface-card">
+    // Mobile (< lg) : feuille fixée en bas d'écran, à mi-hauteur — le reste de la page reste
+    // visible et défilable derrière (pas de fond bloquant). Desktop : panneau intégré sous la
+    // photo, comme avant.
+    <div className="fixed inset-x-0 bottom-0 z-50 h-[50vh] rounded-t-2xl border-t border-x border-stroke-default shadow-[0_-8px_24px_rgba(0,0,0,0.15)] lg:static lg:z-auto lg:mt-2 lg:h-auto lg:flex-1 lg:min-h-[280px] lg:min-h-0 lg:rounded-xl lg:border lg:shadow-none flex flex-col overflow-hidden bg-surface-card">
       <div className="shrink-0 flex items-center gap-2.5 px-3 py-2.5 border-b border-stroke-default">
         <Avatar name={authorName} imageUrl={authorAvatarUrl} size={28} />
         <span className="flex-1 font-semibold text-sm text-content-main truncate">{authorName}</span>
@@ -82,6 +93,23 @@ export function InlineChatPanel({
           <X size={18} />
         </button>
       </div>
+
+      {/* Trace du bien concerné : sans elle, rien n'indique dans la discussion de quelle annonce il
+          s'agit. */}
+      {propertyTitle && (
+        <div className="shrink-0 flex items-center gap-2.5 px-3 py-2 border-b border-stroke-default bg-surface-app">
+          <div className="relative w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-stroke-default">
+            {propertyPhotoUrl && <Image src={propertyPhotoUrl} alt="" fill className="object-cover" />}
+          </div>
+          <div className="min-w-0">
+            <p className="text-[12px] text-content-muted">{t.propertyDetail.chatAboutProperty}</p>
+            <p className="text-[0.85rem] font-semibold text-content-main truncate">{propertyTitle}</p>
+            {propertyPrice != null && (
+              <p className="text-[12px] font-bold text-brand-secondary-text">{formatPrice(propertyPrice)}</p>
+            )}
+          </div>
+        </div>
+      )}
 
       <div ref={scrollRef} className="flex-1 min-h-0 overflow-y-auto px-3 py-2.5 space-y-2">
         {isStarting || isLoading ? (

@@ -7,9 +7,9 @@ import type { MetadataRoute } from 'next';
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
-    name: 'Onina.mg - Immobilier à Madagascar',
+    name: 'Onina.mg - L’immobilier à Madagascar',
     short_name: 'Onina',
-    description: "Trouvez votre chez-vous : Achat, vente et location d'immobiliers à Madagascar.",
+    description: "L’immobilier à Madagascar. Trouvez. Fondez. Habitez.",
     start_url: '/',
     scope: '/',
     display: 'standalone',
