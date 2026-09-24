@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { listingService } from '../services/listing-service';
-import type { PropertyFilters } from '../types/listing.types';
+import type { Property, PropertyFilters } from '../types/listing.types';
 
 const PAGE_SIZE = 12;
 
@@ -10,8 +10,15 @@ const PAGE_SIZE = 12;
 // une page renvoyant moins de PAGE_SIZE éléments signale la dernière page. Ne PAS réutiliser pour
 // Mes Biens/Favoris/la modération admin, des listes déjà bornées à un utilisateur qui n'ont pas
 // besoin de pagination — laissées sur `useProperties` (voir ce hook).
-export function useInfiniteProperties(filters: Omit<PropertyFilters, 'limit' | 'offset'>) {
+export function useInfiniteProperties(
+  filters: Omit<PropertyFilters, 'limit' | 'offset'>,
+  // Première page déjà chargée côté serveur (rendu SEO de l'accueil) — à ne passer que pour les
+  // filtres par défaut : `initialData` s'applique à toute nouvelle clé de requête.
+  initialPage?: Property[]
+) {
   return useInfiniteQuery({
+    initialData: initialPage ? { pages: [initialPage], pageParams: [0] } : undefined,
+    initialDataUpdatedAt: initialPage ? 0 : undefined,
     queryKey: ['properties', 'infinite', filters],
     queryFn: ({ pageParam }) => listingService.list({ ...filters, limit: PAGE_SIZE, offset: pageParam }),
     initialPageParam: 0,

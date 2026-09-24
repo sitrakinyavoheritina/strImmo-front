@@ -1,79 +1,63 @@
-'use client';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { HomeClient } from './home-client';
+import { fetchProperties } from '@/lib/seo/api';
+import { getGeoPages } from '@/lib/seo/geo';
+import { SITE_DESCRIPTION, SITE_TITLE, absoluteUrl } from '@/lib/seo/site';
+import { TYPE_INFO, type SeoPropertyType } from '@/lib/seo/slug';
 
-import { useEffect, useRef } from 'react';
-import { FeaturedStories } from '@/features/feed/components/featured-stories';
-import { FeedList } from '@/features/feed/components/feed-list';
-import { RightRail } from '@/features/feed/components/right-rail';
-import { SearchSection } from '@/features/search/components/search-section';
-import { useInfiniteProperties } from '@/features/search/hooks/use-infinite-properties';
-import { useDebouncedSearchFilters } from '@/features/search/hooks/use-debounced-search-filters';
-import { useHomeSearchFiltersStore } from '@/lib/state/use-home-search-filters-store';
-import { useFeedDisplayPreference } from '@/lib/theme/use-feed-display-preference';
-import { useTranslation } from '@/lib/i18n/use-translation';
+export const revalidate = 300;
 
-export default function HomePage() {
-  const { t } = useTranslation();
-  // Le fil (rail de stories + liste) se filtre directement selon les puces choisies dans
-  // `SearchSection` — pas de bouton "Rechercher" à cliquer, demandé explicitement. Le texte libre
-  // (lieu) passe par `useDebouncedSearchFilters` : sans ça, chaque lettre tapée déclencherait sa
-  // propre requête réseau.
-  const filters = useHomeSearchFiltersStore((state) => state.filters);
-  const debouncedFilters = useDebouncedSearchFilters(filters);
-  const {
-    data,
-    isLoading,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-  } = useInfiniteProperties({ ...debouncedFilters, sortBy: 'recent' });
-  const properties = data?.pages.flat();
-  // Cartes par défaut, liste compacte en option (voir /parametres) — demandé explicitement après
-  // l'essai de la liste : l'ancien affichage reste le standard, pas remplacé d'office.
-  const { preference: feedDisplay } = useFeedDisplayPreference();
+export const metadata: Metadata = {
+  title: { absolute: SITE_TITLE },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: absoluteUrl('/') },
+  openGraph: { url: absoluteUrl('/'), title: SITE_TITLE, description: SITE_DESCRIPTION, type: 'website', siteName: 'Onina', locale: 'fr_MG' },
+};
 
-  // Scroll infini façon Facebook/Instagram (demandé explicitement, pour ne jamais avoir à cliquer
-  // "page suivante") : une sentinelle invisible tout en bas du fil déclenche le chargement de la
-  // page suivante dès qu'elle devient visible — même mécanisme (IntersectionObserver sur une
-  // sentinelle) que le repli mobile de SearchSection, voir son commentaire pour le détail. `rootMargin`
-  // positif : la page suivante commence à charger un peu avant que la sentinelle n'atteigne
-  // réellement le bas de l'écran, pour qu'elle soit prête avant que l'utilisateur n'arrive au bout.
-  const sentinelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const sentinel = sentinelRef.current;
-    if (!sentinel) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) fetchNextPage();
-      },
-      { rootMargin: '600px 0px 0px 0px', threshold: 0 }
-    );
-    observer.observe(sentinel);
-    return () => observer.disconnect();
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+// Accueil : le fil reste un composant client (filtres, scroll infini), mais la première page
+// d'annonces est chargée ici, côté serveur — le HTML contient donc de vraies annonces et leurs
+// liens. Le bloc de texte + liens sous le fil relie l'accueil aux catégories et aux communes.
+export default async function HomePage() {
+  const [initialProperties, geoPages] = await Promise.all([
+    fetchProperties({ sortBy: 'recent', limit: 12, offset: 0 }),
+    getGeoPages(),
+  ]);
+  const types = Object.keys(TYPE_INFO) as SeoPropertyType[];
 
   return (
-    <div className="flex px-3 sm:px-6 lg:px-0">
-      <div className="flex-1 min-w-0 pt-0 sm:pt-2 pb-4 sm:pb-6 space-y-3">
-        <SearchSection />
-        {properties && properties.length > 0 && <FeaturedStories properties={properties.slice(0, 12)} />}
-        <div>
-          {isLoading ? (
-            <p className="text-sm text-content-muted">{t.search.searching}</p>
-          ) : properties && properties.length > 0 ? (
-            <>
-              <FeedList properties={properties} variant={feedDisplay} />
-              <div ref={sentinelRef} className="h-px" />
-              {isFetchingNextPage && (
-                <p className="text-sm text-content-muted text-center py-3">{t.search.searching}</p>
-              )}
-            </>
-          ) : (
-            <p className="text-sm text-content-muted">{t.search.noResults}</p>
-          )}
-        </div>
-      </div>
-      <RightRail />
-    </div>
+    <>
+      <h1 className="sr-only">Onina, l’immobilier à Madagascar : maisons, appartements, villas et terrains à vendre ou à louer</h1>
+      <HomeClient initialProperties={initialProperties} />
+      <section className="px-3 sm:px-6 lg:px-4 pb-24 lg:pb-10 max-w-5xl mx-auto w-full text-sm text-content-muted">
+        <h2 className="text-sm font-bold text-content-main mb-1.5">L’immobilier à Madagascar avec Onina</h2>
+        <p className="max-w-3xl leading-relaxed">
+          Onina met en relation propriétaires, acheteurs et locataires : parcourez les annonces de
+          maisons, d’appartements, de villas et de terrains à vendre ou à louer à Madagascar.
+        </p>
+        <ul className="flex flex-wrap gap-2 mt-3">
+          {types.map((type) => (
+            <li key={type}>
+              <Link
+                href={`/${TYPE_INFO[type].slug}`}
+                className="inline-block rounded-full border border-stroke-default bg-surface-card px-3 py-1.5 text-[0.85rem] text-content-main hover:border-brand-primary hover:text-brand-primary transition"
+              >
+                {TYPE_INFO[type].plural} à vendre et à louer
+              </Link>
+            </li>
+          ))}
+          {geoPages.slice(0, 8).map((page) => (
+            <li key={`${page.propertyType}-${page.slug}`}>
+              <Link
+                href={`/${TYPE_INFO[page.propertyType].slug}/${page.slug}`}
+                className="inline-block rounded-full border border-stroke-default bg-surface-card px-3 py-1.5 text-[0.85rem] text-content-main hover:border-brand-primary hover:text-brand-primary transition"
+              >
+                {TYPE_INFO[page.propertyType].plural} – {page.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </section>
+    </>
   );
 }

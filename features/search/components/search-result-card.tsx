@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { MapPin } from 'lucide-react';
 import { formatPrice, getPriceSuffix } from '../utils/format-price';
 import type { Property } from '../types/listing.types';
+import { propertyPath } from '@/lib/seo/slug';
 
 /** Carte pour une annonce des résultats de recherche / réponses de l'IA — format le plus compact
  * possible (utilisée uniquement dans le panneau "Recherche IA" inline, sous le chat : pas de place
@@ -12,7 +13,7 @@ import type { Property } from '../types/listing.types';
 export function SearchResultCard({ property }: { property: Property }) {
   return (
     <Link
-      href={`/annonce/${property.id}`}
+      href={propertyPath(property)}
       className="block bg-surface-card rounded-xl border border-stroke-default/80 overflow-hidden shadow-sm hover:shadow-md transition"
     >
       <div className="relative aspect-[4/3] bg-stroke-default">

@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { formatPrice } from '@/features/search/utils/format-price';
 import type { Property } from '@/features/search/types/listing.types';
+import { propertyPath } from '@/lib/seo/slug';
 
 const SCROLL_STEP = 280;
 /** En-dessous de ce déplacement (px), un pointerdown/up est traité comme un clic, pas un drag. */
@@ -221,7 +222,7 @@ export function FeaturedStories({
           return (
             <Link
               key={property.id}
-              href={`/annonce/${property.id}`}
+              href={propertyPath(property)}
               className="w-32 shrink-0 snap-start bg-surface-card rounded-xl border border-stroke-default/80 overflow-hidden shadow-sm hover:shadow-md transition"
             >
               <div className="relative w-full h-20 bg-stroke-default">

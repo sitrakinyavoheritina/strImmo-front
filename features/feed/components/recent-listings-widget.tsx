@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useProperties } from '@/features/search/hooks/use-properties';
+import { propertyPath } from '@/lib/seo/slug';
 
 /** Mini-liste des annonces les plus récentes, en vignette. */
 export function RecentListingsWidget() {
@@ -20,7 +21,7 @@ export function RecentListingsWidget() {
         {recent.map((property) => (
           <Link
             key={property.id}
-            href={`/annonce/${property.id}`}
+            href={propertyPath(property)}
             className="flex items-center gap-2.5 rounded-xl border border-stroke-default bg-surface-card p-2 hover:border-brand-primary transition"
           >
             <div className="relative w-12 h-12 rounded-lg overflow-hidden bg-stroke-default shrink-0">

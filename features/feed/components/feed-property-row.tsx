@@ -14,6 +14,7 @@ import { useLikeProperty } from '@/features/search/hooks/use-like-property';
 import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import { formatRelativeTime } from '@/features/search/utils/format-relative-time';
 import type { Property } from '@/features/search/types/listing.types';
+import { propertyPath } from '@/lib/seo/slug';
 
 const PUBLISHER_LABEL_KEY = {
   owner: 'publisherOwner',
@@ -60,7 +61,7 @@ export function FeedPropertyRow({ property }: { property: Property }) {
           s'adapter au texte — sans `self-stretch`, la miniature restait bloquée à sa hauteur fixe
           et laissait un vide en dessous. */}
       <Link
-        href={`/annonce/${property.id}`}
+        href={propertyPath(property)}
         className="relative w-32 min-h-32 sm:w-40 sm:min-h-40 self-stretch shrink-0 rounded-lg overflow-hidden bg-stroke-default"
       >
         {cover && <Image src={cover} alt={property.title} fill className="object-cover" />}
@@ -93,7 +94,7 @@ export function FeedPropertyRow({ property }: { property: Property }) {
         {/* `line-clamp-2` (pas 1) : un titre un peu long se lit sur deux lignes plutôt que d'être
             coupé à quelques mots — même chose pour le lieu juste en dessous — demandé explicitement
             après un retour sur des titres/lieux tronqués trop tôt. */}
-        <Link href={`/annonce/${property.id}`} className="min-w-0 mt-1">
+        <Link href={propertyPath(property)} className="min-w-0 mt-1">
           <h3 className="text-sm font-semibold text-content-main line-clamp-2">{property.title}</h3>
         </Link>
 

@@ -14,6 +14,7 @@ import { useLikeProperty } from '@/features/search/hooks/use-like-property';
 import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import { formatRelativeTime } from '@/features/search/utils/format-relative-time';
 import type { Property } from '@/features/search/types/listing.types';
+import { propertyPath } from '@/lib/seo/slug';
 
 const PUBLISHER_LABEL_KEY = {
   owner: 'publisherOwner',
@@ -62,7 +63,7 @@ export function FeedPropertyCard({ property }: { property: Property }) {
 
   return (
     <article className="bg-surface-card rounded-2xl border border-stroke-default/80 shadow-sm hover:shadow-md transition">
-      <Link href={`/annonce/${property.id}`} className="block relative aspect-[3/2] bg-stroke-default rounded-t-2xl overflow-hidden">
+      <Link href={propertyPath(property)} className="block relative aspect-[3/2] bg-stroke-default rounded-t-2xl overflow-hidden">
         {cover && <Image src={cover} alt={property.title} fill className="object-cover" />}
         {property.publisherType && (
           <span className="absolute top-3 left-3 bg-surface-card/95 text-content-main text-[10px] font-bold px-2 py-1 rounded-md uppercase">
