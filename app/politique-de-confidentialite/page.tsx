@@ -114,8 +114,14 @@ export default function PrivacyPolicyPage() {
             </ul>
             <p className="mt-2">
               Nous n’utilisons pas vos données à des fins publicitaires et ne les vendons à
-              personne. Onina n’intègre aucun outil de suivi publicitaire ou d’analyse tierce
-              (pas de Google Analytics, pas de pixel Facebook ni équivalent).
+              personne. Pour comprendre comment le site est utilisé (pages vues, recherches,
+              annonces consultées), nous utilisons Google Analytics 4 : les événements envoyés
+              ne contiennent jamais votre téléphone, votre email, votre nom ni aucun identifiant
+              de compte. Nous conservons aussi, sur nos propres serveurs, la liste des annonces
+              que vous avez consultées (rattachée à votre compte si vous êtes connecté, sinon à un
+              identifiant aléatoire de votre navigateur) pour vous les retrouver et fournir aux
+              propriétaires des statistiques de consultation de leurs annonces. Pas de pixel
+              Facebook ni de suivi publicitaire.
             </p>
           </Section>
 
@@ -127,7 +133,7 @@ export default function PrivacyPolicyPage() {
             </p>
             <ul className="list-disc pl-5 space-y-1.5 mt-2">
               <li><strong>Cloudflare R2</strong> — hébergement des photos et documents (CIN, NIF, STAT).</li>
-              <li><strong>Google</strong> — uniquement si vous utilisez « Se connecter avec Google ».</li>
+              <li><strong>Google</strong> — « Se connecter avec Google » si vous l’utilisez, et Google Analytics 4 (statistiques de visite anonymisées).</li>
               <li><strong>Mapbox</strong> — affichage des cartes et positions des annonces.</li>
               <li><strong>OpenAI</strong> — uniquement le texte échangé avec l’assistant de recherche IA, si vous l’utilisez.</li>
               <li><strong>Brevo</strong> — envoi des emails (codes de vérification, réinitialisation de mot de passe).</li>

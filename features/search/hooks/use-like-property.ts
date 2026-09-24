@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { propertyApi } from '../services/property-api';
+import { trackEvent } from '@/lib/analytics/track';
 import { useLikesStore } from '@/lib/state/use-likes-store';
 import type { Property } from '../types/listing.types';
 
@@ -25,6 +26,7 @@ export function useLikeProperty() {
     mutationFn: ({ id, wasLiked }: { id: string; wasLiked: boolean; userId: string }) =>
       wasLiked ? propertyApi.unlike(id) : propertyApi.like(id),
     onMutate: ({ id, wasLiked, userId }) => {
+      trackEvent('favorite_property', { property_id: id, action: wasLiked ? 'remove' : 'add', source: 'like' });
       setLiked(userId, id, !wasLiked);
     },
     onSuccess: ({ likesCount }, { id }) => {

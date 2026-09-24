@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { Send, Sparkles, ChevronRight } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
+import { trackEvent } from '@/lib/analytics/track';
 import { getErrorMessage } from '@/lib/api/get-error-message';
 import { filtersToSearchParams } from '../utils/filters-query';
 import { useChatAssistant } from '../hooks/use-chat-assistant';
@@ -49,6 +50,7 @@ export function AiSearchPanel() {
     setMessages(nextHistory);
     setInput('');
 
+    trackEvent('send_message', { source: 'ai_search' });
     mutate(nextHistory, {
       onSuccess: (response) => {
         setMessages((prev) => [...prev, { role: 'assistant', content: response.reply }]);

@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { AppShell } from '@/components/layout/app-shell';
 import { QueryProvider } from '@/lib/api/query-provider';
+import { Analytics } from '@/components/analytics/analytics';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -59,6 +60,7 @@ export default function RootLayout({
       <body className="antialiased bg-surface-app text-content-main min-h-screen flex flex-col">
         <QueryProvider>
           <AppShell>{children}</AppShell>
+          <Analytics />
         </QueryProvider>
       </body>
     </html>

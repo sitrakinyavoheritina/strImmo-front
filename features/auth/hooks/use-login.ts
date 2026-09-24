@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginFormData } from '../schemas';
+import { trackEvent } from '@/lib/analytics/track';
 import { authService } from '../services/auth-service';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { getErrorMessage } from '@/lib/api/get-error-message';
@@ -28,6 +29,7 @@ export function useLogin() {
     try {
       const { user, token } = await authService.login(data);
       setSession(user, token);
+      trackEvent('login', { method: 'password', role: user.role });
       // Le compte a sa propre préférence enregistrée côté serveur — elle prend le dessus sur ce
       // qui était choisi localement en tant que visiteur, pour retrouver le même réglage que sur
       // n'importe quel autre appareil une fois connecté (voir /auth/preferences).

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Pencil, Home, Heart, Globe, Moon, LayoutGrid, LogOut, Shield } from 'lucide-react';
+import { Pencil, Home, Heart, History, Globe, Moon, LayoutGrid, LogOut, Shield } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
@@ -109,6 +109,7 @@ export default function ParametresPage() {
               <MenuRow href="/profil/modifier" icon={Pencil} label={t.profile.edit} />
               <MenuRow href="/mes-biens" icon={Home} label={t.profile.myListings} />
               <MenuRow href="/favoris" icon={Heart} label={t.profile.myFavorites} />
+              <MenuRow href="/historique" icon={History} label={t.profile.viewHistory} />
             </div>
           </div>
         )}

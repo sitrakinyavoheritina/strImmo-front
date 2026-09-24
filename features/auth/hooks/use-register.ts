@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { trackEvent } from '@/lib/analytics/track';
 import { authService } from '../services/auth-service';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { getErrorMessage } from '@/lib/api/get-error-message';
@@ -25,6 +26,7 @@ export function useRegisterSubmit() {
     setErrorMessage(null);
     try {
       const result = await authService.register(payload);
+      trackEvent('register', { method: 'password', role: payload.role });
       if (result.status === 'authenticated') {
         setSession(result.user, result.token);
         setStoredTheme(result.user.themePreference);

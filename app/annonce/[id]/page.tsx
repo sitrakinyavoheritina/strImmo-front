@@ -9,6 +9,9 @@ import { useTranslation } from '@/lib/i18n/use-translation';
 import { useLikesStore } from '@/lib/state/use-likes-store';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
+import { useTrackPropertyView } from '@/lib/analytics/use-track-property-view';
+import { trackPropertyContact } from '@/lib/analytics/property-tracking';
+import { OwnerPropertyStats } from '@/features/analytics/components/owner-property-stats';
 import { useProperty } from '@/features/search/hooks/use-property';
 import { useLikeProperty } from '@/features/search/hooks/use-like-property';
 import { useApproveProperty, useRejectProperty } from '@/features/search/hooks/use-moderate-property';
@@ -51,6 +54,8 @@ export default function AnnoncePage() {
   const isChatOpen = manualChatOpen || (searchParams.get('chat') === '1' && isAuthenticated);
 
   const { data: property, isLoading } = useProperty(id);
+  // Consultation : GA4 `view_property` + historique backend, dédoublonnés, jamais bloquants.
+  useTrackPropertyView(property);
 
   // Contacter le vendeur, discuter avec lui, publier une annonce : tout ça suppose un compte
   // (on ne peut ni afficher un numéro à contacter, ni ouvrir une discussion, sans savoir qui la
@@ -348,6 +353,8 @@ export default function AnnoncePage() {
                 seulement s'il a été renseigné (facultatif, contrairement à commission/caution). */}
             <PropertyFees values={property} t={t} className="mt-2" />
 
+            {userId === property.ownerId && !isAdminUser && <OwnerPropertyStats propertyId={property.id} />}
+
             {/* Motif de refus — visible par le propriétaire sur sa propre fiche, pas seulement
                 dans la liste "Mes Biens" (où c'était déjà affiché) : demandé explicitement pour
                 qu'il le voie aussi en ouvrant directement l'annonce. Absent pour tout autre
@@ -489,6 +496,7 @@ export default function AnnoncePage() {
           {!isAdminUser && property.contactPhone && (
             <div className="hidden lg:block lg:sticky lg:bottom-0 lg:bg-surface-card mt-3 pt-3 border-t border-stroke-default">
               <ContactActions
+                propertyId={property.id}
                 contactPhone={property.contactPhone}
                 phone2={property.phone2}
                 isAuthenticated={isAuthenticated}
@@ -525,6 +533,7 @@ export default function AnnoncePage() {
         <div className="lg:hidden fixed inset-x-0 bottom-16 z-40 bg-surface-card border-t border-stroke-default px-3 py-2.5 space-y-2 shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
           {property.contactPhone && (
             <ContactActions
+              propertyId={property.id}
               contactPhone={property.contactPhone}
               phone2={property.phone2}
               isAuthenticated={isAuthenticated}
@@ -571,6 +580,7 @@ export default function AnnoncePage() {
  * pour ne pas dupliquer cette logique entre la version desktop (colonne d'infos) et la barre fixe
  * mobile ci-dessus. */
 function ContactActions({
+  propertyId,
   contactPhone,
   phone2,
   isAuthenticated,
@@ -579,6 +589,7 @@ function ContactActions({
   copyLabel,
   copiedLabel,
 }: {
+  propertyId: string;
   contactPhone?: string;
   phone2?: string;
   isAuthenticated: boolean;
@@ -592,6 +603,7 @@ function ContactActions({
   async function handleCopy(number: string) {
     try {
       await navigator.clipboard.writeText(number);
+      trackPropertyContact({ id: propertyId });
       setCopiedNumber(number);
       setTimeout(() => setCopiedNumber((current) => (current === number ? null : current)), 1500);
     } catch {

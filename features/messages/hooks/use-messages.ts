@@ -1,3 +1,4 @@
+import { trackEvent } from '@/lib/analytics/track';
 import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { messageService, toMessage } from '../services/message-service';
@@ -89,6 +90,7 @@ export function useSendMessage(conversationId: string) {
           resolve(ack);
         });
       }).then(toMessage),
+    onSuccess: () => trackEvent('send_message', { source: 'conversation' }),
   });
 }
 

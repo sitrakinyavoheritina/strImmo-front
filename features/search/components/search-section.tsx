@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { Sparkles, Search } from 'lucide-react';
+import { useTrackSearch } from '@/lib/analytics/use-track-search';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useHomeSearchFiltersStore } from '@/lib/state/use-home-search-filters-store';
 import { Chip } from '@/components/ui/form-controls';
@@ -40,6 +41,7 @@ export function SearchSection() {
   const update = useHomeSearchFiltersStore((state) => state.update);
   const selectPropertyType = useHomeSearchFiltersStore((state) => state.selectPropertyType);
   const resetFilters = useHomeSearchFiltersStore((state) => state.reset);
+  useTrackSearch(filters);
 
   // Repli mobile de `MobileSearchPanel` — voir le commentaire détaillé dans ce fichier pour
   // pourquoi c'est un IntersectionObserver sur une sentinelle (placée hors de la section sticky

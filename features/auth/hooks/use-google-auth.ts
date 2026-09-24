@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { trackEvent } from '@/lib/analytics/track';
 import { authService } from '../services/auth-service';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { getErrorMessage } from '@/lib/api/get-error-message';
@@ -25,6 +26,7 @@ export function useGoogleAuth() {
     try {
       const { user, token } = await authService.loginWithGoogle(idToken);
       setSession(user, token);
+      trackEvent('login', { method: 'google', role: user.role });
       setStoredTheme(user.themePreference);
       setStoredFeedDisplay(user.feedDisplay);
       if (!user.phone) {

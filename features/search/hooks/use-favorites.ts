@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { favoriteApi } from '../services/favorite-api';
+import { trackEvent } from '@/lib/analytics/track';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 
 /** Ids des annonces enregistrées par le compte connecté — vrai backend (voir
@@ -27,6 +28,7 @@ export function useToggleFavorite() {
     mutationFn: ({ propertyId, wasSaved }: { propertyId: string; wasSaved: boolean }) =>
       wasSaved ? favoriteApi.remove(propertyId) : favoriteApi.add(propertyId),
     onMutate: ({ propertyId, wasSaved }) => {
+      trackEvent('favorite_property', { property_id: propertyId, action: wasSaved ? 'remove' : 'add', source: 'save' });
       queryClient.setQueryData<string[]>(['favorites'], (ids) => {
         if (!ids) return ids;
         return wasSaved ? ids.filter((id) => id !== propertyId) : [...ids, propertyId];
