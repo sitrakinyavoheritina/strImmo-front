@@ -21,23 +21,24 @@ function subscribeStorage(callback: () => void) {
 export function PushPermissionPrompt() {
   const { t } = useTranslation();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const userId = useAuthStore((s) => s.user?.id);
   const { ready, permission, subscribed, isBusy, enable } = usePushNotifications();
   const dismissed = useSyncExternalStore(
     subscribeStorage,
     () => localStorage.getItem(STORAGE_KEY) === '1',
     () => true
   );
-  const autoSubscribed = useRef(false);
+  const autoSubscribedFor = useRef<string | null>(null);
 
   // Permission déjà accordée (ex. depuis les réglages du navigateur) mais aucun abonnement
   // enregistré pour ce compte sur cet appareil : on l'enregistre sans rien redemander.
   useEffect(() => {
-    if (!isAuthenticated || !ready || autoSubscribed.current) return;
+    if (!isAuthenticated || !userId || !ready || autoSubscribedFor.current === userId) return;
     if (permission === 'granted' && !subscribed) {
-      autoSubscribed.current = true;
+      autoSubscribedFor.current = userId;
       void enable().catch(() => undefined);
     }
-  }, [isAuthenticated, ready, permission, subscribed, enable]);
+  }, [isAuthenticated, userId, ready, permission, subscribed, enable]);
 
   if (process.env.NODE_ENV !== 'production') return null;
   if (!isAuthenticated || !ready || dismissed || permission !== 'default') return null;
@@ -57,19 +58,19 @@ export function PushPermissionPrompt() {
   }
 
   return (
-    <div className="flex items-center gap-3 bg-brand-primary-soft text-content-main text-sm py-2 px-3">
-      <span className="shrink-0 w-8 h-8 rounded-full bg-brand-primary/15 flex items-center justify-center text-brand-primary">
-        <BellRing size={15} />
+    <div className="flex items-center gap-4 bg-brand-primary-soft text-content-main border-b border-brand-primary/20 py-4 px-4 lg:px-6">
+      <span className="shrink-0 w-12 h-12 rounded-full bg-brand-primary/15 flex items-center justify-center text-brand-primary">
+        <BellRing size={24} />
       </span>
       <div className="flex-1 min-w-0">
-        <p className="font-semibold truncate">{t.profile.pushPromptTitle}</p>
-        <p className="text-[0.85rem] text-content-muted">{t.profile.pushDescription}</p>
+        <p className="text-base font-semibold">{t.profile.pushPromptTitle}</p>
+        <p className="text-sm text-content-muted">{t.profile.pushDescription}</p>
       </div>
       <button
         type="button"
         onClick={handleAccept}
         disabled={isBusy}
-        className="shrink-0 py-1.5 px-3 rounded-lg bg-brand-primary hover:bg-brand-primary-hover text-white text-[0.85rem] font-semibold transition disabled:opacity-50"
+        className="shrink-0 py-2.5 px-5 rounded-lg bg-brand-primary hover:bg-brand-primary-hover text-white text-sm font-semibold transition disabled:opacity-50"
       >
         {t.profile.pushPromptAccept}
       </button>
@@ -80,7 +81,7 @@ export function PushPermissionPrompt() {
         title={t.profile.pushPromptLater}
         className="shrink-0 text-content-muted hover:text-content-main transition p-1"
       >
-        <X size={16} />
+        <X size={20} />
       </button>
     </div>
   );
