@@ -101,6 +101,8 @@ export interface User {
   address?: string;
   phone2?: string;
   isEmailVerified: boolean;
+  /** Numéro confirmé par OTP SMS (voir /verification-telephone). */
+  isPhoneVerified: boolean;
   /** `false` uniquement pour un compte créé via "Se connecter avec Google" qui n'a jamais lui-même
    *  choisi de mot de passe (voir strImmo/src/auth/entities/user.entity.ts) — /profil/modifier
    *  n'exige alors pas le mot de passe actuel, qu'il ne peut de toute façon pas connaître. */

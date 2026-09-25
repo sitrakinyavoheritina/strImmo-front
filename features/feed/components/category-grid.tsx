@@ -23,16 +23,19 @@ export function CategoryGrid() {
 
   return (
     <div>
-      <h3 className="text-sm font-semibold text-content-main mb-2.5">{t.feed.popularCategories}</h3>
-      <div className="grid grid-cols-2 gap-2.5">
+      <h3 className="text-sm font-semibold text-content-main mb-1.5">{t.feed.popularCategories}</h3>
+      <div className="grid grid-cols-2 gap-1.5">
         {CATEGORIES.map(({ href, icon: Icon, labelKey }) => (
           <Link
             key={href}
             href={href}
-            className="flex flex-col items-center gap-1.5 rounded-xl border border-stroke-default bg-surface-card py-3 px-2 text-center text-[0.85rem] font-medium text-content-main hover:border-brand-primary hover:text-brand-primary transition"
+            className="group grid grid-cols-[1fr_4fr] items-stretch overflow-hidden rounded-lg border border-stroke-default bg-surface-card text-xs leading-tight font-medium text-content-main hover:border-brand-primary hover:text-brand-primary transition"
           >
-            <Icon size={20} />
-            {t.feed[labelKey]}
+            {/* 1/5 de la carte pour l'icône (fond coloré), 4/5 pour le texte. */}
+            <span className="flex items-center justify-center bg-brand-primary-soft text-brand-primary py-1">
+              <Icon size={15} />
+            </span>
+            <span className="flex items-center px-1.5 py-1">{t.feed[labelKey]}</span>
           </Link>
         ))}
       </div>

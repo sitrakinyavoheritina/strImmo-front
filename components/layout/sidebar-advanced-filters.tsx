@@ -40,6 +40,9 @@ export function SidebarAdvancedFilters() {
         draft={filters}
         onUpdate={update}
         onSelectPropertyType={selectPropertyType}
+        onFeeToggle={(key, value) =>
+          router.push(`/recherche?${filtersToSearchParams({ ...filters, [key]: value }).toString()}`)
+        }
         isAdvancedOpen={isAdvancedOpen}
         onToggleAdvanced={() => setIsAdvancedOpen((v) => !v)}
       />

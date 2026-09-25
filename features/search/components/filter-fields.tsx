@@ -49,13 +49,21 @@ export type FilterFieldsProps = {
    *  recherche de l'accueil, inutile de les répéter ; ne garde que le nombre de chambres min et
    *  la section dépliable spécifique au type de bien sélectionné. */
   mode?: 'full' | 'compact';
+  /** Appelé quand on coche/décoche « sans commission / caution / droit de visite » : le parent
+   *  lance alors la recherche directement (sans attendre le bouton « Appliquer »). */
+  onFeeToggle?: (key: 'noCommission' | 'noCaution' | 'noVisitFee', value: true | undefined) => void;
 };
 
 /** Les champs de filtre eux-mêmes (type, localisation, prix, publieur, avancé par type de bien) —
  * séparés de leur habillage (modal plein écran vs section fixe dans la sidebar) pour ne pas
  * dupliquer cette longue liste entre `FilterModal` et `SidebarAdvancedFilters`. */
-export function FilterFields({ draft, onUpdate, onSelectPropertyType, isAdvancedOpen, onToggleAdvanced, mode = 'full' }: FilterFieldsProps) {
+export function FilterFields({ draft, onUpdate, onSelectPropertyType, isAdvancedOpen, onToggleAdvanced, mode = 'full', onFeeToggle }: FilterFieldsProps) {
   const { t } = useTranslation();
+  function toggleFee(key: 'noCommission' | 'noCaution' | 'noVisitFee', checked: boolean) {
+    const value = checked || undefined;
+    onUpdate(key, value);
+    onFeeToggle?.(key, value);
+  }
   const priceCeiling = draft.kind === 'sale' ? PRICE_CEILING.sale : PRICE_CEILING.rent;
 
   return (
@@ -186,9 +194,9 @@ export function FilterFields({ draft, onUpdate, onSelectPropertyType, isAdvanced
           annonces SANS ce frais (non renseigné ou à 0). Hors du "Plus de critères" repliable. */}
       <Section>
         <div className="space-y-2.5">
-          <Toggle label={t.search.noCommission} checked={!!draft.noCommission} onChange={(v) => onUpdate('noCommission', v || undefined)} />
-          <Toggle label={t.search.noCaution} checked={!!draft.noCaution} onChange={(v) => onUpdate('noCaution', v || undefined)} />
-          <Toggle label={t.search.noVisitFee} checked={!!draft.noVisitFee} onChange={(v) => onUpdate('noVisitFee', v || undefined)} />
+          <Toggle label={t.search.noCommission} checked={!!draft.noCommission} onChange={(v) => toggleFee('noCommission', v)} />
+          <Toggle label={t.search.noCaution} checked={!!draft.noCaution} onChange={(v) => toggleFee('noCaution', v)} />
+          <Toggle label={t.search.noVisitFee} checked={!!draft.noVisitFee} onChange={(v) => toggleFee('noVisitFee', v)} />
         </div>
       </Section>
 

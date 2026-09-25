@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-const PHONE_REGEX = /^[0-9\s+]{8,15}$/;
+// Numéro mobile malgache réel (032/033/034/037/038/039 + 7 chiffres), en local ou en +261 — même
+// règle que le backend (strImmo/src/auth/utils/malagasy-phone.ts) : un texte quelconque est refusé.
+const PHONE_REGEX = /^(?:\+?261|0)3[2-9]\d{7}$/;
+export const isValidMalagasyPhone = (value: string) => PHONE_REGEX.test(value.replace(/[\s.\-()]/g, ''));
 
 // `identifier` accepte un numéro de téléphone OU un email — le backend interroge les deux colonnes
 // (voir strImmo/src/auth/services/auth.service.ts:login). L'onglet Téléphone/Email du formulaire
@@ -17,7 +20,7 @@ export type LoginFormData = z.infer<typeof loginSchema>;
 export const ownerTenantSchema = z.object({
   firstName: z.string().min(2, 'Le prénom est requis'),
   lastName: z.string().min(2, 'Le nom est requis'),
-  phone: z.string().regex(PHONE_REGEX, 'Numéro de téléphone invalide'),
+  phone: z.string().refine(isValidMalagasyPhone, 'Numéro de téléphone invalide (ex. 034 12 345 67)'),
   email: z.string().email('Adresse email invalide').optional().or(z.literal('')),
   password: z.string().min(4, 'Le mot de passe doit contenir au moins 4 caractères'),
 });
@@ -30,7 +33,7 @@ export type OwnerTenantFormData = z.infer<typeof ownerTenantSchema>;
 export const agentSchema = z.object({
   firstName: z.string().min(2, 'Le prénom est requis'),
   lastName: z.string().min(2, 'Le nom est requis'),
-  phone: z.string().regex(PHONE_REGEX, 'Numéro de téléphone invalide'),
+  phone: z.string().refine(isValidMalagasyPhone, 'Numéro de téléphone invalide (ex. 034 12 345 67)'),
   password: z.string().min(4, 'Le mot de passe doit contenir au moins 4 caractères'),
 });
 
@@ -43,7 +46,7 @@ export type AgentFormData = z.infer<typeof agentSchema>;
 export const agencySchema = z.object({
   firstName: z.string().min(2, 'Le prénom est requis'),
   lastName: z.string().min(2, 'Le nom est requis'),
-  phone: z.string().regex(PHONE_REGEX, 'Numéro de téléphone invalide'),
+  phone: z.string().refine(isValidMalagasyPhone, 'Numéro de téléphone invalide (ex. 034 12 345 67)'),
   email: z.string().email('Adresse email invalide').min(1, "L'email est requis"),
   password: z.string().min(4, 'Le mot de passe doit contenir au moins 4 caractères'),
   agencyName: z.string().min(2, "Le nom de l'agence est requis"),

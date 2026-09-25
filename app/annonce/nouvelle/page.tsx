@@ -11,6 +11,7 @@ import { PropertyForm, type PropertyFormHandle } from '@/features/listings/compo
 import { ListingPreview } from '@/features/listings/components/listing-preview';
 import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
+import { BecomePublisherPanel } from '@/features/auth/components/become-publisher-panel';
 import { RightRail } from '@/features/feed/components/right-rail';
 import type { PropertyFormValues } from '@/features/search/types/listing.types';
 
@@ -60,13 +61,10 @@ export default function NouvelleAnnoncePage() {
     // Rien à afficher ici : le useEffect ci-dessus redirige déjà vers /connexion.
     content = null;
   } else if (user.role === 'tenant') {
-    // Un locataire ne peut pas publier d'annonce — même règle côté serveur
-    // (strImmo/src/properties/properties.service.ts).
-    content = (
-      <div className="max-w-md mx-auto px-4 py-16 text-center">
-        <p className="text-content-main font-semibold">{t.listing.tenantForbidden}</p>
-      </div>
-    );
+    // Un locataire ne peut pas publier (même règle côté serveur, strImmo/src/properties/
+    // properties.service.ts) : il change d'abord de type de compte après vérification du numéro
+    // par OTP — le formulaire s'affiche ensuite tout seul (le rôle du store change).
+    content = <BecomePublisherPanel />;
   } else if (isPublished) {
     content = (
       <div className="max-w-md mx-auto px-4 py-16 text-center space-y-3">

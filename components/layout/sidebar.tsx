@@ -9,13 +9,15 @@ import { isAdmin } from '@/features/auth/utils/is-admin';
 import { getNavItems, isNavItemActive } from './nav-items';
 import { SidebarAdvancedFilters } from './sidebar-advanced-filters';
 
-/** Colonne de navigation gauche, persistante à partir de `lg:`. Sur l'accueil uniquement, les
- * filtres avancés de recherche sont affichés directement en bas (pas besoin d'ouvrir le modal
+/** Colonne de navigation gauche, persistante à partir de `lg:`. Sur l'accueil et la page de
+ * résultats (/recherche), les filtres avancés de recherche sont affichés directement en bas (pas besoin d'ouvrir le modal
  * de la barre de recherche pour y accéder). */
 export function Sidebar() {
   const pathname = usePathname();
   const { t } = useTranslation();
-  const isHome = pathname === '/';
+  // Accueil et page de résultats : mêmes filtres avancés (le store est synchronisé avec l'URL sur
+  // /recherche, voir app/recherche/page.tsx).
+  const showAdvancedFilters = pathname === '/' || pathname.startsWith('/recherche');
   const unreadCount = useUnreadMessagesCount();
   const user = useAuthStore((state) => state.user);
   const navItems = getNavItems(isAdmin(user));
@@ -48,7 +50,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      {isHome && <SidebarAdvancedFilters />}
+      {showAdvancedFilters && <SidebarAdvancedFilters />}
     </aside>
   );
 }

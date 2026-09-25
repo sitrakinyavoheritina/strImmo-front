@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { markWelcomePending } from '@/lib/auth/welcome-flag';
 import { trackEvent } from '@/lib/analytics/track';
 import { authService } from '../services/auth-service';
 import { useAuthStore } from '@/lib/state/use-auth-store';
@@ -29,14 +30,17 @@ export function useRegisterSubmit() {
       trackEvent('register', { method: 'password', role: payload.role });
       if (result.status === 'authenticated') {
         setSession(result.user, result.token);
+        markWelcomePending(result.user.id);
         setStoredTheme(result.user.themePreference);
         setStoredFeedDisplay(result.user.feedDisplay);
-        router.push('/');
+        // Propriétaire : un code SMS vient d'être envoyé, on l'attend sur l'écran de vérification.
+        router.push(payload.role === 'owner' && !result.user.isPhoneVerified ? '/verification-telephone' : '/');
       } else if (payload.role === 'agent') {
         // Un intermédiaire n'a plus besoin d'une validation admin : session ouverte tout de suite,
         // comme un propriétaire (le backend ne renvoie pas de token à l'inscription, d'où le login).
         const session = await authService.login({ identifier: payload.phone, password: payload.password });
         setSession(session.user, session.token);
+        markWelcomePending(session.user.id);
         setStoredTheme(session.user.themePreference);
         setStoredFeedDisplay(session.user.feedDisplay);
         router.push('/');

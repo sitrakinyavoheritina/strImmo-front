@@ -23,6 +23,7 @@ function toUser(api: ApiUser): User {
     address: api.address ?? undefined,
     phone2: api.phone2 ?? undefined,
     isEmailVerified: api.isEmailVerified ?? false,
+    isPhoneVerified: api.isPhoneVerified ?? true,
     hasPassword: api.hasPassword ?? true,
     role: api.role,
     themePreference: api.themePreference,
@@ -102,6 +103,17 @@ export const authService = {
     if (payload.description) form.append('description', payload.description);
     await authApi.registerAgency(form);
     return { status: 'pending' };
+  },
+
+  resendPhoneCode: () => authApi.resendPhoneCode(),
+
+  verifyPhone: (code: string) => authApi.verifyPhone(code),
+
+  requestPublisherUpgrade: (phone?: string) => authApi.requestPublisherUpgrade(phone),
+
+  upgradeToPublisher: async (payload: { role: 'owner' | 'agent'; code: string }): Promise<{ user: User; token: string }> => {
+    const res = await authApi.upgradeToPublisher(payload);
+    return { user: toUser(res.user), token: res.access_token };
   },
 
   updateProfile: async (payload: UpdateProfilePayload): Promise<User> => {

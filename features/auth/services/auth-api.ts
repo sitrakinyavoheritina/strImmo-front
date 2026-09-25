@@ -14,6 +14,7 @@ export type ApiUser = {
   address: string | null;
   phone2: string | null;
   isEmailVerified: boolean;
+  isPhoneVerified?: boolean;
   hasPassword: boolean;
   role: UserRole;
   themePreference: ThemePreference;
@@ -65,6 +66,22 @@ export const authApi = {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       .then((r) => r.data),
+
+  // Vérification du numéro du compte connecté (OTP SMS envoyé à l'inscription propriétaire).
+  resendPhoneCode: () =>
+    apiClient.post<{ message: string }>('/auth/resend-phone-code', {}).then((r) => r.data),
+
+  verifyPhone: (code: string) =>
+    apiClient.post<{ isPhoneVerified: boolean }>('/auth/verify-phone', { code }).then((r) => r.data),
+
+  // Locataire → propriétaire/intermédiaire (pour publier) : envoi de l'OTP SMS puis confirmation.
+  requestPublisherUpgrade: (phone?: string) =>
+    apiClient
+      .post<{ phone: string }>('/auth/publisher-upgrade/send-code', { phone })
+      .then((r) => r.data),
+
+  upgradeToPublisher: (payload: { role: 'owner' | 'agent'; code: string }) =>
+    apiClient.post<AuthenticatedResponse>('/auth/publisher-upgrade', payload).then((r) => r.data),
 
   updateProfile: (formData: FormData) =>
     apiClient

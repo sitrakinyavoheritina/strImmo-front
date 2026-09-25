@@ -86,6 +86,10 @@ export function FilterModal({ onClose, filters, onApply }: FilterModalProps) {
             draft={draft}
             onUpdate={update}
             onSelectPropertyType={selectPropertyType}
+            onFeeToggle={(key, value) => {
+              onApply({ ...draft, [key]: value });
+              onClose();
+            }}
             isAdvancedOpen={isAdvancedOpen}
             onToggleAdvanced={() => setIsAdvancedOpen((v) => !v)}
           />

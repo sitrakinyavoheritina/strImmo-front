@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { WelcomeModal } from '@/features/auth/components/welcome-modal';
 import { FeaturedStories } from '@/features/feed/components/featured-stories';
 import { FeedList } from '@/features/feed/components/feed-list';
 import { RightRail } from '@/features/feed/components/right-rail';
@@ -59,6 +60,7 @@ export function HomeClient({ initialProperties }: { initialProperties: Property[
 
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
+      <WelcomeModal />
       <div className="flex-1 min-w-0 pt-0 sm:pt-2 pb-4 sm:pb-6 space-y-3">
         <SearchSection />
         {properties && properties.length > 0 && <FeaturedStories properties={properties.slice(0, 12)} />}

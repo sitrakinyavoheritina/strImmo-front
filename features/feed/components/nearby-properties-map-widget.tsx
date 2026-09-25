@@ -1,5 +1,7 @@
 'use client';
 
+import { useAuthStore } from '@/lib/state/use-auth-store';
+import { isWelcomePending } from '@/lib/auth/welcome-flag';
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import mapboxgl from 'mapbox-gl';
@@ -38,6 +40,9 @@ export function NearbyPropertiesMapWidget() {
     // Déjà acquise lors d'un précédent passage sur l'accueil cette session — pas la peine de
     // redemander la position ni de rafficher le chargement.
     if (position || error) return;
+    // Nouveau compte sur l'accueil : la demande de position est faite par le parcours de bienvenue
+    // (WelcomeModal), après le message de félicitations — pas de fenêtre du navigateur par-dessus.
+    if (window.location.pathname === '/' && isWelcomePending(useAuthStore.getState().user?.id)) return;
     if (!navigator.geolocation) {
       // Différé d'un micro-tick : un `setState` synchrone dans le corps de l'effet (pas dans un
       // callback asynchrone comme `getCurrentPosition` ci-dessous) déclenche un rendu en cascade

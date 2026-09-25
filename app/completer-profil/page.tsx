@@ -1,5 +1,6 @@
 'use client';
 
+import { markWelcomePending } from '@/lib/auth/welcome-flag';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Home, Key, Handshake, Building2 } from 'lucide-react';
@@ -100,9 +101,11 @@ export default function CompleterProfilPage() {
         ...(role === 'agency' ? toNifStatPayload(nifStat) : {}),
       });
       setSession(updatedUser, token);
+      markWelcomePending(updatedUser.id);
       setStoredTheme(updatedUser.themePreference);
       setStoredFeedDisplay(updatedUser.feedDisplay);
-      router.push('/');
+      // Propriétaire : un code SMS vient d'être envoyé (voir strImmo completeProfile).
+      router.push(updatedUser.role === 'owner' && !updatedUser.isPhoneVerified ? '/verification-telephone' : '/');
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "Une erreur est survenue."));
     } finally {

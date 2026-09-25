@@ -84,6 +84,10 @@ export const RegisterOwnerForm: React.FC<{ role: 'owner' | 'tenant' }> = ({ role
             }`}
           />
           {errors.email && <p className="mt-0.5 text-[0.85rem] text-danger">{errors.email.message}</p>}
+          {/* Propriétaire seulement : le locataire n'a pas de code à l'inscription. */}
+          {role === 'owner' && !errors.email && (
+            <p className="mt-0.5 text-[0.85rem] text-content-muted">{t.auth.emailCodeHint}</p>
+          )}
         </div>
 
         <div>
