@@ -230,7 +230,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
       // trois sont facultatifs (0 par défaut, jamais bloquant), plus aucun n'est "obligatoire".
       commission: requiresCommission ? Number(commission) || 0 : undefined,
       caution: Number(caution) || 0,
-      visitFee: Number(visitFee) || 0,
+      visitFee: requiresCommission ? Number(visitFee) || 0 : undefined,
     };
 
     if (propertyType === 'house') {
@@ -421,8 +421,9 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
             error={errors.price}
           />
 
-          {/* Côte à côte pour économiser de la place — demandé explicitement. */}
-          <div className="grid grid-cols-2 gap-3">
+          {/* Propriétaire : caution seule. Intermédiaire/agence : caution + droit de visite côte à
+              côte pour économiser de la place. */}
+          <div className={requiresCommission ? 'grid grid-cols-2 gap-3' : ''}>
             <FormInput
               label={t.listing.caution}
               value={caution}
@@ -431,14 +432,16 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
               type="number"
               suffix="Ar"
             />
-            <FormInput
-              label={t.listing.visitFee}
-              value={visitFee}
-              onChange={(value) => setVisitFee(onlyDigits(value))}
-              placeholder="0"
-              type="number"
-              suffix="Ar"
-            />
+            {requiresCommission && (
+              <FormInput
+                label={t.listing.visitFee}
+                value={visitFee}
+                onChange={(value) => setVisitFee(onlyDigits(value))}
+                placeholder="0"
+                type="number"
+                suffix="Ar"
+              />
+            )}
           </div>
 
           {/* Commission côte à côte avec le contact 2 — réservée à intermédiaire/agence (rémunère

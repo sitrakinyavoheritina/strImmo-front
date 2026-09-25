@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import { MapPin } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
+import { useAuthStore } from '@/lib/state/use-auth-store';
 import { PROPERTY_TYPE_LABEL_KEY, titleRepeatsTypeLabel } from '@/features/search/utils/get-key-features';
 import { getPropertyDetailStats } from '@/features/search/utils/get-property-detail-stats';
 import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
@@ -16,6 +17,7 @@ import type { PropertyFormValues } from '@/features/search/types/listing.types';
  * n'apparaissaient pas dans l'aperçu). */
 export function ListingPreview({ values, photos }: { values: PropertyFormValues; photos: File[] }) {
   const { t } = useTranslation();
+  const role = useAuthStore((state) => state.user?.role);
   const [activePhoto, setActivePhoto] = useState(0);
   // Pas de révocation via useEffect ici : en Strict Mode (dev), React monte/démonte/remonte les
   // effets une fois par exercice, ce qui révoquerait ces URL blob avant que l'aperçu n'ait fini de
@@ -82,7 +84,7 @@ export function ListingPreview({ values, photos }: { values: PropertyFormValues;
 
         {/* Même bloc que la fiche détail publiée (voir app/annonce/[id]/page.tsx) — ce qui est
             annoncé ici doit correspondre à ce qui sera réellement visible une fois publié. */}
-        <PropertyFees values={values} t={t} className="mt-1" />
+        <PropertyFees values={values} t={t} publisherType={role} className="mt-1" />
       </div>
 
       {stats.length > 0 && (

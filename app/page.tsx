@@ -4,7 +4,7 @@ import { HomeClient } from './home-client';
 import { fetchProperties } from '@/lib/seo/api';
 import { getGeoPages } from '@/lib/seo/geo';
 import { SITE_DESCRIPTION, SITE_TITLE, absoluteUrl } from '@/lib/seo/site';
-import { TYPE_INFO, type SeoPropertyType } from '@/lib/seo/slug';
+import { TYPE_INFO } from '@/lib/seo/slug';
 
 export const revalidate = 300;
 
@@ -23,40 +23,34 @@ export default async function HomePage() {
     fetchProperties({ sortBy: 'recent', limit: 12, offset: 0 }),
     getGeoPages(),
   ]);
-  const types = Object.keys(TYPE_INFO) as SeoPropertyType[];
 
   return (
     <>
       <h1 className="sr-only">Onina, l’immobilier à Madagascar : maisons, appartements, villas et terrains à vendre ou à louer</h1>
       <HomeClient initialProperties={initialProperties} />
-      <section className="px-3 sm:px-6 lg:px-4 pb-24 lg:pb-10 max-w-5xl mx-auto w-full text-sm text-content-muted">
+      {/* Bloc de texte SEO : masqué à l'écran partout (mobile et ordinateur) — `sr-only` le garde
+          lisible par les lecteurs d'écran et les robots sans occuper de place. Les liens vers les
+          catégories sont visibles dans la colonne de droite (CategoryGrid). */}
+      <section className="sr-only">
         <h2 className="text-sm font-bold text-content-main mb-1.5">L’immobilier à Madagascar avec Onina</h2>
         <p className="max-w-3xl leading-relaxed">
           Onina met en relation propriétaires, acheteurs et locataires : parcourez les annonces de
           maisons, d’appartements, de villas et de terrains à vendre ou à louer à Madagascar.
         </p>
-        <ul className="flex flex-wrap gap-2 mt-3">
-          {types.map((type) => (
-            <li key={type}>
-              <Link
-                href={`/${TYPE_INFO[type].slug}`}
-                className="inline-block rounded-full border border-stroke-default bg-surface-card px-3 py-1.5 text-[0.85rem] text-content-main hover:border-brand-primary hover:text-brand-primary transition"
-              >
-                {TYPE_INFO[type].plural} à vendre et à louer
-              </Link>
-            </li>
-          ))}
-          {geoPages.slice(0, 8).map((page) => (
-            <li key={`${page.propertyType}-${page.slug}`}>
-              <Link
-                href={`/${TYPE_INFO[page.propertyType].slug}/${page.slug}`}
-                className="inline-block rounded-full border border-stroke-default bg-surface-card px-3 py-1.5 text-[0.85rem] text-content-main hover:border-brand-primary hover:text-brand-primary transition"
-              >
-                {TYPE_INFO[page.propertyType].plural} – {page.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        {geoPages.length > 0 && (
+          <ul className="flex flex-wrap gap-2 mt-3">
+            {geoPages.slice(0, 8).map((page) => (
+              <li key={`${page.propertyType}-${page.slug}`}>
+                <Link
+                  href={`/${TYPE_INFO[page.propertyType].slug}/${page.slug}`}
+                  className="inline-block rounded-full border border-stroke-default bg-surface-card px-3 py-1.5 text-[0.85rem] text-content-main hover:border-brand-primary hover:text-brand-primary transition"
+                >
+                  {TYPE_INFO[page.propertyType].plural} – {page.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </section>
     </>
   );

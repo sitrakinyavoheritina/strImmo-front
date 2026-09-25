@@ -8,15 +8,29 @@ type FeeValues = { commission?: number | null; caution?: number | null; visitFee
  * texte brut séparé par des virgules — partagé entre l'aperçu avant publication
  * (listing-preview.tsx) et la fiche détail publiée (app/annonce/[id]/page.tsx) pour qu'ils
  * affichent exactement le même rendu. */
-export function PropertyFees({ values, t, className = '' }: { values: FeeValues; t: Translations; className?: string }) {
+export function PropertyFees({
+  values,
+  t,
+  publisherType,
+  className = '',
+}: {
+  values: FeeValues;
+  t: Translations;
+  /** Un propriétaire (particulier) n'affiche que la caution — ni commission (réservée aux
+   *  intermédiaires/agences) ni droit de visite. */
+  publisherType?: string;
+  className?: string;
+}) {
   const items: { key: string; icon: LucideIcon; label: string; value: number }[] = [];
   if (values.caution != null) items.push({ key: 'caution', icon: Shield, label: t.listing.caution, value: values.caution });
-  if (values.commission != null) items.push({ key: 'commission', icon: Percent, label: t.listing.commission, value: values.commission });
-  if (values.visitFee != null) items.push({ key: 'visitFee', icon: DoorOpen, label: t.propertyDetail.visitFee, value: values.visitFee });
+  const isOwner = publisherType === 'owner';
+  if (values.commission != null && !isOwner) items.push({ key: 'commission', icon: Percent, label: t.listing.commission, value: values.commission });
+  if (values.visitFee != null && !isOwner) items.push({ key: 'visitFee', icon: DoorOpen, label: t.propertyDetail.visitFee, value: values.visitFee });
   if (items.length === 0) return null;
 
   return (
-    <div className={`flex flex-wrap gap-2 ${className}`}>
+    // Ordinateur : les frais s'empilent de haut en bas (pas côte à côte) ; mobile : rangée qui passe à la ligne.
+    <div className={`flex flex-wrap gap-2 lg:flex-col lg:items-start ${className}`}>
       {items.map((item) => (
         <div
           key={item.key}

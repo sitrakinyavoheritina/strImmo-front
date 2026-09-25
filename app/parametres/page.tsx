@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { PushNotificationsRow } from '@/features/notifications/components/push-notifications-row';
+import { unsubscribeOnLogout } from '@/lib/push/push-client';
 import { Pencil, Home, Heart, History, Globe, Moon, LayoutGrid, LogOut, Shield } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
@@ -63,6 +65,7 @@ export default function ParametresPage() {
   ];
 
   function handleLogout() {
+    unsubscribeOnLogout();
     clearSession();
     router.push('/connexion');
   }
@@ -126,6 +129,7 @@ export default function ParametresPage() {
               <span className="flex-1 text-sm font-medium text-content-main">{t.profile.language}</span>
               <LanguageSwitcher />
             </div>
+            {isAuthenticated && <PushNotificationsRow />}
             {/* "Système" (par défaut) suit `prefers-color-scheme`, sans rien à choisir — un choix
                 explicite Clair/Sombre prend le dessus quel que soit le système (voir
                 useThemePreference et les blocs `@media`/`[data-theme]` dans globals.css). */}

@@ -13,6 +13,7 @@ import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { MenuRow } from '@/components/ui/menu-row';
 import { RightRail } from '@/features/feed/components/right-rail';
+import { unsubscribeOnLogout } from '@/lib/push/push-client';
 
 export default function ProfilPage() {
   const { t } = useTranslation();
@@ -60,6 +61,7 @@ export default function ProfilPage() {
   }
 
   function handleLogout() {
+    unsubscribeOnLogout();
     clearSession();
     router.push('/connexion');
   }

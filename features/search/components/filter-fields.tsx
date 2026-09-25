@@ -199,7 +199,7 @@ export function FilterFields({ draft, onUpdate, onSelectPropertyType, isAdvanced
           <div className="space-y-2.5">
             {/* Frais : plafonds sur commission / caution / droit de visite (voir aussi le formulaire
                 de publication). */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className={`grid gap-3 ${mode === 'compact' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-3'}`}>
               {(
                 [
                   ['maxCommission', t.search.maxCommission],

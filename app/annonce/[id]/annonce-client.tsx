@@ -361,7 +361,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
                 PropertiesService.create/update, qui ne les accepte que d'un intermédiaire/une
                 agence), donc naturellement absents ici pour lui. Droit de visite affiché
                 seulement s'il a été renseigné (facultatif, contrairement à commission/caution). */}
-            <PropertyFees values={property} t={t} className="mt-2" />
+            <PropertyFees values={property} t={t} publisherType={property.publisherType} className="mt-2" />
 
             {userId === property.ownerId && !isAdminUser && <OwnerPropertyStats propertyId={property.id} />}
 

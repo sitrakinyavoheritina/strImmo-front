@@ -11,6 +11,7 @@ import { useThemePreference, type ThemePreference } from '@/lib/theme/use-theme-
 import { authService } from '@/features/auth/services/auth-service';
 import { Avatar } from '@/components/ui/avatar';
 import type { User as AuthUser } from '@/features/auth/types';
+import { unsubscribeOnLogout } from '@/lib/push/push-client';
 
 /** Avatar + nom dans la topbar : ouvre un choix (voir le profil / se déconnecter) au clic,
  * plutôt que de naviguer directement vers /profil — même pattern que LanguageMenu. */
@@ -27,6 +28,7 @@ export function UserMenu({ user }: { user: AuthUser }) {
 
   function handleLogout() {
     setIsOpen(false);
+    unsubscribeOnLogout();
     clearSession();
     router.push('/connexion');
   }

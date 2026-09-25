@@ -76,3 +76,49 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// --- Notifications push (Web Push / VAPID) ---------------------------------------------------
+// Envoyées par le backend (strImmo/src/push) quand une notification est créée (nouveau message,
+// annonce validée/refusée...). Charge utile JSON : { title, body, url, tag }.
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch {
+    data = { title: 'Onina', body: event.data ? event.data.text() : '' };
+  }
+  const title = data.title || 'Onina';
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // Onglet Onina déjà visible et au premier plan : l'utilisateur voit déjà le message arriver en
+      // temps réel (WebSocket) — inutile de le doubler d'une notification système.
+      if (windowClients.some((client) => client.visibilityState === 'visible' && client.focused)) return;
+      return self.registration.showNotification(title, {
+        body: data.body || '',
+        icon: '/manifest-icon-192.png',
+        badge: '/manifest-icon-192.png',
+        tag: data.tag,
+        renotify: Boolean(data.tag),
+        data: { url: data.url || '/' },
+      });
+    })
+  );
+});
+
+// Clic : ramène l'onglet Onina déjà ouvert vers la bonne page, sinon en ouvre un nouveau.
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const target = new URL((event.notification.data && event.notification.data.url) || '/', self.location.origin).href;
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      for (const client of windowClients) {
+        if (new URL(client.url).origin === self.location.origin && 'focus' in client) {
+          return client.focus().then((focused) => ('navigate' in focused ? focused.navigate(target) : undefined));
+        }
+      }
+      return self.clients.openWindow(target);
+    })
+  );
+});
