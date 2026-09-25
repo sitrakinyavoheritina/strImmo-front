@@ -130,10 +130,10 @@ export type PropertyFilters = {
   /** Restreint aux annonces publiées il y a au plus ce nombre de jours (ex. 7 pour "nouveautés de
    *  la semaine") — calculé côté serveur par rapport à maintenant à chaque requête. */
   maxAgeDays?: number;
-  /** Plafonds de frais (Ar) — annonces dont la commission / caution / droit de visite ne dépasse pas ce montant. */
-  maxCommission?: number;
-  maxCaution?: number;
-  maxVisitFee?: number;
+  /** Uniquement les annonces sans commission / caution / droit de visite (absents ou à 0). */
+  noCommission?: boolean;
+  noCaution?: boolean;
+  noVisitFee?: boolean;
   /** Type de compte ayant publié l'annonce (propriétaire / intermédiaire / agence). */
   publisherType?: PublisherType;
   /** Restreint aux annonces publiées par cet utilisateur (écran "Mon compte"). */

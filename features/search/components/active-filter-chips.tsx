@@ -52,6 +52,9 @@ export function ActiveFilterChips({
   if (filters.minBedrooms !== undefined) {
     chips.push({ key: 'minBedrooms', label: `${filters.minBedrooms}+ ${t.search.bedroomsMin}` });
   }
+  if (filters.noCommission) chips.push({ key: 'noCommission', label: t.search.noCommission });
+  if (filters.noCaution) chips.push({ key: 'noCaution', label: t.search.noCaution });
+  if (filters.noVisitFee) chips.push({ key: 'noVisitFee', label: t.search.noVisitFee });
   if (filters.hasComfort) chips.push({ key: 'hasComfort', label: t.search.comfort });
   if (filters.hasCarAccess) chips.push({ key: 'hasCarAccess', label: t.search.carAccess });
   if (filters.bathroomLocation) {

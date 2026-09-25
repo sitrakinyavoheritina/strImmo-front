@@ -182,6 +182,16 @@ export function FilterFields({ draft, onUpdate, onSelectPropertyType, isAdvanced
         </Section>
       )}
 
+      {/* Frais : oui/non, pour tous les types de bien (même sans type choisi) — actif = uniquement les
+          annonces SANS ce frais (non renseigné ou à 0). Hors du "Plus de critères" repliable. */}
+      <Section>
+        <div className="space-y-2.5">
+          <Toggle label={t.search.noCommission} checked={!!draft.noCommission} onChange={(v) => onUpdate('noCommission', v || undefined)} />
+          <Toggle label={t.search.noCaution} checked={!!draft.noCaution} onChange={(v) => onUpdate('noCaution', v || undefined)} />
+          <Toggle label={t.search.noVisitFee} checked={!!draft.noVisitFee} onChange={(v) => onUpdate('noVisitFee', v || undefined)} />
+        </div>
+      </Section>
+
       <Section>
         <button
           type="button"
@@ -197,29 +207,6 @@ export function FilterFields({ draft, onUpdate, onSelectPropertyType, isAdvanced
 
         {isAdvancedOpen && (
           <div className="space-y-2.5">
-            {/* Frais : plafonds sur commission / caution / droit de visite (voir aussi le formulaire
-                de publication). */}
-            <div className={`grid gap-3 ${mode === 'compact' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-3'}`}>
-              {(
-                [
-                  ['maxCommission', t.search.maxCommission],
-                  ['maxCaution', t.search.maxCaution],
-                  ['maxVisitFee', t.search.maxVisitFee],
-                ] as const
-              ).map(([key, label]) => (
-                <div key={key}>
-                  <FieldLabel>{label}</FieldLabel>
-                  <input
-                    type="number"
-                    min={0}
-                    placeholder="0"
-                    value={draft[key] ?? ''}
-                    onChange={(event) => onUpdate(key, event.target.value ? Number(event.target.value) : undefined)}
-                    className="w-full rounded-xl border border-stroke-default px-3 py-2.5 text-sm outline-none focus:border-brand-primary"
-                  />
-                </div>
-              ))}
-            </div>
             {!draft.propertyType && (
               <Toggle
                 label={t.search.carAccess}
