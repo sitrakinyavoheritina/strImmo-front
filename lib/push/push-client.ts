@@ -67,7 +67,9 @@ export async function subscribeToPush(): Promise<SubscribeResult> {
       applicationServerKey: urlBase64ToUint8Array(data.publicKey),
     }));
 
-  await apiClient.post('/push/subscribe', subscription.toJSON());
+  // Seulement endpoint + clés : `toJSON()` ajoute des champs (expirationTime) que l'API refuse.
+  const { endpoint, keys } = subscription.toJSON();
+  await apiClient.post('/push/subscribe', { endpoint, keys });
   return 'subscribed';
 }
 

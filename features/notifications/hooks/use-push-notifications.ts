@@ -32,6 +32,8 @@ export function usePushNotifications() {
   });
 
   return {
+    // false tant que l'état de l'appareil n'a pas été lu (évite d'agir sur une valeur par défaut).
+    ready: data !== undefined,
     permission: data?.permission ?? 'default',
     subscribed: data?.subscribed ?? false,
     isBusy: enable.isPending || disable.isPending,

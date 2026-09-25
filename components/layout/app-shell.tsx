@@ -6,6 +6,7 @@ import { AdminRouteGuard } from './admin-route-guard';
 import { OfflineBanner } from './offline-banner';
 import { InstallPromptBanner } from './install-prompt-banner';
 import { ServiceWorkerRegistration } from './service-worker-registration';
+import { PushPermissionPrompt } from './push-permission-prompt';
 import { SplashScreen } from './splash-screen';
 
 /** Habillage global du site : topbar + sidebar gauche (desktop) / bande d'icônes en bas d'écran
@@ -21,6 +22,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <AdminRouteGuard />
       <OfflineBanner />
       <InstallPromptBanner />
+      <PushPermissionPrompt />
       <Topbar />
       <div className="flex-1 flex w-full">
         <Sidebar />
