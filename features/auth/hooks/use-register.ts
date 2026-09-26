@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { markWelcomePending } from '@/lib/auth/welcome-flag';
 import { trackEvent } from '@/lib/analytics/track';
+import { getPhoneNotVerified } from '../utils/phone-not-verified';
+import { usePhoneVerificationRedirect } from './use-phone-verification-redirect';
 import { authService } from '../services/auth-service';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { getErrorMessage } from '@/lib/api/get-error-message';
@@ -19,6 +21,7 @@ import type { RegisterPayload } from '../types';
 export function useRegisterSubmit() {
   const router = useRouter();
   const setSession = useAuthStore((state) => state.setSession);
+  const goToVerification = usePhoneVerificationRedirect();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -28,24 +31,30 @@ export function useRegisterSubmit() {
     try {
       const result = await authService.register(payload);
       trackEvent('register', { method: 'password', role: payload.role });
-      if (result.status === 'authenticated') {
+      if (payload.role === 'tenant' && result.status === 'authenticated') {
+        // Locataire : session tout de suite, aucun code à l'inscription.
         setSession(result.user, result.token);
         markWelcomePending(result.user.id);
         setStoredTheme(result.user.themePreference);
         setStoredFeedDisplay(result.user.feedDisplay);
-        // Propriétaire : un code SMS vient d'être envoyé, on l'attend sur l'écran de vérification.
-        router.push(payload.role === 'owner' && !result.user.isPhoneVerified ? '/verification-telephone' : '/');
-      } else if (payload.role === 'agent') {
-        // Un intermédiaire n'a plus besoin d'une validation admin : session ouverte tout de suite,
-        // comme un propriétaire (le backend ne renvoie pas de token à l'inscription, d'où le login).
-        const session = await authService.login({ identifier: payload.phone, password: payload.password });
-        setSession(session.user, session.token);
-        markWelcomePending(session.user.id);
-        setStoredTheme(session.user.themePreference);
-        setStoredFeedDisplay(session.user.feedDisplay);
         router.push('/');
       } else {
-        router.push('/connexion?attente=1');
+        // Propriétaire, intermédiaire, agence : un code SMS (et email) vient d'être envoyé et AUCUNE
+        // session n'est ouverte avant sa saisie. On rejoue une connexion : le backend répond alors
+        // 403 PHONE_NOT_VERIFIED avec le jeton de vérification (on ignore le jeton d'accès que
+        // l'inscription propriétaire renvoie encore, pour rester compatible avec l'app mobile).
+        try {
+          const session = await authService.login({ identifier: payload.phone, password: payload.password });
+          setSession(session.user, session.token);
+          markWelcomePending(session.user.id);
+          setStoredTheme(session.user.themePreference);
+          setStoredFeedDisplay(session.user.feedDisplay);
+          router.push('/');
+        } catch (loginError) {
+          const notVerified = getPhoneNotVerified(loginError);
+          if (!notVerified) throw loginError;
+          goToVerification(notVerified, true);
+        }
       }
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "Une erreur est survenue lors de l'inscription."));

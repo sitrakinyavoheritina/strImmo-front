@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { trackEvent } from '@/lib/analytics/track';
 import { authService } from '../services/auth-service';
 import { useAuthStore } from '@/lib/state/use-auth-store';
+import { getPhoneNotVerified } from '../utils/phone-not-verified';
+import { usePhoneVerificationRedirect } from './use-phone-verification-redirect';
 import { getErrorMessage } from '@/lib/api/get-error-message';
 import { setStoredTheme } from '@/lib/theme/use-theme-preference';
 import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
@@ -17,6 +19,7 @@ import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
 export function useGoogleAuth() {
   const router = useRouter();
   const setSession = useAuthStore((state) => state.setSession);
+  const goToVerification = usePhoneVerificationRedirect();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -35,6 +38,11 @@ export function useGoogleAuth() {
       }
       router.push(user.role === 'admin' || user.role === 'superadmin' ? '/admin' : '/');
     } catch (error) {
+      const notVerified = getPhoneNotVerified(error);
+      if (notVerified) {
+        goToVerification(notVerified, false);
+        return;
+      }
       setErrorMessage(getErrorMessage(error, 'Connexion avec Google impossible. Réessayez.'));
     } finally {
       setIsLoading(false);

@@ -153,7 +153,7 @@ export function SearchSection() {
             sur l'app mobile (demandé explicitement : "rendre le Next.js en version responsive
             mobile comme le React Native"). */}
         {tab === 'search' && (
-          <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-5">
+          <div className="hidden sm:contents">
             <div className="flex rounded-full border border-stroke-default overflow-hidden shrink-0">
               <button
                 type="button"
@@ -175,7 +175,8 @@ export function SearchSection() {
               </button>
             </div>
 
-            <div className="flex flex-wrap items-center gap-1.5">
+            {/* `sm:contents` sur le parent : Louer/Acheter et « Type de bien » deviennent des éléments directs de la rangée des onglets, ce qui permet à `ml-auto` de caler « Type de bien » à droite du bloc, même quand la rangée passe à la ligne. */}
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-1.5">
               <span className="text-[0.85rem] font-semibold text-content-muted shrink-0">{t.search.propertyType} :</span>
               <Chip active={!filters.propertyType} onClick={() => selectPropertyType(undefined)}>
                 {t.search.allTypes}

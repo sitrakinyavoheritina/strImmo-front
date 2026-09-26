@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { X, Send } from 'lucide-react';
+import { X, Send, ImagePlus } from 'lucide-react';
 import Image from 'next/image';
 import { formatPrice } from '@/features/search/utils/format-price';
 import { Avatar } from '@/components/ui/avatar';
@@ -11,8 +11,11 @@ import {
   useStartConversation,
   useConversation,
   useSendMessage,
+  useSendImageMessage,
   useMarkConversationRead,
 } from '@/features/messages/hooks/use-messages';
+import { MessageImage } from '@/features/messages/components/message-image';
+import { checkChatImage } from '@/lib/messages/chat-image';
 
 
 
@@ -57,9 +60,12 @@ export function InlineChatPanel({
   const conversationId = conversation?.id;
   const { data: messages, isLoading } = useConversation(conversationId ?? '');
   const { mutateAsync: sendMessage, isPending: isSending } = useSendMessage(conversationId ?? '');
+  const { mutateAsync: sendImage, isPending: isSendingImage } = useSendImageMessage(conversationId ?? '');
   useMarkConversationRead(conversationId ?? '', messages);
 
   const [draft, setDraft] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     requestAnimationFrame(() => scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight }));
@@ -73,6 +79,26 @@ export function InlineChatPanel({
       await sendMessage(text);
     } catch {
       setDraft(text);
+    }
+  }
+
+  // Pièce jointe : images uniquement (même règle et même route que le chat en pleine page).
+  async function handlePickImage(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file || !conversationId || isSendingImage) return;
+
+    const problem = checkChatImage(file);
+    if (problem) {
+      setErrorMessage(problem === 'notImage' ? t.messages.photoOnly : t.messages.photoTooLarge);
+      return;
+    }
+
+    setErrorMessage(null);
+    try {
+      await sendImage(file);
+    } catch {
+      setErrorMessage(t.messages.photoUploadError);
     }
   }
 
@@ -117,21 +143,38 @@ export function InlineChatPanel({
         ) : (
           messages?.map((message) => (
             <div key={message.id} className={`flex ${message.senderId === currentUserId ? 'justify-end' : 'justify-start'}`}>
-              <p
-                className={`max-w-[80%] text-sm px-3 py-2 rounded-2xl ${
-                  message.senderId === currentUserId
-                    ? 'bg-brand-primary text-white rounded-br-sm'
-                    : 'bg-surface-card lg:bg-surface-app text-content-main rounded-bl-sm'
-                }`}
-              >
-                {message.text}
-              </p>
+              {message.imageUrl ? (
+                <MessageImage src={message.imageUrl} size={160} />
+              ) : (
+                <p
+                  className={`max-w-[80%] text-sm px-3 py-2 rounded-2xl ${
+                    message.senderId === currentUserId
+                      ? 'bg-brand-primary text-white rounded-br-sm'
+                      : 'bg-surface-card lg:bg-surface-app text-content-main rounded-bl-sm'
+                  }`}
+                >
+                  {message.text}
+                </p>
+              )}
             </div>
           ))
         )}
       </div>
 
+      {errorMessage && <p className="shrink-0 text-[0.85rem] text-danger px-3 pb-1">{errorMessage}</p>}
+
       <div className="shrink-0 flex items-center gap-2 px-2.5 py-2.5 border-t border-stroke-default">
+        <input ref={fileInputRef} type="file" accept="image/*" hidden onChange={handlePickImage} />
+        <button
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
+          disabled={!conversationId || isSendingImage}
+          aria-label={t.messages.attachPhoto}
+          title={t.messages.attachPhoto}
+          className="shrink-0 w-9 h-9 rounded-full border border-stroke-default flex items-center justify-center text-content-muted hover:text-content-main transition disabled:opacity-40"
+        >
+          <ImagePlus size={16} />
+        </button>
         <input
           value={draft}
           onChange={(event) => setDraft(event.target.value)}

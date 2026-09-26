@@ -67,6 +67,13 @@ export const authApi = {
       })
       .then((r) => r.data),
 
+  // Avant la première connexion (pas encore de session) : jeton de vérification de la réponse 403.
+  resendPhoneVerification: (verificationToken: string) =>
+    apiClient.post<{ message: string }>('/auth/phone-verification/resend', { verificationToken }).then((r) => r.data),
+
+  confirmPhoneVerification: (payload: { verificationToken: string; code: string }) =>
+    apiClient.post<AuthenticatedResponse>('/auth/phone-verification/confirm', payload).then((r) => r.data),
+
   // Vérification du numéro du compte connecté (OTP SMS envoyé à l'inscription propriétaire).
   resendPhoneCode: () =>
     apiClient.post<{ message: string }>('/auth/resend-phone-code', {}).then((r) => r.data),

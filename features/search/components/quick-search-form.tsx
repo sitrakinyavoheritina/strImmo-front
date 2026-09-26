@@ -38,7 +38,7 @@ export function QuickSearchForm() {
       >
         {/* `gap-5` entre groupes (prix / publié par), `gap-1.5` à l'intérieur d'un même groupe —
             même principe que la rangée du dessus (voir search-section.tsx). */}
-        <div className="flex flex-wrap items-center gap-5">
+        <div className="flex flex-wrap items-center justify-between gap-5">
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[0.85rem] font-semibold text-content-muted shrink-0">{t.search.priceLabel} :</span>
             <input
@@ -59,7 +59,8 @@ export function QuickSearchForm() {
             />
           </div>
 
-          <div className="flex flex-wrap items-center gap-1.5">
+          {/* `mx-auto` : « Publié par » reste centré dans la place restante, sur la même ligne que le prix. */}
+          <div className="mx-auto flex flex-wrap items-center justify-center gap-1.5">
             <span className="text-[0.85rem] font-semibold text-content-muted shrink-0">{t.search.publisherType} :</span>
             <Chip active={!filters.publisherType} onClick={() => update('publisherType', undefined)}>
               {t.search.allPublishers}

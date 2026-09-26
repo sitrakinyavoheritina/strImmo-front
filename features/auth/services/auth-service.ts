@@ -105,6 +105,13 @@ export const authService = {
     return { status: 'pending' };
   },
 
+  resendPhoneVerification: (verificationToken: string) => authApi.resendPhoneVerification(verificationToken),
+
+  confirmPhoneVerification: async (payload: { verificationToken: string; code: string }): Promise<{ user: User; token: string }> => {
+    const res = await authApi.confirmPhoneVerification(payload);
+    return { user: toUser(res.user), token: res.access_token };
+  },
+
   resendPhoneCode: () => authApi.resendPhoneCode(),
 
   verifyPhone: (code: string) => authApi.verifyPhone(code),

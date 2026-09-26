@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Users } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useAdminUsers } from '@/features/admin/hooks/use-admin-users';
-import { AdminUserListItem } from '@/features/admin/components/admin-user-list-item';
+import { AdminUserListItem, isUnvalidatedAccount } from '@/features/admin/components/admin-user-list-item';
+import { Chip } from '@/components/ui/form-controls';
 import { RightRail } from '@/features/feed/components/right-rail';
 
 // Liste de tous les comptes inscrits sur la plateforme — demandé explicitement ("liste des
@@ -29,6 +30,9 @@ export default function AdminUtilisateursPage() {
   }, [hasHydrated, isAuthenticated, isAdminUser, router]);
 
   const { data: users, isLoading } = useAdminUsers({ enabled: isAdminUser });
+  const [onlyNotValidated, setOnlyNotValidated] = useState(false);
+  const notValidatedCount = users?.filter(isUnvalidatedAccount).length ?? 0;
+  const shownUsers = onlyNotValidated ? users?.filter(isUnvalidatedAccount) : users;
 
   if (!isAdminUser) return null;
 
@@ -40,11 +44,22 @@ export default function AdminUtilisateursPage() {
           {isLoading ? t.search.searching : `${users?.length ?? 0} ${t.adminUsersPage.subtitle}`}
         </p>
 
+        {!isLoading && users && (
+          <div className="flex gap-2 mt-3">
+            <Chip active={!onlyNotValidated} onClick={() => setOnlyNotValidated(false)}>
+              {t.adminUsersPage.filterAll} ({users.length})
+            </Chip>
+            <Chip active={onlyNotValidated} onClick={() => setOnlyNotValidated(true)}>
+              {t.adminUsersPage.filterNotValidated} ({notValidatedCount})
+            </Chip>
+          </div>
+        )}
+
         {isLoading ? (
           <p className="text-sm text-content-muted mt-4">{t.search.searching}</p>
-        ) : users && users.length > 0 ? (
+        ) : shownUsers && shownUsers.length > 0 ? (
           <div className="space-y-2 mt-4">
-            {users.map((u) => (
+            {shownUsers.map((u) => (
               <AdminUserListItem key={u.id} user={u} />
             ))}
           </div>

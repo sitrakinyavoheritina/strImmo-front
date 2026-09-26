@@ -9,6 +9,8 @@ type ListingPhotoPickerProps = {
   onChange: (photos: File[]) => void;
   min: number;
   max: number;
+  /** Vrai après un clic sur « Suivant » avec trop peu de photos : le message passe en rouge. */
+  showMinError?: boolean;
 };
 
 // Une photo de smartphone/appareil moderne dépasse facilement 5-10 Mo à pleine résolution —
@@ -42,7 +44,7 @@ async function shrinkPhoto(file: File): Promise<File> {
 /** Grille de photos pour la création d'annonce : entre `min` et `max` photos, la première de la
  * liste est toujours la couverture (badge dédié) — on peut promouvoir une autre photo en
  * couverture, ou en supprimer une. */
-export function ListingPhotoPicker({ photos, onChange, min, max }: ListingPhotoPickerProps) {
+export function ListingPhotoPicker({ photos, onChange, min, max, showMinError = false }: ListingPhotoPickerProps) {
   const { t } = useTranslation();
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
@@ -89,7 +91,7 @@ export function ListingPhotoPicker({ photos, onChange, min, max }: ListingPhotoP
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-[0.85rem] font-semibold text-content-muted">{t.listing.photos}</span>
         <span className={`text-[0.85rem] font-semibold ${photos.length < min ? 'text-danger' : 'text-content-muted'}`}>
-          {photos.length}/{max} {photos.length < min ? `(${t.listing.photosMinHint})` : ''}
+          {photos.length}/{max}
         </span>
       </div>
 
@@ -144,6 +146,16 @@ export function ListingPhotoPicker({ photos, onChange, min, max }: ListingPhotoP
         disabled={isProcessing}
         onChange={handleFilesSelected}
       />
+
+      {/* Sous les images : rappel permanent du minimum, qui passe en rouge et indique combien il en
+          manque dès qu'on clique sur « Suivant » sans en avoir assez. */}
+      {photos.length < min && (
+        <p className={`mt-1.5 text-[0.85rem] ${showMinError ? 'font-semibold text-danger' : 'text-content-muted'}`}>
+          {(showMinError ? t.listing.photosMinError : t.listing.photosMinRequired)
+            .replace('%min%', String(min))
+            .replace('%missing%', String(min - photos.length))}
+        </p>
+      )}
     </div>
   );
 }

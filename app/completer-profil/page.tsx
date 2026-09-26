@@ -1,5 +1,7 @@
 'use client';
 
+import { getPhoneNotVerified } from '@/features/auth/utils/phone-not-verified';
+import { usePhoneVerificationRedirect } from '@/features/auth/hooks/use-phone-verification-redirect';
 import { markWelcomePending } from '@/lib/auth/welcome-flag';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -39,6 +41,7 @@ export default function CompleterProfilPage() {
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const setSession = useAuthStore((state) => state.setSession);
+  const goToVerification = usePhoneVerificationRedirect();
   const hasHydrated = useAuthHasHydrated();
 
   const [role, setRole] = useState<Role>('owner');
@@ -104,9 +107,16 @@ export default function CompleterProfilPage() {
       markWelcomePending(updatedUser.id);
       setStoredTheme(updatedUser.themePreference);
       setStoredFeedDisplay(updatedUser.feedDisplay);
-      // Propriétaire : un code SMS vient d'être envoyé (voir strImmo completeProfile).
-      router.push(updatedUser.role === 'owner' && !updatedUser.isPhoneVerified ? '/verification-telephone' : '/');
+      router.push('/');
     } catch (error) {
+      // Propriétaire / intermédiaire / agence : le backend a envoyé le code SMS et refuse la session
+      // tant que le numéro n'est pas vérifié — on ferme la session Google en cours et on passe à
+      // l'écran du code (le compte est bien créé).
+      const notVerified = getPhoneNotVerified(error);
+      if (notVerified) {
+        goToVerification(notVerified, true);
+        return;
+      }
       setErrorMessage(getErrorMessage(error, "Une erreur est survenue."));
     } finally {
       setIsLoading(false);

@@ -38,7 +38,6 @@ export default function ModifierAnnoncePage() {
   const formRef = useRef<PropertyFormHandle>(null);
 
   const isOwner = user?.id === property?.ownerId;
-  const isAdminUser = user?.role === 'admin' || user?.role === 'superadmin';
 
   // Attend `hasHydrated` (session relue depuis localStorage) avant de rediriger — sinon, sur un
   // chargement direct de cette page, `isAuthenticated` vaut encore `false` le temps de la
@@ -51,10 +50,12 @@ export default function ModifierAnnoncePage() {
       router.replace('/connexion');
       return;
     }
-    if (!isLoading && property && !isOwner && !isAdminUser) {
+    // Propriétaire uniquement : un admin consulte et modère, il ne modifie pas le contenu (le
+    // backend refuse aussi, voir strImmo/src/properties/properties.service.ts:update).
+    if (!isLoading && property && !isOwner) {
       router.replace(`/annonce/${id}`);
     }
-  }, [hasHydrated, isAuthenticated, isLoading, property, isOwner, isAdminUser, id, router]);
+  }, [hasHydrated, isAuthenticated, isLoading, property, isOwner, id, router]);
 
   // `property` (un `Property` complet) satisfait structurellement `PropertyFormValues` (sous-
   // ensemble de `Property`, voir listing.types.ts) — pas de mapping à écrire, une seule
@@ -89,7 +90,7 @@ export default function ModifierAnnoncePage() {
     );
   }
 
-  if (!isOwner && !isAdminUser) return null;
+  if (!isOwner) return null;
 
   return (
     <div className="max-w-2xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-24">

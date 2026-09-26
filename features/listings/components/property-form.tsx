@@ -112,6 +112,8 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   );
   // Facultatif même pour intermédiaire/agence (contrairement à commission/caution ci-dessus,
   // obligatoires pour eux) — jamais de validation "requis" associée, voir plus bas.
+  // Après un clic sur « Suivant » / « Aperçu » avec moins de MIN_PHOTOS photos (voir ListingPhotoPicker).
+  const [photosAttempted, setPhotosAttempted] = useState(false);
   const [visitFee, setVisitFee] = useState(
     initialValues?.visitFee !== undefined ? String(initialValues.visitFee) : ''
   );
@@ -314,6 +316,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   function handleNext1() {
     const nextErrors = validateStep1();
     setErrors((prev) => ({ ...prev, ...nextErrors }));
+    if (mode === 'create' && photos.length < MIN_PHOTOS) setPhotosAttempted(true);
     if (Object.keys(nextErrors).length > 0 || (mode === 'create' && photos.length < MIN_PHOTOS)) return;
     onNext();
   }
@@ -337,6 +340,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   function handlePreview() {
     const nextErrors = validate();
     setErrors(nextErrors);
+    if (mode === 'create' && photos.length < MIN_PHOTOS) setPhotosAttempted(true);
     if (Object.keys(nextErrors).length > 0 || (mode === 'create' && photos.length < MIN_PHOTOS)) return;
     onPreview({ ...buildValues(), title: displayedTitle }, photos);
   }
@@ -372,7 +376,9 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
 
           <div>
             <FieldLabel>{t.search.propertyType}</FieldLabel>
-            <div className="flex flex-wrap gap-2">
+            {/* Les 4 types sur UNE seule ligne (jamais de retour à la ligne), espacement et marges
+                intérieures réduits : chaque puce se partage la largeur à parts égales. */}
+            <div className="flex flex-nowrap gap-1 [&>button]:flex-1 [&>button]:whitespace-nowrap [&>button]:px-1.5 [&>button]:text-[0.8rem]">
               {PROPERTY_TYPES.map(({ value, labelKey }) => (
                 <Chip
                   key={value}
@@ -485,7 +491,13 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
               <p className="mt-1.5 text-[12px] text-content-muted">{t.listing.photosImmutableNotice}</p>
             </div>
           ) : (
-            <ListingPhotoPicker photos={photos} onChange={setPhotos} min={MIN_PHOTOS} max={MAX_PHOTOS} />
+            <ListingPhotoPicker
+              photos={photos}
+              onChange={setPhotos}
+              min={MIN_PHOTOS}
+              max={MAX_PHOTOS}
+              showMinError={photosAttempted}
+            />
           )}
         </>
       )}

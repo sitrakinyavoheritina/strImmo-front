@@ -8,6 +8,8 @@ import { loginSchema, LoginFormData } from '../schemas';
 import { trackEvent } from '@/lib/analytics/track';
 import { authService } from '../services/auth-service';
 import { useAuthStore } from '@/lib/state/use-auth-store';
+import { getPhoneNotVerified } from '../utils/phone-not-verified';
+import { usePhoneVerificationRedirect } from './use-phone-verification-redirect';
 import { getErrorMessage } from '@/lib/api/get-error-message';
 import { setStoredTheme } from '@/lib/theme/use-theme-preference';
 import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
@@ -15,6 +17,7 @@ import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
 export function useLogin() {
   const router = useRouter();
   const setSession = useAuthStore((state) => state.setSession);
+  const goToVerification = usePhoneVerificationRedirect();
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -40,6 +43,12 @@ export function useLogin() {
       // que sur une fiche de profil qui ne lui sert à rien en priorité — demandé explicitement.
       router.push(user.role === 'admin' || user.role === 'superadmin' ? '/admin' : '/');
     } catch (error) {
+      // Propriétaire / intermédiaire / agence dont le numéro n'est pas vérifié : pas de session, écran du code.
+      const notVerified = getPhoneNotVerified(error);
+      if (notVerified) {
+        goToVerification(notVerified, false);
+        return;
+      }
       setErrorMessage(getErrorMessage(error, 'Identifiants incorrects.'));
     } finally {
       setIsLoading(false);

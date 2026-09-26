@@ -9,14 +9,25 @@ import { authService } from '@/features/auth/services/auth-service';
 import { getErrorMessage } from '@/lib/api/get-error-message';
 import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
+import { OtpInput } from '@/components/ui/otp-input';
+import { isValidMalagasyPhone } from '@/features/auth/schemas';
 
 type Step = 'request' | 'reset';
 
-// Mot de passe oublié — code par email uniquement pour l'instant (choix email/SMS prévu plus
-// tard côté produit, voir strImmo/src/auth/auth.service.ts:requestPasswordReset). Étape 1 :
-// demander le code (réponse volontairement générique côté serveur, on avance toujours à l'étape
-// 2 quoi qu'il arrive — ne jamais s'en servir pour révéler si un compte existe). Étape 2 : code +
-// nouveau mot de passe.
+// Mot de passe oublié — le même code part par SMS et par email (voir strImmo/src/auth/auth.service.ts:
+// requestPasswordReset). Étape 1 : saisir un numéro OU un email, validé AVANT l'envoi (une faute de
+// frappe ne doit pas laisser attendre un code qui ne viendra jamais) ; la réponse du serveur reste
+// volontairement générique, on avance toujours à l'étape 2 — ne jamais s'en servir pour révéler si
+// un compte existe. Étape 2 : code (6 cases) + nouveau mot de passe.
+
+// Un identifiant avec « @ » est un email, sinon un numéro malgache.
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+function identifierError(value: string, t: ReturnType<typeof useTranslation>['t']): string | null {
+  const trimmed = value.trim();
+  if (!trimmed) return t.forgotPasswordPage.identifierRequired;
+  if (trimmed.includes('@')) return EMAIL_REGEX.test(trimmed) ? null : t.forgotPasswordPage.identifierInvalidEmail;
+  return isValidMalagasyPhone(trimmed) ? null : t.forgotPasswordPage.identifierInvalidPhone;
+}
 export default function MotDePasseOubliePage() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -30,8 +41,9 @@ export default function MotDePasseOubliePage() {
 
   async function handleRequestCode(event: React.FormEvent) {
     event.preventDefault();
-    if (!identifier.trim()) {
-      setErrorMessage(t.forgotPasswordPage.identifierRequired);
+    const problem = identifierError(identifier, t);
+    if (problem) {
+      setErrorMessage(problem);
       return;
     }
     setErrorMessage(null);
@@ -47,9 +59,19 @@ export default function MotDePasseOubliePage() {
     }
   }
 
+  async function handleResend() {
+    setErrorMessage(null);
+    try {
+      await authService.forgotPassword(identifier.trim());
+      setInfoMessage(t.forgotPasswordPage.codeResent);
+    } catch (error) {
+      setErrorMessage(getErrorMessage(error, "Impossible d'envoyer le code."));
+    }
+  }
+
   async function handleResetPassword(event: React.FormEvent) {
     event.preventDefault();
-    if (!code.trim()) {
+    if (code.length !== 6) {
       setErrorMessage(t.forgotPasswordPage.codeRequired);
       return;
     }
@@ -60,7 +82,7 @@ export default function MotDePasseOubliePage() {
     setErrorMessage(null);
     setIsLoading(true);
     try {
-      await authService.resetPassword({ identifier: identifier.trim(), code: code.trim(), newPassword });
+      await authService.resetPassword({ identifier: identifier.trim(), code, newPassword });
       router.push('/connexion?reinitialise=1');
     } catch (error) {
       setErrorMessage(getErrorMessage(error, 'Code invalide ou expiré.'));
@@ -94,6 +116,7 @@ export default function MotDePasseOubliePage() {
                 placeholder={t.forgotPasswordPage.identifierPlaceholder}
                 className="w-full px-3 py-2 sm:py-2.5 bg-surface-app border border-stroke-default rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition"
               />
+              <p className="mt-1 text-[0.85rem] text-content-muted">{t.forgotPasswordPage.channelsHint}</p>
             </div>
             <Button type="submit" disabled={isLoading} variant="secondary" className="w-full">
               {isLoading ? t.forgotPasswordPage.sending : t.forgotPasswordPage.sendCode}
@@ -101,19 +124,7 @@ export default function MotDePasseOubliePage() {
           </form>
         ) : (
           <form className="space-y-3 sm:space-y-5" onSubmit={handleResetPassword}>
-            <div>
-              <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">
-                {t.forgotPasswordPage.codeLabel}
-              </label>
-              <input
-                value={code}
-                onChange={(event) => setCode(event.target.value)}
-                placeholder={t.forgotPasswordPage.codePlaceholder}
-                inputMode="numeric"
-                maxLength={6}
-                className="w-full px-3 py-2 sm:py-2.5 bg-surface-app border border-stroke-default rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition tracking-widest"
-              />
-            </div>
+            <OtpInput label={t.forgotPasswordPage.codeLabel} value={code} onChange={setCode} autoFocus />
             <div>
               <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">
                 {t.forgotPasswordPage.newPasswordLabel}
@@ -129,6 +140,14 @@ export default function MotDePasseOubliePage() {
             <Button type="submit" disabled={isLoading} variant="secondary" className="w-full">
               {isLoading ? t.forgotPasswordPage.resetting : t.forgotPasswordPage.resetPassword}
             </Button>
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={isLoading}
+              className="w-full text-center text-[0.85rem] font-semibold text-brand-primary hover:text-brand-primary-hover transition disabled:opacity-50"
+            >
+              {t.forgotPasswordPage.resendCode}
+            </button>
             <button
               type="button"
               onClick={() => {
