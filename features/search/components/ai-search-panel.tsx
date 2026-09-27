@@ -76,7 +76,17 @@ export function AiSearchPanel() {
         {messages.length === 0 && (
           <div className="flex items-start gap-2 bg-surface-app rounded-xl p-3 text-sm text-content-main">
             <Sparkles size={16} className="text-brand-primary shrink-0 mt-0.5" />
-            {t.chat.welcomeMessage}
+            {/* Le message d'accueil contient un exemple concret sur sa propre ligne (séparé par
+                "\n" dans la traduction) — mis en italique/atténué pour bien le distinguer de la
+                consigne, plus parlant pour un débutant qu'une simple liste de critères entre
+                parenthèses (ville, budget, type de logement...). */}
+            <p>
+              {t.chat.welcomeMessage.split('\n').map((line, index) => (
+                <span key={index} className={index === 0 ? 'block' : 'block mt-1 italic text-content-muted'}>
+                  {line}
+                </span>
+              ))}
+            </p>
           </div>
         )}
         {messages.map((message, index) => (

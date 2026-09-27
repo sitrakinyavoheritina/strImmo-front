@@ -67,7 +67,7 @@ export function Topbar() {
             (voir /admin) — demandé explicitement ("il ne peut pas créer une offre"). */}
         {!isAdminUser && (
           <Link
-            href="/annonce/nouvelle"
+            href="/publier"
             className="inline-flex items-center gap-2 text-brand-primary hover:text-brand-primary-hover text-sm font-semibold rounded-xl py-2 transition shrink-0"
           >
             <span className="flex items-center justify-center w-7 h-7 rounded-full bg-brand-primary text-white shrink-0">

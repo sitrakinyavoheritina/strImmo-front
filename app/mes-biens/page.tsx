@@ -8,6 +8,8 @@ import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 import { useProperties } from '@/features/search/hooks/use-properties';
 import { MyPropertyCard } from '@/features/listings/components/my-property-card';
+import { useMyPropertyRequests } from '@/features/property-requests/hooks/use-property-requests';
+import { MyRequestCard } from '@/features/property-requests/components/my-request-card';
 import { RightRail } from '@/features/feed/components/right-rail';
 
 export default function MesBiensPage() {
@@ -27,6 +29,7 @@ export default function MesBiensPage() {
   const { data: properties, isLoading } = useProperties(user ? { ownerId: user.id } : undefined, {
     enabled: !!user,
   });
+  const { data: myRequests, isLoading: isLoadingRequests } = useMyPropertyRequests(isAuthenticated);
 
   if (!isAuthenticated) return null;
 
@@ -65,6 +68,32 @@ export default function MesBiensPage() {
               {t.myPropertiesPage.postAd}
             </Link>
           </div>
+        )}
+
+        {/* Section "Mes demandes" — mêmes cartes/actions que sur /demandes (onglet "Mes
+            demandes"), gardées ici aussi : "Mes Biens" est l'écran où un compte gère tout ce
+            qu'il a publié, une demande en fait désormais partie au même titre qu'une annonce. */}
+        <div className="flex items-center justify-between mt-6 mb-3">
+          <h2 className="text-base font-bold text-brand-secondary-text">{t.propertyRequestsPage.mesBiensSectionTitle}</h2>
+          <Link href="/demandes" className="text-[0.85rem] font-semibold text-brand-primary hover:underline">
+            {t.propertyRequestsPage.mesBiensSeeAll}
+          </Link>
+        </div>
+        {isLoadingRequests ? (
+          <p className="text-sm text-content-muted">{t.search.searching}</p>
+        ) : myRequests && myRequests.length > 0 ? (
+          <div className="space-y-2">
+            {myRequests.map((request) => (
+              <MyRequestCard key={request.id} request={request} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-content-muted">
+            {t.propertyRequestsPage.mesBiensEmpty}
+            <Link href="/demandes/nouvelle" className="font-semibold text-brand-primary hover:underline">
+              {t.propertyRequestsPage.mesBiensCreateLink}
+            </Link>
+          </p>
         )}
       </div>
       <RightRail />

@@ -48,7 +48,7 @@ export function useConversation(id: string) {
 export function useStartConversation() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (target: { propertyId: string } | { userId: string }) =>
+    mutationFn: (target: { propertyId: string } | { userId: string } | { requestId: string }) =>
       messageService.startConversation(target),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: messagesQueryKeys.conversations });

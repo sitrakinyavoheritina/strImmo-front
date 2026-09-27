@@ -10,6 +10,7 @@ export type AnalyticsEvent =
   | 'search'
   | 'filter_property'
   | 'favorite_property'
+  | 'like_property_request'
   | 'contact_owner'
   | 'send_message'
   | 'login'

@@ -1,6 +1,7 @@
 import {
   Home,
   Newspaper,
+  Search,
   Building2,
   MessageCircle,
   Menu,
@@ -51,7 +52,7 @@ export function getNavItems(isAdminUser: boolean): NavItem[] {
   return [
     { href: '/', icon: Home, labelKey: 'home' },
     { href: '/messages', icon: MessageCircle, labelKey: 'messages' },
-    { href: '/actus', icon: Newspaper, labelKey: 'news' },
+    { href: '/demandes', icon: Search, labelKey: 'mySearches' },
     { href: '/mes-biens', icon: Building2, labelKey: 'myProperties' },
     { href: '/parametres', icon: Menu, labelKey: 'menu' },
   ];

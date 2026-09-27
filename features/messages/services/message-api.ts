@@ -38,9 +38,10 @@ export type ApiContact = {
 export const messageApi = {
   listConversations: () => apiClient.get<ApiConversation[]>('/conversations').then((r) => r.data),
 
-  // `propertyId` (depuis une annonce) ou `userId` (depuis une recherche de contact, voir
-  // searchContacts) — jamais les deux, MessagingController.start() exige l'un des deux.
-  startConversation: (target: { propertyId: string } | { userId: string }) =>
+  // `propertyId` (depuis une annonce), `userId` (depuis une recherche de contact, voir
+  // searchContacts) ou `requestId` (depuis une demande publique, voir public-board-card.tsx) —
+  // un seul à la fois, MessagingController.start() exige l'un des trois.
+  startConversation: (target: { propertyId: string } | { userId: string } | { requestId: string }) =>
     apiClient.post<ApiConversation>('/conversations/start', target).then((r) => r.data),
 
   searchContacts: (query: string) =>

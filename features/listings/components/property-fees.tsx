@@ -2,7 +2,7 @@ import { Shield, Percent, DoorOpen, type LucideIcon } from 'lucide-react';
 import type { Translations } from '@/lib/i18n/translations';
 import { formatPrice } from '@/features/search/utils/format-price';
 
-type FeeValues = { commission?: number | null; caution?: number | null; visitFee?: number | null };
+type FeeValues = { commission?: number | null; caution?: number | null; visitFee?: number | null; kind?: 'sale' | 'rent' };
 
 /** Caution / commission / droit de visite, sous forme de petites cartes iconifiées plutôt que de
  * texte brut séparé par des virgules — partagé entre l'aperçu avant publication
@@ -22,15 +22,21 @@ export function PropertyFees({
   className?: string;
 }) {
   const items: { key: string; icon: LucideIcon; label: string; value: number }[] = [];
-  if (values.caution != null) items.push({ key: 'caution', icon: Shield, label: t.listing.caution, value: values.caution });
+  // Une caution n'a de sens que pour une location — jamais affichée pour un bien à vendre, même
+  // si une valeur est encore présente en base (ancienne annonce, champ pas toujours nettoyé au
+  // changement de type de transaction).
+  if (values.caution != null && values.kind !== 'sale') {
+    items.push({ key: 'caution', icon: Shield, label: t.listing.caution, value: values.caution });
+  }
   const isOwner = publisherType === 'owner';
   if (values.commission != null && !isOwner) items.push({ key: 'commission', icon: Percent, label: t.listing.commission, value: values.commission });
   if (values.visitFee != null && !isOwner) items.push({ key: 'visitFee', icon: DoorOpen, label: t.propertyDetail.visitFee, value: values.visitFee });
   if (items.length === 0) return null;
 
   return (
-    // Ordinateur : les frais s'empilent de haut en bas (pas côte à côte) ; mobile : rangée qui passe à la ligne.
-    <div className={`flex flex-wrap gap-2 lg:flex-col lg:items-start ${className}`}>
+    // Côte à côte, en rangée qui passe à la ligne si besoin — sur mobile comme sur grand écran
+    // (remonté explicitement après un premier essai en colonne empilée sur ordinateur).
+    <div className={`flex flex-wrap gap-2 ${className}`}>
       {items.map((item) => (
         <div
           key={item.key}

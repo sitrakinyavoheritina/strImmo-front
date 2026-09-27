@@ -16,8 +16,10 @@ export function Sidebar() {
   const pathname = usePathname();
   const { t } = useTranslation();
   // Accueil et page de résultats : mêmes filtres avancés (le store est synchronisé avec l'URL sur
-  // /recherche, voir app/recherche/page.tsx).
-  const showAdvancedFilters = pathname === '/' || pathname.startsWith('/recherche');
+  // /recherche, voir app/recherche/page.tsx). Égalité stricte (pas `startsWith`) : un `startsWith`
+  // aurait aussi attrapé `/recherches` (ancien nom du menu "Demandes", voir app/demandes/) avant
+  // son renommage — gardé strict pour ne plus jamais dépendre de ce genre de coïncidence de préfixe.
+  const showAdvancedFilters = pathname === '/' || pathname === '/recherche';
   const unreadCount = useUnreadMessagesCount();
   const user = useAuthStore((state) => state.user);
   const navItems = getNavItems(isAdmin(user));

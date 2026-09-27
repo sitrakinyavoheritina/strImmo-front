@@ -231,7 +231,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
       // désormais — un propriétaire loue aussi contre une caution — remonté explicitement. Les
       // trois sont facultatifs (0 par défaut, jamais bloquant), plus aucun n'est "obligatoire".
       commission: requiresCommission ? Number(commission) || 0 : undefined,
-      caution: Number(caution) || 0,
+      caution: kind === 'sale' ? undefined : Number(caution) || 0,
       visitFee: requiresCommission ? Number(visitFee) || 0 : undefined,
     };
 
@@ -365,7 +365,12 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
             </button>
             <button
               type="button"
-              onClick={() => setKind('sale')}
+              onClick={() => {
+                setKind('sale');
+                // Une caution n'a de sens que pour une location — vidée pour ne rien envoyer côté
+                // serveur (voir buildValues plus bas, qui n'inclut plus le champ pour un bien à vendre).
+                setCaution('');
+              }}
               className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-stroke-default ${
                 kind === 'sale' ? 'bg-brand-primary text-white' : 'text-content-muted hover:bg-surface-app'
               }`}
@@ -432,11 +437,13 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
           <div className={requiresCommission ? 'grid grid-cols-2 gap-3' : ''}>
             <FormInput
               label={t.listing.caution}
-              value={caution}
+              value={kind === 'sale' ? '' : caution}
               onChange={(value) => setCaution(onlyDigits(value))}
               placeholder="0"
               type="number"
               suffix="Ar"
+              disabled={kind === 'sale'}
+              hint={kind === 'sale' ? t.listing.cautionNotApplicable : undefined}
             />
             {requiresCommission && (
               <FormInput

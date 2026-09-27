@@ -41,7 +41,7 @@ export function toMessage(api: ApiMessage): Message {
 
 export const messageService = {
   listConversations: () => messageApi.listConversations().then((list) => list.map(toConversation)),
-  startConversation: (target: { propertyId: string } | { userId: string }) =>
+  startConversation: (target: { propertyId: string } | { userId: string } | { requestId: string }) =>
     messageApi.startConversation(target).then(toConversation),
   searchContacts: (query: string) => messageApi.searchContacts(query).then((list) => list.map(toContact)),
   getMessages: (conversationId: string) =>
