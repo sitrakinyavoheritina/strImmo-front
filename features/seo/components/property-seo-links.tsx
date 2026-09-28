@@ -5,16 +5,22 @@ import { TYPE_INFO, propertyPath } from '@/lib/seo/slug';
 import { formatPrice } from '@/features/search/utils/format-price';
 import type { Property } from '@/features/search/types/listing.types';
 
+// "Annonces similaires" masqué pour le moment (demandé explicitement) — le fil d'Ariane reste
+// affiché, seule cette section est coupée. Un seul drapeau à repasser à true pour la remettre.
+const SHOW_SIMILAR_LISTINGS = false;
+
 /** Liens internes sous une fiche d'annonce (composant serveur, présent dans le HTML) : fil
  * d'Ariane vers la catégorie et la commune, puis annonces similaires. Permet à Google de parcourir
  * le contenu public de proche en proche. */
 export async function PropertySeoLinks({ property }: { property: Property }) {
   const typeInfo = TYPE_INFO[property.propertyType];
   const [similarRaw, geoPages] = await Promise.all([
-    fetchProperties({ propertyType: property.propertyType, communeId: property.communeId, sortBy: 'recent', limit: 7 }),
+    SHOW_SIMILAR_LISTINGS
+      ? fetchProperties({ propertyType: property.propertyType, communeId: property.communeId, sortBy: 'recent', limit: 7 })
+      : Promise.resolve([]),
     property.communeId ? getGeoPages() : Promise.resolve([]),
   ]);
-  const similar = similarRaw.filter((item) => item.id !== property.id).slice(0, 6);
+  const similar = SHOW_SIMILAR_LISTINGS ? similarRaw.filter((item) => item.id !== property.id).slice(0, 6) : [];
   const geoPage = geoPages.find(
     (page) => page.communeId === property.communeId && page.propertyType === property.propertyType
   );

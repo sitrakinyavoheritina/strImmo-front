@@ -1,5 +1,6 @@
 import { apiClient } from '@/lib/api/client';
 import type {
+  AdminDeletedProperty,
   BathroomLocation,
   LandPriceType,
   LandStatus,
@@ -173,4 +174,7 @@ export const propertyApi = {
         byModerator: { moderatorId: string; moderatorName: string; approvedCount: number; rejectedCount: number }[];
       }>('/properties/stats')
       .then((r) => r.data),
+
+  // Réservé admin/superadmin — voir app/admin/annonces (onglet "Supprimées").
+  listDeleted: () => apiClient.get<AdminDeletedProperty[]>('/properties/deleted').then((r) => r.data),
 };

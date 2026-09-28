@@ -1,5 +1,6 @@
 import { apiClient } from '@/lib/api/client';
 import type {
+  AdminPropertyRequestRow,
   CreatePropertyRequestPayload,
   PropertyRequest,
   PropertyRequestReportReason,
@@ -27,4 +28,11 @@ export const propertyRequestApi = {
 
   report: (id: string, reason: PropertyRequestReportReason) =>
     apiClient.post<{ reported: true }>(`/property-requests/${id}/report`, { reason }).then((r) => r.data),
+
+  listForAdmin: () => apiClient.get<AdminPropertyRequestRow[]>('/property-requests/admin/all').then((r) => r.data),
+
+  listDeletedForAdmin: () =>
+    apiClient.get<AdminPropertyRequestRow[]>('/property-requests/admin/deleted').then((r) => r.data),
+
+  removeAsAdmin: (id: string) => apiClient.delete<void>(`/property-requests/admin/${id}`).then(() => undefined),
 };

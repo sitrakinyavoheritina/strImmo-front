@@ -1,6 +1,6 @@
 // Aligné 1:1 sur strImmo/src/notifications/entities/notification.entity.ts — même contrat que
 // mobile (Onina-mobile/src/features/notifications/types/notification.types.ts).
-export type NotificationKind = 'listing_rejected' | 'listing_approved' | 'new_message' | 'other';
+export type NotificationKind = 'listing_rejected' | 'listing_approved' | 'new_message' | 'request_match' | 'other';
 
 export type AppNotification = {
   id: string;

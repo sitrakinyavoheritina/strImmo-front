@@ -12,3 +12,14 @@ export function useProperties(filters?: PropertyFilters, options?: { enabled?: b
     placeholderData: keepPreviousData,
   });
 }
+
+// Réservé admin/superadmin (voir app/admin/annonces, onglet "Supprimées") — le backend renvoie
+// 403 sinon, d'où `enabled` à passer explicitement par l'appelant plutôt que de partir d'une
+// valeur par défaut (même garde que usePropertyStats).
+export function useDeletedProperties(options?: { enabled?: boolean }) {
+  return useQuery({
+    queryKey: ['properties', 'deleted'],
+    queryFn: () => listingService.listDeleted(),
+    enabled: options?.enabled,
+  });
+}

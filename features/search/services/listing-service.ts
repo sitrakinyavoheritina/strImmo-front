@@ -23,4 +23,6 @@ export const listingService = {
   reject: (id: string, reason: string) => propertyApi.reject(id, reason).then(mapApiPropertyToProperty),
 
   getStats: () => propertyApi.getStats(),
+
+  listDeleted: () => propertyApi.listDeleted(),
 };

@@ -76,3 +76,24 @@ export type PublicPropertyRequestFilters = {
   propertyType?: PropertyType;
   communeId?: string;
 };
+
+// Miroir de AdminPropertyRequestRow (strImmo/src/property-requests/property-requests.service.ts)
+// — vue admin uniquement (GET /property-requests/admin/all) : toutes les demandes, publiques ou
+// non, avec les coordonnées de l'auteur pour modérer, jamais exposées sur le tableau public
+// anonyme (voir PublicBoardCard).
+export type AdminPropertyRequestRow = {
+  id: string;
+  kind: ListingKind;
+  propertyType?: PropertyType;
+  communeName?: string;
+  fokontanyName?: string;
+  minBudget?: number;
+  maxBudget?: number;
+  isPublic: boolean;
+  createdAt: string;
+  deletedAt?: string;
+  rawDescription?: string;
+  authorPhone: string;
+  authorName: string;
+  reportCount: number;
+};

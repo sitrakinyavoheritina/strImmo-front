@@ -14,6 +14,7 @@ const MINE_KEY = ['property-requests', 'mine'];
 // usePublicPropertyRequests) — un create/toggle/delete peut changer ce qui y apparaît, donc toutes
 // les variantes doivent être invalidées, pas juste celle actuellement affichée.
 const PUBLIC_KEY_PREFIX = ['property-requests', 'public'];
+const ADMIN_KEY = ['property-requests', 'admin'];
 
 export function useMyPropertyRequests(enabled: boolean) {
   return useQuery({
@@ -94,5 +95,32 @@ export function useReportPropertyRequest() {
   return useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: PropertyRequestReportReason }) =>
       propertyRequestApi.report(id, reason),
+  });
+}
+
+// Vue admin (toutes les demandes, tous comptes) — voir app/admin/demandes/page.tsx.
+export function useAdminPropertyRequests(enabled: boolean) {
+  return useQuery({
+    queryKey: ADMIN_KEY,
+    queryFn: () => propertyRequestApi.listForAdmin(),
+    enabled,
+  });
+}
+
+// Vue admin : demandes supprimées uniquement (voir app/admin/demandes/page.tsx, onglet
+// "Supprimées").
+export function useAdminDeletedPropertyRequests(enabled: boolean) {
+  return useQuery({
+    queryKey: [...ADMIN_KEY, 'deleted'],
+    queryFn: () => propertyRequestApi.listDeletedForAdmin(),
+    enabled,
+  });
+}
+
+export function useAdminDeletePropertyRequest() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => propertyRequestApi.removeAsAdmin(id),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ADMIN_KEY }),
   });
 }

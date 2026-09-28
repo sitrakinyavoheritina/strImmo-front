@@ -28,6 +28,11 @@ import { InlineChatPanel } from '@/features/property-detail/components/inline-ch
 import { PropertyMap } from '@/features/property-detail/components/property-map';
 import { CardOptionsMenu } from '@/features/feed/components/card-options-menu';
 
+// Statistiques du propriétaire ("Statistiques de mon annonce") masquées pour le moment (demandé
+// explicitement) — un seul drapeau à repasser à true pour les réafficher, plutôt que de retirer le
+// composant et devoir tout réécrire plus tard (même pattern que AI_MODE_ENABLED côté demandes).
+const SHOW_OWNER_STATS = false;
+
 // `id` : identifiant réel de l'annonce, extrait côté serveur du segment d'URL (qui peut être un slug
 // SEO suivi de l'identifiant, voir lib/seo/slug.ts) — jamais lu depuis useParams ici.
 export function AnnonceClient({ id, initialProperty }: { id: string; initialProperty?: Property }) {
@@ -196,7 +201,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
                 className="!bg-brand-primary-soft !border-brand-primary/40 !text-brand-primary hover:!bg-brand-primary/20"
               >
                 <Pencil size={20} className="shrink-0" />
-                {t.listing.editListingTitle}
+                {t.listing.editButton}
               </Button>
             </Link>
           </div>
@@ -363,7 +368,9 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
                 seulement s'il a été renseigné (facultatif, contrairement à commission/caution). */}
             <PropertyFees values={property} t={t} publisherType={property.publisherType} className="mt-2" />
 
-            {userId === property.ownerId && !isAdminUser && <OwnerPropertyStats propertyId={property.id} />}
+            {SHOW_OWNER_STATS && userId === property.ownerId && !isAdminUser && (
+              <OwnerPropertyStats propertyId={property.id} />
+            )}
 
             {/* Motif de refus — visible par le propriétaire sur sa propre fiche, pas seulement
                 dans la liste "Mes Biens" (où c'était déjà affiché) : demandé explicitement pour

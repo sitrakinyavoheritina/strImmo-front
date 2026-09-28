@@ -181,3 +181,18 @@ export type PropertyFormValues = DistributiveOmit<
   Property,
   'id' | 'ownerId' | 'createdAt' | 'viewCount' | 'moderationStatus' | 'likesCount'
 >;
+
+// Miroir de la forme renvoyée par PropertiesService.findDeletedForAdmin (strImmo) — vue admin
+// uniquement (GET /properties/deleted), aperçu allégé, pas l'union complète `Property` (pas de
+// photos/détails par type chargés côté serveur pour cette liste).
+export type AdminDeletedProperty = {
+  id: string;
+  title: string;
+  location: string;
+  price: number;
+  kind: ListingKind;
+  propertyType: PropertyType;
+  deletedAt: string;
+  ownerName: string;
+  ownerPhone: string;
+};

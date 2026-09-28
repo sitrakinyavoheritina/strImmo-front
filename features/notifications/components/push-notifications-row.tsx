@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { BellRing } from 'lucide-react';
+import { AlertCircle, BellRing } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { usePushNotifications } from '../hooks/use-push-notifications';
 
@@ -60,7 +60,10 @@ export function PushNotificationsRow() {
         </button>
       </div>
       {(permission === 'denied' || message) && (
-        <p className="text-[0.85rem] text-danger mt-1">{message ?? t.profile.pushDenied}</p>
+        <div className="flex items-start gap-1.5 mt-2 bg-danger/10 border border-danger/20 rounded-lg p-2.5">
+          <AlertCircle size={14} className="text-danger shrink-0 mt-0.5" />
+          <p className="text-[0.85rem] text-danger">{message ?? t.profile.pushDenied}</p>
+        </div>
       )}
     </div>
   );
