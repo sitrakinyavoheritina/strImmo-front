@@ -13,7 +13,11 @@ BRANCH="${BRANCH:-main}"
 PM2_NAME="${PM2_NAME:-onina-web}"
 PORT="${PORT:-3002}"
 
-env_value() { grep -hE "^$1=" .env.production.local .env.local 2>/dev/null | head -n1 | cut -d= -f2- | tr -d '\r'; }
+# `|| true` final : sans ça, un nom de variable absent des deux fichiers fait échouer `grep`
+# (code 1, "aucune correspondance") et, avec `pipefail`, toute la fonction — `set -e` arrête alors
+# le script sur-le-champ à l'appel de `env_value`, avant même d'atteindre les messages d'erreur
+# `✘`/`⚠` prévus juste après pour ce cas précis, qui ne s'affichaient donc jamais.
+env_value() { grep -hE "^$1=" .env.production.local .env.local 2>/dev/null | head -n1 | cut -d= -f2- | tr -d '\r' || true; }
 
 echo "==> 1/5  Vérification de l'environnement de build"
 API_URL="$(env_value NEXT_PUBLIC_API_URL)"
