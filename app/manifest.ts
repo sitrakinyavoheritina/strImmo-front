@@ -7,9 +7,13 @@ import type { MetadataRoute } from 'next';
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: '/',
-    name: 'Onina.mg - L’immobilier à Madagascar',
+    // Nom volontairement court : c'est ce texte que l'OS affiche sous l'icône sur sa propre
+    // "splash screen" générée du manifest (avant que components/layout/splash-screen.tsx ne prenne
+    // le relais) — une phrase entière y rendait ce premier écran très différent du second (juste le
+    // logo + le slogan), d'où l'impression de deux écrans de démarrage disparates.
+    name: 'Onina',
     short_name: 'Onina',
-    description: "L’immobilier à Madagascar. Trouvez. Fondez. Habitez.",
+    description: "Relier l’immobilier à Madagascar. Trouvez. Fondez. Habitez.",
     start_url: '/',
     scope: '/',
     display: 'standalone',

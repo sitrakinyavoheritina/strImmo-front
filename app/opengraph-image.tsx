@@ -3,7 +3,7 @@ import { join } from 'path';
 import { ImageResponse } from 'next/og';
 import { SITE_TAGLINE } from '@/lib/seo/site';
 
-export const alt = 'Onina — L’immobilier à Madagascar';
+export const alt = 'Onina — Relier l’immobilier à Madagascar';
 export const size = { width: 1200, height: 630 };
 export const contentType = 'image/png';
 
@@ -27,7 +27,7 @@ export default function OpengraphImage() {
         }}
       >
         <img src={logoDataUri} alt="" width={556} height={334} />
-        <div style={{ fontSize: 54, fontWeight: 700, color: '#5B291B' }}>L’immobilier à Madagascar</div>
+        <div style={{ fontSize: 54, fontWeight: 700, color: '#5B291B' }}>Relier l’immobilier à Madagascar</div>
         <div style={{ fontSize: 36, fontWeight: 600, color: '#C74F2D' }}>{SITE_TAGLINE}</div>
       </div>
     ),

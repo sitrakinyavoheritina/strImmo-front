@@ -2,14 +2,22 @@
 
 import { useEffect, useState } from 'react';
 import { useIsStandalone } from '@/lib/pwa/use-is-standalone';
+import { SITE_TAGLINE } from '@/lib/seo/site';
 
 const SEEN_KEY = 'onina_splash_seen';
 const VISIBLE_MS = 1300;
 const FADE_MS = 400;
+// Doit rester identique à `background_color` dans app/manifest.ts (et --color-surface-app en
+// clair) : c'est ce fond-là que l'OS affiche pendant sa propre "splash screen" générée du manifest
+// juste avant que cet écran ne prenne le relais — un fond différent (l'ancien public/splash.svg
+// avait le sien, légèrement décalé, #F2E7CB) créait un flash visible entre les deux.
+const BACKGROUND = '#f3e8d2';
 
-/** Écran de démarrage (public/splash.svg) affiché au lancement de l'app installée (PWA) — une fois
- * par session, jamais dans un onglet de navigateur ni à chaque changement de page. Fond de la même
- * couleur que le SVG pour qu'il n'y ait aucune bordure visible quel que soit le format d'écran. */
+/** Écran de démarrage affiché au lancement de l'app installée (PWA), juste après celui que l'OS
+ * génère lui-même à partir du manifest (icône + nom sur `background_color`) — une fois par
+ * session, jamais dans un onglet de navigateur ni à chaque changement de page. Même logo
+ * (public/logo.svg) et même fond que ce premier écran pour enchaîner les deux sans rupture
+ * visible, avec le slogan de la marque en plus, dévoilé juste après le logo. */
 export function SplashScreen() {
   const isStandalone = useIsStandalone();
   const [phase, setPhase] = useState<'hidden' | 'visible' | 'fading'>('hidden');
@@ -37,13 +45,24 @@ export function SplashScreen() {
   return (
     <div
       aria-hidden="true"
-      className={`fixed inset-0 z-[100] flex items-center justify-center bg-[#F2E7CB] transition-opacity ${
+      className={`fixed inset-0 z-[100] flex flex-col items-center justify-center gap-4 transition-opacity ${
         phase === 'fading' ? 'opacity-0' : 'opacity-100'
       }`}
-      style={{ transitionDuration: `${FADE_MS}ms` }}
+      style={{ backgroundColor: BACKGROUND, transitionDuration: `${FADE_MS}ms` }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- SVG statique local, aucune optimisation utile */}
-      <img src="/splash.svg" alt="" className="h-full w-full object-contain" />
+      <img
+        src="/logo.svg"
+        alt=""
+        className="w-36 sm:w-44 h-auto"
+        style={{ animation: 'splash-logo-in 500ms ease-out both' }}
+      />
+      <p
+        className="text-[13px] sm:text-sm font-semibold tracking-wide text-brand-secondary-text"
+        style={{ animation: 'splash-text-in 500ms ease-out 180ms both' }}
+      >
+        {SITE_TAGLINE}
+      </p>
     </div>
   );
 }

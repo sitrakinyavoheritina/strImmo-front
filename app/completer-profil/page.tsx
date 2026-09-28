@@ -3,7 +3,7 @@
 import { getPhoneNotVerified } from '@/features/auth/utils/phone-not-verified';
 import { usePhoneVerificationRedirect } from '@/features/auth/hooks/use-phone-verification-redirect';
 import { markWelcomePending } from '@/lib/auth/welcome-flag';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Home, Key, Handshake, Building2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
@@ -54,12 +54,17 @@ export default function CompleterProfilPage() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  // `goToVerification()` (voir plus bas) ferme la session Google en cours avant de partir vers
+  // l'écran du code — ça fait passer `isAuthenticated` à `false` et déclenchait à tort la garde
+  // juste en dessous, qui renvoyait vers /connexion en même temps, écrasant la navigation voulue
+  // vers /verification-telephone. Ce drapeau la fait ignorer cette sortie volontaire.
+  const leavingForVerification = useRef(false);
 
   // Rien à faire ici pour un compte déjà complet (téléphone déjà renseigné) ou pas connecté —
   // même garde par `useEffect` + `hasHydrated` que les autres pages authentifiées (voir
   // app/profil/modifier/page.tsx), pour ne pas rediriger à tort le temps de la réhydratation.
   useEffect(() => {
-    if (!hasHydrated) return;
+    if (!hasHydrated || leavingForVerification.current) return;
     if (!isAuthenticated) {
       router.replace('/connexion');
       return;
@@ -114,6 +119,7 @@ export default function CompleterProfilPage() {
       // l'écran du code (le compte est bien créé).
       const notVerified = getPhoneNotVerified(error);
       if (notVerified) {
+        leavingForVerification.current = true;
         goToVerification(notVerified, true);
         return;
       }

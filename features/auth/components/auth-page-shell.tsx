@@ -24,7 +24,7 @@ export function AuthPageShell({
           {/* eslint-disable-next-line @next/next/no-img-element -- logo décoratif (SVG statique dans /public) */}
           <img src="/logo.svg" alt="Onina" className="h-9 sm:h-12 w-auto mx-auto" />
         </Link>
-        {/* Slogan de marque sous le logo : "L'immobilier à Madagascar" + "Trouvez. Fondez. Habitez." */}
+        {/* Slogan de marque sous le logo : "Relier l'immobilier à Madagascar" + "Trouvez. Fondez. Habitez." */}
         <p className="text-[12px] sm:text-[0.85rem] font-semibold text-brand-primary mb-1 sm:mb-2">
           {t.hero.title} · {t.hero.subtitle}
         </p>

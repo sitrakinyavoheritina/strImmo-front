@@ -718,7 +718,7 @@ const translations = {
       saveChanges: 'Enregistrer',
     },
     hero: {
-      title: 'L’immobilier à Madagascar',
+      title: 'Relier l’immobilier à Madagascar',
       subtitle: 'Trouvez. Fondez. Habitez.',
       rent: 'Louer',
       buy: 'Acheter',
@@ -1627,7 +1627,7 @@ const translations = {
       saveChanges: 'Tahirizo',
     },
     hero: {
-      title: 'L’immobilier à Madagascar',
+      title: 'Relier l’immobilier à Madagascar',
       subtitle: 'Trouvez. Fondez. Habitez.',
       rent: 'Hanofa',
       buy: 'Hividy',
