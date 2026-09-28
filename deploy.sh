@@ -13,17 +13,23 @@ BRANCH="${BRANCH:-main}"
 PM2_NAME="${PM2_NAME:-onina-web}"
 PORT="${PORT:-3002}"
 
-# `|| true` final : sans ça, un nom de variable absent des deux fichiers fait échouer `grep`
+# Liste de fichiers dans le même ordre de priorité que Next.js lui-même pour un build de
+# production ("Environment Variable Load Order" : .env.production.local > .env.local >
+# .env.production > .env) — sinon cette vérification peut regarder au mauvais endroit et crier à
+# une variable "absente" alors que Next.js la trouverait très bien au build (ex. un `.env` seul en
+# production, sans .env.production.local). `head -n1` prend donc la première valeur trouvée dans
+# CET ordre, comme le ferait réellement Next.js.
+# `|| true` final : sans ça, un nom de variable absent de tous ces fichiers fait échouer `grep`
 # (code 1, "aucune correspondance") et, avec `pipefail`, toute la fonction — `set -e` arrête alors
 # le script sur-le-champ à l'appel de `env_value`, avant même d'atteindre les messages d'erreur
 # `✘`/`⚠` prévus juste après pour ce cas précis, qui ne s'affichaient donc jamais.
-env_value() { grep -hE "^$1=" .env.production.local .env.local 2>/dev/null | head -n1 | cut -d= -f2- | tr -d '\r' || true; }
+env_value() { grep -hE "^$1=" .env.production.local .env.local .env.production .env 2>/dev/null | head -n1 | cut -d= -f2- | tr -d '\r' || true; }
 
 echo "==> 1/5  Vérification de l'environnement de build"
 API_URL="$(env_value NEXT_PUBLIC_API_URL)"
-[ -n "$API_URL" ] || { echo "✘ NEXT_PUBLIC_API_URL absent de .env.production.local"; exit 1; }
+[ -n "$API_URL" ] || { echo "✘ NEXT_PUBLIC_API_URL absent de .env.production.local/.env.local/.env.production/.env"; exit 1; }
 for name in NEXT_PUBLIC_GA_MEASUREMENT_ID NEXT_PUBLIC_SITE_URL; do
-  [ -n "$(env_value $name)" ] || echo "    ⚠ $name non défini dans .env.production.local"
+  [ -n "$(env_value $name)" ] || echo "    ⚠ $name non défini (.env.production.local/.env.local/.env.production/.env)"
 done
 # Le build interroge l'API : s'il ne répond pas, les pages SEO seraient générées vides.
 curl -fsS -m 10 -o /dev/null "$API_URL/properties/sitemap" \
