@@ -84,7 +84,7 @@ export function MyPropertyCard({ property }: { property: Property }) {
         aria-label={t.listing.editListingTitle}
         className="shrink-0 p-2 text-content-muted hover:text-brand-primary transition"
       >
-        <Pencil size={17} />
+        <Pencil size={20} />
       </Link>
       <button
         type="button"
@@ -92,7 +92,7 @@ export function MyPropertyCard({ property }: { property: Property }) {
         aria-label={t.myPropertiesPage.delete}
         className="shrink-0 p-2 text-content-muted hover:text-danger transition"
       >
-        <Trash2 size={18} />
+        <Trash2 size={20} />
       </button>
     </div>
   );

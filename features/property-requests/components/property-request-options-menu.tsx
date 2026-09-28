@@ -53,7 +53,7 @@ export function PropertyRequestOptionsMenu({ requestId }: { requestId: string })
         aria-expanded={isOpen}
         className="text-content-muted hover:text-content-main transition shrink-0"
       >
-        <MoreHorizontal size={18} />
+        <MoreHorizontal size={20} />
       </button>
 
       {isOpen && (
@@ -82,7 +82,7 @@ export function PropertyRequestOptionsMenu({ requestId }: { requestId: string })
                 onClick={handleReportClick}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-danger hover:bg-danger/10 transition disabled:opacity-60 disabled:cursor-default"
               >
-                {isReported ? <Check size={15} /> : <Flag size={15} />}
+                {isReported ? <Check size={20} /> : <Flag size={20} />}
                 {isReported ? t.propertyRequestsPage.menuReported : t.propertyRequestsPage.menuReport}
               </button>
             )}

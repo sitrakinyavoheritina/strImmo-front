@@ -98,7 +98,7 @@ export default function ModifierAnnoncePage() {
         href={`/annonce/${id}`}
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-content-muted hover:text-content-main mb-3"
       >
-        <ArrowLeft size={16} />
+        <ArrowLeft size={20} />
         {t.propertyDetail.back}
       </Link>
 

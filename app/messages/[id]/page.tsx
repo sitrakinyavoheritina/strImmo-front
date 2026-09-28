@@ -209,7 +209,7 @@ export default function ConversationPage() {
           aria-label={t.messages.title}
           className="lg:hidden text-content-muted hover:text-content-main transition -ml-1 p-1"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={20} />
         </button>
         <Avatar name={conversation?.participantName ?? '?'} imageUrl={conversation?.participantAvatarUrl} size={32} />
         <span className="font-bold text-content-main truncate">
@@ -277,7 +277,7 @@ export default function ConversationPage() {
           title={t.messages.attachPhoto}
           className="shrink-0 w-10 h-10 rounded-full border border-stroke-default flex items-center justify-center text-content-muted hover:text-content-main transition disabled:opacity-40"
         >
-          <ImagePlus size={16} />
+          <ImagePlus size={20} />
         </button>
         <input
           value={draft}
@@ -294,7 +294,7 @@ export default function ConversationPage() {
           disabled={!draft.trim() || isPending}
           className="shrink-0 w-10 h-10 rounded-full bg-brand-primary text-white flex items-center justify-center disabled:opacity-40 transition"
         >
-          <Send size={16} />
+          <Send size={20} />
         </button>
       </div>
     </>

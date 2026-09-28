@@ -49,7 +49,7 @@ export default function AdminActusPage() {
         <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text">{t.adminNewsPage.manageTitle}</h1>
         <Link href="/admin/actus/nouveau">
           <Button size="sm">
-            <Plus size={16} />
+            <Plus size={20} />
             {t.adminNewsPage.newArticle}
           </Button>
         </Link>
@@ -76,7 +76,7 @@ export default function AdminActusPage() {
                 aria-label={t.adminNewsPage.editArticle}
                 className="w-8 h-8 rounded-full flex items-center justify-center text-content-muted hover:text-brand-primary hover:bg-surface-app transition shrink-0"
               >
-                <Pencil size={15} />
+                <Pencil size={20} />
               </Link>
               {pendingDeleteId === article.id ? (
                 <div className="flex items-center gap-1.5 text-[0.85rem] font-semibold shrink-0">
@@ -99,7 +99,7 @@ export default function AdminActusPage() {
                   aria-label={t.adminNewsPage.deleteArticle}
                   className="w-8 h-8 rounded-full flex items-center justify-center text-content-muted hover:text-danger hover:bg-surface-app transition shrink-0"
                 >
-                  <Trash2 size={15} />
+                  <Trash2 size={20} />
                 </button>
               )}
             </div>

@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Home, Search as SearchIcon } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ClipboardList, Home } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 
@@ -12,7 +12,8 @@ import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 // parcours, /demandes/nouvelle). Une explication en malgache est affichée sous chaque carte, en
 // plus du français — remonté explicitement après un test où le français seul n'était pas assez
 // clair pour certains utilisateurs, exception au principe habituel d'un seul texte selon la
-// langue choisie (bouton FR/MG en haut).
+// langue choisie (bouton FR/MG en haut) — mise en avant dans son propre encadré coloré, en texte
+// de taille normale (pas une petite note en bas de carte), pour qu'elle se voie vraiment.
 export default function PublierPage() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -27,37 +28,59 @@ export default function PublierPage() {
 
   return (
     <div className="max-w-xl mx-auto px-3 sm:px-6 py-6 sm:py-10">
-      <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text text-center mb-6">
+      <button
+        type="button"
+        onClick={() => router.back()}
+        className="inline-flex items-center gap-1 text-sm font-semibold text-content-muted hover:text-content-main mb-4"
+      >
+        <ArrowLeft size={20} />
+        {t.listing.back}
+      </button>
+
+      <h1 className="text-xl sm:text-2xl font-extrabold text-brand-secondary-text text-center">
         {t.publishChoicePage.title}
       </h1>
+      <p className="text-sm text-content-muted text-center mt-1.5">{t.publishChoicePage.subtitle}</p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-7">
         <Link
           href="/annonce/nouvelle"
-          className="text-left bg-surface-card border border-stroke-default/80 rounded-2xl p-4 hover:border-brand-primary hover:shadow-sm transition"
+          className="group text-left bg-surface-card border-2 border-stroke-default/80 rounded-2xl p-5 hover:border-brand-primary hover:shadow-lg transition-all"
         >
-          <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-brand-primary-soft text-brand-primary mb-2.5">
-            <Home size={20} />
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-primary-soft text-brand-primary mb-3.5">
+            <Home size={26} />
           </span>
-          <p className="font-semibold text-content-main text-sm">{t.publishChoicePage.offerTitle}</p>
-          <p className="text-[0.85rem] text-content-muted mt-0.5">{t.publishChoicePage.offerSubtitle}</p>
-          <p className="text-[0.8rem] text-content-muted mt-2 italic border-t border-stroke-default/60 pt-2">
+          <p className="font-bold text-content-main text-base">{t.publishChoicePage.offerTitle}</p>
+          <p className="text-sm text-content-muted mt-1">{t.publishChoicePage.offerSubtitle}</p>
+
+          <p className="mt-3.5 rounded-xl bg-surface-app px-3 py-2.5 text-sm text-content-main">
             {t.publishChoicePage.offerExplanationMg}
           </p>
+
+          <span className="mt-3.5 flex items-center justify-between text-[0.85rem] font-semibold text-brand-primary">
+            {t.publishChoicePage.choose}
+            <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+          </span>
         </Link>
 
         <Link
           href="/demandes/nouvelle"
-          className="text-left bg-surface-card border border-stroke-default/80 rounded-2xl p-4 hover:border-brand-primary hover:shadow-sm transition"
+          className="group text-left bg-surface-card border-2 border-stroke-default/80 rounded-2xl p-5 hover:border-brand-primary hover:shadow-lg transition-all"
         >
-          <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-brand-primary-soft text-brand-primary mb-2.5">
-            <SearchIcon size={20} />
+          <span className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-primary-soft text-brand-primary mb-3.5">
+            <ClipboardList size={26} />
           </span>
-          <p className="font-semibold text-content-main text-sm">{t.publishChoicePage.demandTitle}</p>
-          <p className="text-[0.85rem] text-content-muted mt-0.5">{t.publishChoicePage.demandSubtitle}</p>
-          <p className="text-[0.8rem] text-content-muted mt-2 italic border-t border-stroke-default/60 pt-2">
+          <p className="font-bold text-content-main text-base">{t.publishChoicePage.demandTitle}</p>
+          <p className="text-sm text-content-muted mt-1">{t.publishChoicePage.demandSubtitle}</p>
+
+          <p className="mt-3.5 rounded-xl bg-surface-app px-3 py-2.5 text-sm text-content-main">
             {t.publishChoicePage.demandExplanationMg}
           </p>
+
+          <span className="mt-3.5 flex items-center justify-between text-[0.85rem] font-semibold text-brand-primary">
+            {t.publishChoicePage.choose}
+            <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
+          </span>
         </Link>
       </div>
     </div>

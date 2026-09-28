@@ -29,7 +29,7 @@ export function MobileNavStrip() {
   const navItems = getNavItems(isAdmin(user));
 
   return (
-    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 flex items-stretch bg-surface-card border-t border-stroke-default pb-[var(--safe-bottom)]">
+    <nav className="lg:hidden fixed bottom-0 inset-x-0 z-40 flex items-stretch gap-1 px-1 bg-surface-card border-t border-stroke-default pb-[var(--safe-bottom)]">
       {navItems.map(({ href, icon: Icon, labelKey }) => {
         const isActive = isNavItemActive(pathname, href);
         return (
@@ -40,7 +40,7 @@ export function MobileNavStrip() {
             className="relative flex-1 flex items-center justify-center py-1.5 min-h-12 transition active:bg-surface-app"
           >
             <span
-              className={`flex flex-col items-center gap-0.5 px-3.5 py-1 rounded-2xl transition ${
+              className={`flex flex-col items-center gap-0.5 px-1.5 py-1 rounded-2xl transition ${
                 isActive ? 'bg-brand-primary-soft' : ''
               }`}
             >
@@ -55,7 +55,7 @@ export function MobileNavStrip() {
                 className={isActive ? 'text-brand-primary' : 'text-content-muted'}
               />
               <span
-                className={`text-[10px] leading-none ${
+                className={`text-[11px] leading-none whitespace-nowrap ${
                   isActive ? 'font-bold text-brand-primary' : 'font-medium text-content-main'
                 }`}
               >

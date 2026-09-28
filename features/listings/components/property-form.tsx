@@ -642,7 +642,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
                   aria-label={t.listing.editTitle}
                   className="text-content-muted hover:text-brand-primary transition"
                 >
-                  <Pencil size={13} />
+                  <Pencil size={20} />
                 </button>
               )}
             </div>

@@ -111,7 +111,7 @@ export function MobileSearchPanel({
         />
         {(filters.location || Object.keys(filters).length > 0) && (
           <button type="button" onClick={reset} aria-label={t.search.reset} className="shrink-0 text-content-muted">
-            <X size={18} />
+            <X size={20} />
           </button>
         )}
       </div>
@@ -143,7 +143,7 @@ export function MobileSearchPanel({
               aria-label={t.search.moreFilters}
               className="shrink-0 flex items-center justify-center w-9 h-9 rounded-full border border-stroke-default bg-surface-card text-brand-primary shadow-sm"
             >
-              <SlidersHorizontal size={16} />
+              <SlidersHorizontal size={20} />
             </button>
           </div>
         </div>
@@ -232,7 +232,7 @@ export function MobileSearchPanel({
               onClick={() => setIsFilterModalOpen(true)}
               className="flex items-center gap-1 text-sm font-bold text-brand-primary"
             >
-              <SlidersHorizontal size={14} />
+              <SlidersHorizontal size={20} />
               {t.search.moreFilters}
             </button>
           </div>

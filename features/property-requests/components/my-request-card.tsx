@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { filtersToSearchParams } from '@/features/search/utils/filters-query';
 import { useDeletePropertyRequest, useUpdatePropertyRequestVisibility } from '../hooks/use-property-requests';
-import { requestSentence } from '../utils/request-summary';
+import { requestCriteriaLabels, requestSentence, requestTitle } from '../utils/request-summary';
 import type { PropertyRequest } from '../types/property-request.types';
 
 /** Carte d'une de MES demandes — utilisée sur /demandes (onglet "Mes demandes") et sur
@@ -14,6 +14,7 @@ export function MyRequestCard({ request }: { request: PropertyRequest }) {
   const { t, locale } = useTranslation();
   const { mutate: updateVisibility, isPending: isTogglingVisibility } = useUpdatePropertyRequestVisibility();
   const { mutate: remove, isPending: isDeleting } = useDeletePropertyRequest();
+  const criteriaLabels = requestCriteriaLabels(request, t);
 
   const resultsHref = `/recherche?${filtersToSearchParams({
     kind: request.kind,
@@ -27,7 +28,20 @@ export function MyRequestCard({ request }: { request: PropertyRequest }) {
     <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-3">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <p className="text-sm text-content-main whitespace-pre-line">{requestSentence(request, locale)}</p>
+          <p className="text-sm font-bold text-brand-secondary-text">{requestTitle(request, locale)}</p>
+          <p className="text-sm text-content-main whitespace-pre-line mt-0.5">{requestSentence(request, locale)}</p>
+          {criteriaLabels.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {criteriaLabels.map((label) => (
+                <span
+                  key={label}
+                  className="text-[11px] font-semibold px-2 py-0.5 rounded-full bg-surface-app text-content-muted border border-stroke-default"
+                >
+                  {label}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
         <span
           className={`shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${

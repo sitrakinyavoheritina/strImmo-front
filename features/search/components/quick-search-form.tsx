@@ -100,14 +100,14 @@ export function QuickSearchForm() {
               aria-label={t.search.advancedFilters}
               className="relative shrink-0 flex items-center justify-center w-9 h-9 rounded-xl border border-stroke-default text-content-muted hover:border-brand-primary hover:text-brand-primary transition"
             >
-              <SlidersHorizontal size={16} />
+              <SlidersHorizontal size={20} />
               {hasActiveAdvancedFilters(filters) && (
                 <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-brand-secondary" />
               )}
             </button>
 
             <Button type="submit" size="sm" aria-label={t.search.apply} className="whitespace-nowrap">
-              <Search size={16} />
+              <Search size={20} />
               {t.search.apply}
             </Button>
           </div>

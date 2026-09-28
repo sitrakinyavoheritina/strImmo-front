@@ -36,7 +36,7 @@ export function FileInput({
           <img src={previewUrl} alt="" className="w-9 h-9 rounded-lg object-cover shrink-0" />
         ) : (
           <span className="w-9 h-9 rounded-lg bg-stroke-default flex items-center justify-center shrink-0 text-content-muted">
-            <Upload size={16} />
+            <Upload size={20} />
           </span>
         )}
         <span className="flex-1 min-w-0 truncate text-content-main">

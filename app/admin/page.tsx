@@ -91,52 +91,52 @@ export default function AdminDashboardPage() {
                 : t.adminDashboard.noPending}
             </p>
           </div>
-          <ArrowRight size={18} className="shrink-0 text-brand-primary" />
+          <ArrowRight size={20} className="shrink-0 text-brand-primary" />
         </Link>
 
         <Link
           href="/admin/annonces"
           className="mt-2 flex items-center gap-3 bg-surface-card border border-stroke-default/80 rounded-xl p-4 hover:border-brand-primary/40 transition"
         >
-          <List size={18} className="shrink-0 text-brand-primary" />
+          <List size={20} className="shrink-0 text-brand-primary" />
           <p className="font-semibold text-content-main flex-1">{t.adminDashboard.allListingsCta}</p>
-          <ArrowRight size={18} className="shrink-0 text-content-muted" />
+          <ArrowRight size={20} className="shrink-0 text-content-muted" />
         </Link>
 
         <Link
           href="/admin/utilisateurs"
           className="mt-2 flex items-center gap-3 bg-surface-card border border-stroke-default/80 rounded-xl p-4 hover:border-brand-primary/40 transition"
         >
-          <Users size={18} className="shrink-0 text-brand-primary" />
+          <Users size={20} className="shrink-0 text-brand-primary" />
           <p className="font-semibold text-content-main flex-1">{t.adminDashboard.usersCta}</p>
-          <ArrowRight size={18} className="shrink-0 text-content-muted" />
+          <ArrowRight size={20} className="shrink-0 text-content-muted" />
         </Link>
 
         <Link
           href="/admin/signalements"
           className="mt-2 flex items-center gap-3 bg-surface-card border border-stroke-default/80 rounded-xl p-4 hover:border-brand-primary/40 transition"
         >
-          <Flag size={18} className="shrink-0 text-danger" />
+          <Flag size={20} className="shrink-0 text-danger" />
           <p className="font-semibold text-content-main flex-1">{t.adminDashboard.reportsCta}</p>
-          <ArrowRight size={18} className="shrink-0 text-content-muted" />
+          <ArrowRight size={20} className="shrink-0 text-content-muted" />
         </Link>
 
         <Link
           href="/admin/journal-erreurs"
           className="mt-2 flex items-center gap-3 bg-surface-card border border-stroke-default/80 rounded-xl p-4 hover:border-brand-primary/40 transition"
         >
-          <Bug size={18} className="shrink-0 text-brand-primary" />
+          <Bug size={20} className="shrink-0 text-brand-primary" />
           <p className="font-semibold text-content-main flex-1">{t.adminDashboard.errorLogsCta}</p>
-          <ArrowRight size={18} className="shrink-0 text-content-muted" />
+          <ArrowRight size={20} className="shrink-0 text-content-muted" />
         </Link>
 
         <Link
           href="/admin/supprimer-bien"
           className="mt-2 flex items-center gap-3 bg-surface-card border border-stroke-default/80 rounded-xl p-4 hover:border-brand-primary/40 transition"
         >
-          <Trash2 size={18} className="shrink-0 text-danger" />
+          <Trash2 size={20} className="shrink-0 text-danger" />
           <p className="font-semibold text-content-main flex-1">{t.adminDashboard.deleteListingCta}</p>
-          <ArrowRight size={18} className="shrink-0 text-content-muted" />
+          <ArrowRight size={20} className="shrink-0 text-content-muted" />
         </Link>
 
         {/* Annonces par mois — barres proportionnelles au mois le plus chargé, pas de librairie de

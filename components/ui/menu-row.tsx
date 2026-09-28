@@ -23,10 +23,10 @@ export function MenuRow({
 }) {
   const content = (
     <>
-      <Icon size={18} />
+      <Icon size={20} />
       <span className="flex-1 text-left">{label}</span>
       {badge && <span className="text-[0.85rem] text-content-muted">{badge}</span>}
-      {href && !disabled && <ChevronRight size={16} className="text-content-muted" />}
+      {href && !disabled && <ChevronRight size={20} className="text-content-muted" />}
     </>
   );
   const className = `w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition ${

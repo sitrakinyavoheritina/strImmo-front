@@ -36,7 +36,7 @@ export function EditableRow({
             aria-label={editLabel}
             className="text-content-muted hover:text-brand-primary transition p-0.5 -m-0.5"
           >
-            <Pencil size={13} />
+            <Pencil size={20} />
           </button>
         )}
       </div>

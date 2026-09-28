@@ -107,7 +107,7 @@ export function PendingPropertyCard({ property }: { property: Property }) {
           aria-label={t.validationPage.approve}
           className="p-2 rounded-lg bg-brand-primary/10 text-brand-primary hover:bg-brand-primary/20 transition disabled:opacity-50"
         >
-          <Check size={16} />
+          <Check size={20} />
         </button>
         <button
           type="button"
@@ -115,7 +115,7 @@ export function PendingPropertyCard({ property }: { property: Property }) {
           aria-label={t.validationPage.reject}
           className="p-2 rounded-lg bg-danger/10 text-danger hover:bg-danger/20 transition"
         >
-          <X size={16} />
+          <X size={20} />
         </button>
       </div>
     </div>

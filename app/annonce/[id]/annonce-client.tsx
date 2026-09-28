@@ -173,7 +173,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
           onClick={() => router.back()}
           className="inline-flex items-center gap-1 text-sm font-semibold text-content-muted hover:text-content-main"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={20} />
           {t.propertyDetail.back}
         </button>
         {userId === property.ownerId && !isAdminUser && (
@@ -185,7 +185,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
               onClick={() => setIsDeleteConfirming(true)}
               className="!bg-danger/10 !border-danger/40 !text-danger hover:!bg-danger/20"
             >
-              <Trash2 size={14} className="shrink-0" />
+              <Trash2 size={20} className="shrink-0" />
               {t.myPropertiesPage.delete}
             </Button>
             <Link href={`/annonce/${id}/modifier`}>
@@ -195,7 +195,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
                 variant="outline"
                 className="!bg-brand-primary-soft !border-brand-primary/40 !text-brand-primary hover:!bg-brand-primary/20"
               >
-                <Pencil size={14} className="shrink-0" />
+                <Pencil size={20} className="shrink-0" />
                 {t.listing.editListingTitle}
               </Button>
             </Link>
@@ -247,7 +247,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
                   aria-pressed={isLiked}
                   className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition"
                 >
-                  <Heart size={18} className={isLiked ? 'text-danger fill-danger' : 'text-content-muted'} />
+                  <Heart size={20} className={isLiked ? 'text-danger fill-danger' : 'text-content-muted'} />
                 </button>
                 <CardOptionsMenu
                   property={property}
@@ -311,7 +311,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
                   onClick={() => (isAuthenticated ? setManualChatOpen(true) : requireAuth())}
                   className="shrink-0 mt-2 w-full"
                 >
-                  <MessageCircle size={14} className="shrink-0" />
+                  <MessageCircle size={20} className="shrink-0" />
                   <span className="truncate">
                     {t.propertyDetail.chatWith} {property.authorName}
                   </span>
@@ -565,7 +565,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
               onClick={() => (isAuthenticated ? setManualChatOpen(true) : requireAuth())}
               className="w-full"
             >
-              <MessageCircle size={14} className="shrink-0" />
+              <MessageCircle size={20} className="shrink-0" />
               <span className="truncate">
                 {t.propertyDetail.chatWith} {property.authorName}
               </span>
@@ -631,7 +631,7 @@ function ContactActions({
     // le DOM pour un utilisateur qui ne peut de toute façon pas encore les utiliser.
     return (
       <Button type="button" size="sm" onClick={requireAuth} className="w-full">
-        <Phone size={14} className="shrink-0" />
+        <Phone size={20} className="shrink-0" />
         <span className="truncate">{contactLabel}</span>
       </Button>
     );
@@ -658,7 +658,7 @@ function ContactActions({
                 : 'bg-surface-app hover:bg-stroke-default border border-stroke-default text-content-main'
             }`}
           >
-            {isCopied ? <Check size={14} className="shrink-0" /> : <Copy size={14} className="shrink-0" />}
+            {isCopied ? <Check size={20} className="shrink-0" /> : <Copy size={20} className="shrink-0" />}
             <span className="truncate">{isCopied ? copiedLabel : number}</span>
           </button>
         );

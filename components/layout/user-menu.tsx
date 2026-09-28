@@ -54,7 +54,7 @@ export function UserMenu({ user }: { user: AuthUser }) {
       >
         <Avatar name={user.fullName} imageUrl={user.avatarUrl} size={32} />
         <span className="hidden lg:inline text-sm font-semibold text-content-main">{user.fullName}</span>
-        <ChevronDown size={14} className={`hidden lg:inline text-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown size={20} className={`hidden lg:inline text-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && (
@@ -74,7 +74,7 @@ export function UserMenu({ user }: { user: AuthUser }) {
                 onClick={() => setIsOpen(false)}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-content-main hover:bg-surface-app transition"
               >
-                <User size={15} />
+                <User size={20} />
                 {t.profile.viewProfile}
               </Link>
             )}
@@ -83,7 +83,7 @@ export function UserMenu({ user }: { user: AuthUser }) {
               onClick={handleLogout}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-danger hover:bg-danger/10 transition"
             >
-              <LogOut size={15} />
+              <LogOut size={20} />
               {t.profile.logout}
             </button>
 

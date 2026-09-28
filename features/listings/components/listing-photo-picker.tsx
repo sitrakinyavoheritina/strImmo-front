@@ -121,7 +121,7 @@ export function ListingPhotoPicker({ photos, onChange, min, max, showMinError = 
               aria-label={t.listing.removePhoto}
               className="absolute top-1 right-1 h-6 w-6 flex items-center justify-center rounded-full bg-surface-card/90 text-content-main"
             >
-              <X size={12} />
+              <X size={16} />
             </button>
           </div>
         ))}

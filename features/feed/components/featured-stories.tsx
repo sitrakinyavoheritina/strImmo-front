@@ -262,7 +262,7 @@ export function FeaturedStories({
         aria-label="Précédent"
         className="hidden sm:flex absolute left-1 top-1/2 -translate-y-1/2 items-center justify-center w-8 h-8 rounded-full bg-surface-card border border-stroke-default shadow-md text-content-main opacity-0 group-hover/rail:opacity-100 transition"
       >
-        <ChevronLeft size={16} />
+        <ChevronLeft size={20} />
       </button>
       <button
         type="button"
@@ -270,7 +270,7 @@ export function FeaturedStories({
         aria-label="Suivant"
         className="hidden sm:flex absolute right-1 top-1/2 -translate-y-1/2 items-center justify-center w-8 h-8 rounded-full bg-surface-card border border-stroke-default shadow-md text-content-main opacity-0 group-hover/rail:opacity-100 transition"
       >
-        <ChevronRight size={16} />
+        <ChevronRight size={20} />
       </button>
     </section>
   );

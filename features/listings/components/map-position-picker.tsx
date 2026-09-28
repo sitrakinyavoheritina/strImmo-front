@@ -147,7 +147,7 @@ export function MapPositionPicker({
           onClick={handleUseMyLocation}
           className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-surface-card border border-stroke-default rounded-lg px-2.5 py-1.5 text-[0.85rem] font-semibold text-content-main shadow-sm hover:border-brand-primary/60 transition"
         >
-          <Crosshair size={14} />
+          <Crosshair size={20} />
           {t.listing.useMyLocation}
         </button>
       </div>

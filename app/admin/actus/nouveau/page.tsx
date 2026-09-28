@@ -34,7 +34,7 @@ export default function NouvelArticlePage() {
         href="/admin/actus"
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-content-muted hover:text-content-main mb-3"
       >
-        <ArrowLeft size={16} />
+        <ArrowLeft size={20} />
         {t.adminNewsPage.manageTitle}
       </Link>
       <h1 className="text-lg font-bold text-brand-secondary-text mb-4">{t.adminNewsPage.newArticle}</h1>

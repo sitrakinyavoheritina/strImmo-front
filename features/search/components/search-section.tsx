@@ -133,7 +133,7 @@ export function SearchSection() {
               tab === 'search' ? 'bg-brand-secondary text-white' : 'text-content-muted hover:bg-surface-app'
             }`}
           >
-            <Search size={12} />
+            <Search size={16} />
             {t.search.searchTab}
           </button>
           <button
@@ -143,7 +143,7 @@ export function SearchSection() {
               tab === 'ai' ? 'bg-brand-secondary text-white' : 'text-content-muted hover:bg-surface-app'
             }`}
           >
-            <Sparkles size={12} />
+            <Sparkles size={16} />
             {t.search.aiTab}
           </button>
         </div>

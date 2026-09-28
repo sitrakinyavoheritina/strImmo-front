@@ -141,7 +141,7 @@ export default function ModifierProfilPage() {
         href="/profil"
         className="inline-flex items-center gap-1.5 text-sm font-semibold text-content-muted hover:text-content-main mb-4"
       >
-        <ArrowLeft size={16} />
+        <ArrowLeft size={20} />
         {t.profile.myAccount}
       </Link>
 
@@ -163,7 +163,7 @@ export default function ModifierProfilPage() {
               aria-label={t.profile.coverChange}
               className="absolute bottom-2 right-2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/55 flex items-center justify-center cursor-pointer transition"
             >
-              <Pencil size={14} className="text-white" />
+              <Pencil size={20} className="text-white" />
             </label>
             <input id={coverInputId} type="file" accept="image/*" className="sr-only" onChange={handleChangeCover} />
           </div>
@@ -176,7 +176,7 @@ export default function ModifierProfilPage() {
                 aria-label={t.profile.avatarChange}
                 className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-brand-primary border-2 border-surface-card flex items-center justify-center cursor-pointer hover:bg-brand-primary-hover transition"
               >
-                <Pencil size={14} className="text-white" />
+                <Pencil size={20} className="text-white" />
               </label>
               <input
                 id={avatarInputId}

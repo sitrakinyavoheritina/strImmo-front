@@ -74,7 +74,7 @@ export default function AdminUserDetailPage() {
           href="/admin/utilisateurs"
           className="inline-flex items-center gap-1 text-sm font-semibold text-content-muted hover:text-content-main"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={20} />
           {d.back}
         </Link>
 

@@ -61,7 +61,7 @@ function LogRow({ log }: { log: ErrorLogItem }) {
             onClick={() => setIsOpen((value) => !value)}
             className="mt-1.5 flex items-center gap-1 text-[0.85rem] font-semibold text-brand-primary hover:underline"
           >
-            {isOpen ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
             {t.adminErrorLogsPage.details}
           </button>
           {isOpen && (
@@ -132,7 +132,7 @@ export default function AdminErrorLogsPage() {
             className="flex-1 min-w-0 rounded-xl border border-stroke-default bg-surface-card px-3 py-2 text-sm text-content-main placeholder-content-muted outline-none focus:border-brand-primary"
           />
           <Button type="submit" size="sm">
-            <Search size={16} />
+            <Search size={20} />
             {t.adminErrorLogsPage.search}
           </Button>
         </form>

@@ -135,7 +135,7 @@ export default function CompleterProfilPage() {
               {ROLES.map(({ value, icon: Icon, titleKey }) => (
                 <Chip key={value} active={role === value} onClick={() => setRole(value)}>
                   <span className="inline-flex items-center gap-1.5">
-                    <Icon size={13} />
+                    <Icon size={16} />
                     {t.auth[titleKey]}
                   </span>
                 </Chip>

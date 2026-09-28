@@ -1,7 +1,39 @@
-import type { ListingKind, PropertyType } from '@/features/search/types/listing.types';
+import type {
+  BathroomLocation,
+  LandStatus,
+  ListingKind,
+  PropertyType,
+  RoomType,
+  WaterSource,
+} from '@/features/search/types/listing.types';
+
+// Critères facultatifs supplémentaires ("Plus de critères") — mêmes noms/valeurs que
+// PropertyFilters (features/search/types/listing.types.ts), voir FilterFields, réutilisé tel quel
+// par app/demandes/nouvelle/page.tsx.
+type PropertyRequestExtraCriteria = {
+  hasCarAccess?: boolean;
+  hasMotorbikeAccess?: boolean;
+  waterSource?: WaterSource;
+  bathroomLocation?: BathroomLocation;
+  hasIndividualMeter?: boolean;
+  isIndependent?: boolean;
+  roomType?: RoomType;
+  minParkingSpots?: number;
+  isFurnished?: boolean;
+  hasComfort?: boolean;
+  hasCaretakerAnnex?: boolean;
+  legalStatus?: LandStatus;
+  isResidentialArea?: boolean;
+  hasWaterAvailable?: boolean;
+  hasElectricityAvailable?: boolean;
+  isBuildReady?: boolean;
+  noCommission?: boolean;
+  noCaution?: boolean;
+  noVisitFee?: boolean;
+};
 
 // Miroir de strImmo/src/property-requests/entities/property-request.entity.ts.
-export type PropertyRequest = {
+export type PropertyRequest = PropertyRequestExtraCriteria & {
   id: string;
   userId: string;
   kind: ListingKind;
@@ -24,13 +56,16 @@ export type PropertyRequest = {
 export const PROPERTY_REQUEST_REPORT_REASONS = ['spam', 'inappropriate', 'scam', 'other'] as const;
 export type PropertyRequestReportReason = (typeof PROPERTY_REQUEST_REPORT_REASONS)[number];
 
-export type CreatePropertyRequestPayload = {
+// `communeId`/`fokontanyId`/`maxBudget` obligatoires côté serveur (voir
+// CreatePropertyRequestDto) — une demande sans zone ni budget max ne serait pas assez précise
+// pour être comparée utilement à une nouvelle annonce (voir matchAndNotify).
+export type CreatePropertyRequestPayload = PropertyRequestExtraCriteria & {
   kind: ListingKind;
   propertyType?: PropertyType;
-  communeId?: string;
-  fokontanyId?: string;
+  communeId: string;
+  fokontanyId: string;
   minBudget?: number;
-  maxBudget?: number;
+  maxBudget: number;
   minBedrooms?: number;
   rawDescription?: string;
   isPublic?: boolean;

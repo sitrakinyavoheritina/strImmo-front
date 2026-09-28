@@ -43,6 +43,13 @@ export function AiSearchPanel() {
 
   function handleSend(event: React.FormEvent) {
     event.preventDefault();
+    submitMessage();
+  }
+
+  // Séparé de `handleSend` pour être appelable aussi depuis `onKeyDown` du textarea (Entrée
+  // envoie, Maj+Entrée insère un retour à la ligne) — un textarea n'émet pas d'événement de
+  // soumission de formulaire sur Entrée comme le faisait l'ancien `<input>` à une ligne.
+  function submitMessage() {
     const text = input.trim();
     if (!text || isPending) return;
 
@@ -119,26 +126,33 @@ export function AiSearchPanel() {
               className="mt-2 flex items-center gap-1 text-sm font-semibold text-brand-primary hover:text-brand-primary-hover transition"
             >
               {t.chat.viewAllResults} ({lastProperties.length})
-              <ChevronRight size={16} />
+              <ChevronRight size={20} />
             </button>
           )}
         </div>
       )}
 
-      <form onSubmit={handleSend} className="flex items-center gap-2">
-        <input
+      <form onSubmit={handleSend} className="flex items-end gap-2">
+        <textarea
           value={input}
           onChange={(event) => setInput(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+              event.preventDefault();
+              submitMessage();
+            }
+          }}
           placeholder={t.chat.inputPlaceholder}
-          className="flex-1 rounded-xl border border-stroke-default px-3.5 py-2.5 text-sm outline-none focus:border-brand-primary"
+          rows={2}
+          className="flex-1 rounded-xl border border-stroke-default px-3.5 py-2.5 text-sm outline-none focus:border-brand-primary resize-none"
         />
         <button
           type="submit"
           disabled={isPending || !input.trim()}
           aria-label={t.chat.send}
-          className="bg-brand-primary hover:bg-brand-primary-hover text-white rounded-xl p-2.5 transition disabled:opacity-60"
+          className="shrink-0 bg-brand-primary hover:bg-brand-primary-hover text-white rounded-xl p-2.5 transition disabled:opacity-60"
         >
-          <Send size={16} />
+          <Send size={20} />
         </button>
       </form>
     </div>

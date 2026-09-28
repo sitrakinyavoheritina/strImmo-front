@@ -36,7 +36,7 @@ function FavoriteListItem({ property, onRemove }: { property: Property; onRemove
         aria-label="Retirer des favoris"
         className="shrink-0 p-2 text-brand-primary"
       >
-        <Bookmark size={18} className="fill-brand-primary" />
+        <Bookmark size={20} className="fill-brand-primary" />
       </button>
     </div>
   );

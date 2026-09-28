@@ -94,7 +94,7 @@ export default function AdminSupprimerBienPage() {
               disabled={isPending}
               className="mt-3 inline-flex items-center gap-2 rounded-xl bg-danger px-4 py-2 text-sm font-semibold text-white hover:opacity-90 transition disabled:opacity-60"
             >
-              <Trash2 size={16} />
+              <Trash2 size={20} />
               {t.adminDeleteListing.button}
             </button>
           </div>

@@ -65,7 +65,7 @@ export function InstallPromptBanner() {
         title={isMobile ? t.pwa.installClose : t.pwa.installDismiss}
         className="shrink-0 text-content-muted hover:text-content-main transition p-1"
       >
-        <X size={16} />
+        <X size={20} />
       </button>
     </div>
   );

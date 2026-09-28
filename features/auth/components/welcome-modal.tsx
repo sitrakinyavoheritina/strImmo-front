@@ -152,7 +152,7 @@ export function WelcomeModal() {
           aria-label={t.welcome.close}
           className="absolute top-3 right-3 p-1 text-content-muted hover:text-content-main"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
 
         {step === 'welcome' ? (

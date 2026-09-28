@@ -116,7 +116,7 @@ export function InlineChatPanel({
           aria-label={t.propertyDetail.chatClose}
           className="text-content-muted hover:text-content-main transition"
         >
-          <X size={18} />
+          <X size={20} />
         </button>
       </div>
 
@@ -173,7 +173,7 @@ export function InlineChatPanel({
           title={t.messages.attachPhoto}
           className="shrink-0 w-9 h-9 rounded-full border border-stroke-default flex items-center justify-center text-content-muted hover:text-content-main transition disabled:opacity-40"
         >
-          <ImagePlus size={16} />
+          <ImagePlus size={20} />
         </button>
         <input
           value={draft}
@@ -192,7 +192,7 @@ export function InlineChatPanel({
           aria-label={t.chat.send}
           className="shrink-0 w-9 h-9 rounded-full bg-brand-primary text-white flex items-center justify-center disabled:opacity-40 transition"
         >
-          <Send size={16} />
+          <Send size={20} />
         </button>
       </div>
     </div>

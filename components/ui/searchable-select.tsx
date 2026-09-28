@@ -75,7 +75,7 @@ export function SearchableSelect({
         <span className={`truncate ${selected ? 'text-content-main' : 'text-content-muted'}`}>
           {selected ? selected.label : placeholder}
         </span>
-        <ChevronDown size={16} className={`shrink-0 text-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown size={20} className={`shrink-0 text-content-muted transition-transform ${isOpen ? 'rotate-180' : ''}`} />
       </button>
       {error && <p className="mt-1 text-[0.85rem] text-danger">{error}</p>}
 

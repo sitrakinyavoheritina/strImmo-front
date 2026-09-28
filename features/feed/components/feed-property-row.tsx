@@ -129,7 +129,7 @@ export function FeedPropertyRow({ property }: { property: Property }) {
                 aria-pressed={isLiked}
                 className="flex items-center gap-1 hover:text-danger transition"
               >
-                <Heart size={14} className={isLiked ? 'text-danger fill-danger' : ''} />
+                <Heart size={20} className={isLiked ? 'text-danger fill-danger' : ''} />
                 {formatCount(property.likesCount)}
               </button>
               <button
@@ -138,7 +138,7 @@ export function FeedPropertyRow({ property }: { property: Property }) {
                 aria-label={`${t.propertyDetail.chatWith} ${property.authorName ?? ''}`.trim()}
                 className="hover:text-brand-primary transition"
               >
-                <MessageCircle size={14} />
+                <MessageCircle size={20} />
               </button>
               <CardOptionsMenu property={property} />
             </div>

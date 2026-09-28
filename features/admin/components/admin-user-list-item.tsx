@@ -145,7 +145,7 @@ export function AdminUserListItem({ user }: { user: AdminUser }) {
             {t.adminUsersPage.joinedOn} {createdAt}
           </p>
         </div>
-        <ChevronRight size={16} className="shrink-0 text-content-muted" />
+        <ChevronRight size={20} className="shrink-0 text-content-muted" />
       </Link>
       {canDelete && (
         <button
@@ -163,7 +163,7 @@ export function AdminUserListItem({ user }: { user: AdminUser }) {
           }}
           className="shrink-0 p-2 rounded-lg text-danger hover:bg-danger/10 transition disabled:opacity-50"
         >
-          <Trash2 size={16} />
+          <Trash2 size={20} />
         </button>
       )}
     </div>

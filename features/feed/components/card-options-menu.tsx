@@ -92,7 +92,7 @@ export function CardOptionsMenu({
         aria-expanded={isOpen}
         className={triggerClassName}
       >
-        <MoreHorizontal size={18} />
+        <MoreHorizontal size={20} />
       </button>
 
       {isOpen && (
@@ -110,7 +110,7 @@ export function CardOptionsMenu({
               onClick={handleSaveClick}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-content-main hover:bg-surface-app transition"
             >
-              <Bookmark size={15} className={isSaved ? 'fill-brand-primary text-brand-primary' : ''} />
+              <Bookmark size={20} className={isSaved ? 'fill-brand-primary text-brand-primary' : ''} />
               {isSaved ? t.feed.menuSaved : t.feed.menuSave}
             </button>
 
@@ -120,7 +120,7 @@ export function CardOptionsMenu({
                 onClick={() => setIsOpen(false)}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-content-main hover:bg-surface-app transition"
               >
-                <Phone size={15} />
+                <Phone size={20} />
                 {t.feed.menuContact}
               </a>
             )}
@@ -130,7 +130,7 @@ export function CardOptionsMenu({
               onClick={handleChatClick}
               className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-content-main hover:bg-surface-app transition"
             >
-              <MessageCircle size={15} />
+              <MessageCircle size={20} />
               {t.feed.menuChat}
             </button>
 
@@ -158,7 +158,7 @@ export function CardOptionsMenu({
                 onClick={handleReportClick}
                 className="w-full flex items-center gap-2.5 px-3 py-2 text-sm text-danger hover:bg-danger/10 transition disabled:opacity-60 disabled:cursor-default"
               >
-                {isReported ? <Check size={15} /> : <Flag size={15} />}
+                {isReported ? <Check size={20} /> : <Flag size={20} />}
                 {isReported ? t.feed.menuReported : t.feed.menuReport}
               </button>
             )}

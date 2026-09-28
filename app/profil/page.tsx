@@ -96,7 +96,7 @@ export default function ProfilPage() {
           <div className="flex justify-end mb-3">
             <Link href="/profil/modifier">
               <Button size="sm" variant="outline">
-                <Pencil size={14} />
+                <Pencil size={20} />
                 {t.profile.edit}
               </Button>
             </Link>

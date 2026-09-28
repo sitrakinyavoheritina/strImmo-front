@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 import { getErrorMessage } from '@/lib/api/get-error-message';
@@ -10,20 +9,27 @@ import { Chip, FieldLabel, FormInput } from '@/components/ui/form-controls';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
-import { PROPERTY_TYPES } from '@/features/search/components/filter-fields';
+import { FilterFields, PROPERTY_TYPES } from '@/features/search/components/filter-fields';
 import { useCommunes } from '@/features/listings/hooks/use-communes';
 import { useFokontany } from '@/features/listings/hooks/use-fokontany';
 import { chatApi } from '@/features/search/services/chat-api';
 import { useCreatePropertyRequest } from '@/features/property-requests/hooks/use-property-requests';
 import { requestSentence } from '@/features/property-requests/utils/request-summary';
-import type { ListingKind, PropertyType } from '@/features/search/types/listing.types';
+import type { ListingKind, PropertyFilters, PropertyType } from '@/features/search/types/listing.types';
 
 type Step = 'form' | 'summary';
 
-// Création d'une demande (recherche enregistrée) — voir strImmo/src/property-requests/. Deux
-// façons de remplir les critères : le formulaire ci-dessous, ou décrire en une phrase à
-// l'assistant IA (réutilise POST /chat, déjà utilisé pour la recherche classique) qui préremplit
-// les mêmes champs. Les deux aboutissent au même écran de résumé avant création.
+// Décrire en une phrase à l'assistant IA est temporairement masqué (demandé explicitement, "pour
+// le moment") — le code reste en place pour le réactiver d'un coup en repassant ce drapeau à true,
+// plutôt que de le supprimer et devoir tout réécrire plus tard.
+const AI_MODE_ENABLED = false;
+
+// Création d'une demande (recherche enregistrée) — voir strImmo/src/property-requests/. Le type de
+// transaction, le quartier et le budget maximum sont obligatoires (voir CreatePropertyRequestDto) :
+// une demande trop vague ne serait pas assez précise pour être comparée utilement à une nouvelle
+// annonce (voir matchAndNotify). Les critères "Plus de critères" réutilisent tel quel le composant
+// des filtres de recherche avancés de l'accueil (FilterFields, mode="compact") — mêmes champs,
+// mêmes noms, pour ne pas dupliquer cette longue liste dans un second composant.
 export default function NouvelleDemandePage() {
   const { t, locale } = useTranslation();
   const router = useRouter();
@@ -44,9 +50,15 @@ export default function NouvelleDemandePage() {
   const { data: fokontanyList } = useFokontany(communeId);
   const [minBudget, setMinBudget] = useState('');
   const [maxBudget, setMaxBudget] = useState('');
-  const [minBedrooms, setMinBedrooms] = useState('');
   const [rawDescription, setRawDescription] = useState<string | undefined>();
   const [isPublic, setIsPublic] = useState(false);
+
+  // Critères facultatifs supplémentaires ("Plus de critères") — mêmes champs que la recherche
+  // avancée de l'accueil (voir SidebarAdvancedFilters), réinitialisés à chaque changement de type
+  // de bien (`handleSelectPropertyType`) puisqu'aucun ne survit à un changement de type (même
+  // règle que useHomeSearchFiltersStore.selectPropertyType).
+  const [advancedCriteria, setAdvancedCriteria] = useState<Partial<PropertyFilters>>({});
+  const [isAdvancedOpen, setIsAdvancedOpen] = useState(false);
 
   const [isAiMode, setIsAiMode] = useState(false);
   const [aiText, setAiText] = useState('');
@@ -55,7 +67,18 @@ export default function NouvelleDemandePage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
 
+  function handleSelectPropertyType(value: PropertyType | undefined) {
+    setPropertyType(value);
+    setAdvancedCriteria({});
+  }
+
+  function handleAdvancedUpdate<K extends keyof PropertyFilters>(key: K, value: PropertyFilters[K]) {
+    setAdvancedCriteria((prev) => ({ ...prev, [key]: value }));
+  }
+
   async function handleAiAnalyze() {
+    // Gardé pour AI_MODE_ENABLED, voir le commentaire en tête de fichier — jamais atteignable tant
+    // que le bouton qui bascule `isAiMode` reste masqué.
     const text = aiText.trim();
     if (!text || isAiLoading) return;
     setAiError(null);
@@ -76,7 +99,6 @@ export default function NouvelleDemandePage() {
       }
       if (filters.minPrice != null) setMinBudget(String(filters.minPrice));
       if (filters.maxPrice != null) setMaxBudget(String(filters.maxPrice));
-      if (filters.minBedrooms != null) setMinBedrooms(String(filters.minBedrooms));
       setRawDescription(text);
       setIsAiMode(false);
     } catch (error) {
@@ -86,25 +108,25 @@ export default function NouvelleDemandePage() {
     }
   }
 
+  const canContinue = !!kind && !!communeId && !!fokontanyId && !!maxBudget;
+
   function handleContinue() {
-    if (!kind) return;
+    if (!canContinue) return;
     setStep('summary');
   }
 
   async function handleSubmit() {
-    if (!kind) return;
+    if (!kind || !communeId || !fokontanyId || !maxBudget) return;
     setSubmitError(null);
     try {
       await createRequest({
+        ...advancedCriteria,
         kind,
         propertyType,
         communeId,
         fokontanyId,
         minBudget: minBudget ? Number(minBudget) : undefined,
-        maxBudget: maxBudget ? Number(maxBudget) : undefined,
-        // Sans objet pour un terrain (voir le champ masqué plus bas) — jamais envoyé dans ce cas,
-        // même si une valeur traîne encore dans le brouillon après un changement de type.
-        minBedrooms: propertyType !== 'land' && minBedrooms ? Number(minBedrooms) : undefined,
+        maxBudget: Number(maxBudget),
         rawDescription,
         isPublic,
       });
@@ -118,6 +140,7 @@ export default function NouvelleDemandePage() {
 
   const communeName = communes?.find((c) => c.id === communeId)?.name;
   const fokontanyName = fokontanyList?.find((f) => f.id === fokontanyId)?.name;
+  const filterDraft: PropertyFilters = { ...advancedCriteria, propertyType };
 
   if (created) {
     return (
@@ -141,14 +164,15 @@ export default function NouvelleDemandePage() {
       <div className="mt-5 bg-surface-card border border-stroke-default/80 rounded-2xl p-4 sm:p-5 space-y-4">
         {step === 'form' ? (
           <>
-            <button
-              type="button"
-              onClick={() => setIsAiMode((v) => !v)}
-              className="inline-flex items-center gap-1.5 text-[0.85rem] font-semibold text-brand-primary hover:underline"
-            >
-              <Sparkles size={14} />
-              {isAiMode ? t.propertyRequestsPage.manualMode : t.propertyRequestsPage.aiMode}
-            </button>
+            {AI_MODE_ENABLED && (
+              <button
+                type="button"
+                onClick={() => setIsAiMode((v) => !v)}
+                className="inline-flex items-center gap-1.5 text-[0.85rem] font-semibold text-brand-primary hover:underline"
+              >
+                {isAiMode ? t.propertyRequestsPage.manualMode : t.propertyRequestsPage.aiMode}
+              </button>
+            )}
 
             {isAiMode ? (
               <div className="space-y-2">
@@ -189,11 +213,11 @@ export default function NouvelleDemandePage() {
                 <div>
                   <FieldLabel>{t.propertyRequestsPage.propertyTypeLabel}</FieldLabel>
                   <div className="flex flex-wrap gap-1.5">
-                    <Chip active={!propertyType} onClick={() => setPropertyType(undefined)}>
+                    <Chip active={!propertyType} onClick={() => handleSelectPropertyType(undefined)}>
                       {t.propertyRequestsPage.propertyTypeAny}
                     </Chip>
                     {PROPERTY_TYPES.map(({ value, labelKey }) => (
-                      <Chip key={value} active={propertyType === value} onClick={() => setPropertyType(value)}>
+                      <Chip key={value} active={propertyType === value} onClick={() => handleSelectPropertyType(value)}>
                         {t.search[labelKey]}
                       </Chip>
                     ))}
@@ -215,9 +239,6 @@ export default function NouvelleDemandePage() {
                   emptyMessage={t.listing.communeEmptyMessage}
                 />
 
-                {/* Facultatif, choisi après la commune (désactivé tant qu'elle n'est pas encore
-                    choisie) — même parcours que la localisation précise d'une annonce, voir
-                    property-form.tsx. */}
                 <SearchableSelect
                   label={t.propertyRequestsPage.fokontanyLabel}
                   value={fokontanyId}
@@ -251,17 +272,15 @@ export default function NouvelleDemandePage() {
                   </div>
                 </div>
 
-                {/* Un terrain n'a pas de chambres — champ masqué pour ce type, comme dans le
-                    formulaire de publication d'une annonce (voir property-form.tsx). */}
-                {propertyType !== 'land' && (
-                  <FormInput
-                    label={t.propertyRequestsPage.minBedroomsLabel}
-                    value={minBedrooms}
-                    onChange={(v) => setMinBedrooms(v.replace(/\D/g, ''))}
-                    placeholder="0"
-                    type="number"
-                  />
-                )}
+                <FilterFields
+                  mode="compact"
+                  draft={filterDraft}
+                  onUpdate={handleAdvancedUpdate}
+                  onSelectPropertyType={handleSelectPropertyType}
+                  isAdvancedOpen={isAdvancedOpen}
+                  onToggleAdvanced={() => setIsAdvancedOpen((v) => !v)}
+                  feeTogglesPlacement="insideAdvanced"
+                />
 
                 <div>
                   <FieldLabel>{t.propertyRequestsPage.detailsLabel}</FieldLabel>
@@ -312,6 +331,10 @@ export default function NouvelleDemandePage() {
         )}
       </div>
 
+      {step === 'form' && !isAiMode && !canContinue && (
+        <p className="mt-2 text-[0.85rem] text-content-muted">{t.propertyRequestsPage.requiredFields}</p>
+      )}
+
       <div className="mt-4 flex items-center gap-3">
         {step === 'summary' && (
           <Button type="button" variant="outline" onClick={() => setStep('form')}>
@@ -320,7 +343,7 @@ export default function NouvelleDemandePage() {
         )}
         <div className="flex-1">
           {step === 'form' ? (
-            <Button type="button" className="w-full" disabled={!kind} onClick={handleContinue}>
+            <Button type="button" className="w-full" disabled={!canContinue} onClick={handleContinue}>
               {t.propertyRequestsPage.next}
             </Button>
           ) : (
