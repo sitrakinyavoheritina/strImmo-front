@@ -45,19 +45,26 @@ export default function PublierPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-7">
         <Link
           href="/annonce/nouvelle"
-          className="group text-left bg-surface-card border-2 border-stroke-default/80 rounded-2xl p-5 hover:border-brand-primary hover:shadow-lg transition-all"
+          className="group text-left bg-surface-card border-2 border-stroke-default/80 rounded-2xl p-5 hover:border-brand-primary hover:shadow-lg active:scale-[0.98] transition-all"
         >
-          <span className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-primary-soft text-brand-primary mb-3.5">
-            <Home size={26} />
-          </span>
-          <p className="font-bold text-content-main text-base">{t.publishChoicePage.offerTitle}</p>
-          <p className="text-sm text-content-muted mt-1">{t.publishChoicePage.offerSubtitle}</p>
+          <div className="flex items-center gap-3.5">
+            <span className="shrink-0 inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-primary-soft text-brand-primary">
+              <Home size={26} />
+            </span>
+            <div className="min-w-0">
+              <p className="font-bold text-content-main text-base">{t.publishChoicePage.offerTitle}</p>
+              <p className="text-sm text-content-muted mt-0.5">{t.publishChoicePage.offerSubtitle}</p>
+            </div>
+          </div>
 
-          <p className="mt-3.5 rounded-xl bg-surface-app px-3 py-2.5 text-sm text-content-main">
+          <p className="mt-4 flex items-start gap-2 rounded-xl bg-surface-app px-3 py-2.5 text-sm text-content-main">
+            <span className="shrink-0 mt-0.5 text-[10px] font-bold text-content-muted border border-stroke-default rounded px-1 py-0.5 leading-none">
+              MG
+            </span>
             {t.publishChoicePage.offerExplanationMg}
           </p>
 
-          <span className="mt-3.5 flex items-center justify-between text-[0.85rem] font-semibold text-brand-primary">
+          <span className="mt-3.5 pt-3.5 border-t border-stroke-default/80 flex items-center justify-between text-[0.85rem] font-semibold text-brand-primary">
             {t.publishChoicePage.choose}
             <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
           </span>
@@ -65,19 +72,26 @@ export default function PublierPage() {
 
         <Link
           href="/demandes/nouvelle"
-          className="group text-left bg-surface-card border-2 border-stroke-default/80 rounded-2xl p-5 hover:border-brand-primary hover:shadow-lg transition-all"
+          className="group text-left bg-surface-card border-2 border-stroke-default/80 rounded-2xl p-5 hover:border-brand-primary hover:shadow-lg active:scale-[0.98] transition-all"
         >
-          <span className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-primary-soft text-brand-primary mb-3.5">
-            <ClipboardList size={26} />
-          </span>
-          <p className="font-bold text-content-main text-base">{t.publishChoicePage.demandTitle}</p>
-          <p className="text-sm text-content-muted mt-1">{t.publishChoicePage.demandSubtitle}</p>
+          <div className="flex items-center gap-3.5">
+            <span className="shrink-0 inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-brand-primary-soft text-brand-primary">
+              <ClipboardList size={26} />
+            </span>
+            <div className="min-w-0">
+              <p className="font-bold text-content-main text-base">{t.publishChoicePage.demandTitle}</p>
+              <p className="text-sm text-content-muted mt-0.5">{t.publishChoicePage.demandSubtitle}</p>
+            </div>
+          </div>
 
-          <p className="mt-3.5 rounded-xl bg-surface-app px-3 py-2.5 text-sm text-content-main">
+          <p className="mt-4 flex items-start gap-2 rounded-xl bg-surface-app px-3 py-2.5 text-sm text-content-main">
+            <span className="shrink-0 mt-0.5 text-[10px] font-bold text-content-muted border border-stroke-default rounded px-1 py-0.5 leading-none">
+              MG
+            </span>
             {t.publishChoicePage.demandExplanationMg}
           </p>
 
-          <span className="mt-3.5 flex items-center justify-between text-[0.85rem] font-semibold text-brand-primary">
+          <span className="mt-3.5 pt-3.5 border-t border-stroke-default/80 flex items-center justify-between text-[0.85rem] font-semibold text-brand-primary">
             {t.publishChoicePage.choose}
             <ArrowRight size={20} className="transition-transform group-hover:translate-x-1" />
           </span>
