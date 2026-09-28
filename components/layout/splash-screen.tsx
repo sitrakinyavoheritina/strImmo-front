@@ -3,9 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useIsStandalone } from '@/lib/pwa/use-is-standalone';
 import { SITE_TAGLINE } from '@/lib/seo/site';
+import { OninaLogoReveal } from '@/components/ui/onina-logo-reveal';
 
 const SEEN_KEY = 'onina_splash_seen';
-const VISIBLE_MS = 1300;
+// Le reveal du logo (voir OninaLogoReveal / @keyframes onina-logo-* dans globals.css) dure
+// ~2,3s à lui seul (tracé progressif → zoom → reflet) ; VISIBLE_MS laisse un court instant
+// "posé" après coup avant d'entamer le fondu de sortie.
+const VISIBLE_MS = 2800;
 const FADE_MS = 400;
 // Doit rester identique à `background_color` dans app/manifest.ts (et --color-surface-app en
 // clair) : c'est ce fond-là que l'OS affiche pendant sa propre "splash screen" générée du manifest
@@ -50,17 +54,8 @@ export function SplashScreen() {
       }`}
       style={{ backgroundColor: BACKGROUND, transitionDuration: `${FADE_MS}ms` }}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element -- SVG statique local, aucune optimisation utile */}
-      <img
-        src="/logo.svg"
-        alt=""
-        className="w-36 sm:w-44 h-auto"
-        style={{ animation: 'splash-logo-in 500ms ease-out both' }}
-      />
-      <p
-        className="text-[13px] sm:text-sm font-semibold tracking-wide text-brand-secondary-text"
-        style={{ animation: 'splash-text-in 500ms ease-out 180ms both' }}
-      >
+      <OninaLogoReveal className="w-36 sm:w-44" />
+      <p className="splash-tagline text-[13px] sm:text-sm font-semibold tracking-wide text-brand-secondary-text">
         {SITE_TAGLINE}
       </p>
     </div>

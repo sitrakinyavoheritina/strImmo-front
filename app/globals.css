@@ -113,12 +113,64 @@
   --color-danger-hover: #ef4444;
 }
 
-/* Apparition du logo/texte sur l'écran de démarrage PWA (voir components/layout/splash-screen.tsx)
-   — décalées l'une de l'autre pour un effet séquencé plutôt qu'un bloc qui apparaît d'un coup. */
-@keyframes splash-logo-in {
-  from { opacity: 0; transform: scale(0.85); }
-  to { opacity: 1; transform: scale(1); }
+/* Reveal du logo Onina (voir components/ui/onina-logo-reveal.tsx) : chaque trait se dessine
+   (stroke-dashoffset, normalisé par pathLength=1 pour ne pas dépendre de la longueur réelle de
+   chaque tracé), puis l'ensemble zoome à sa taille finale, puis un reflet balaie la silhouette.
+   Scopé sous `prefers-reduced-motion: no-preference` : sans cette préférence, .onina-logo-path
+   garde son fill plein et immobile (défini directement en JSX), .onina-logo-shine reste invisible
+   et .onina-logo-scale-wrap reste à sa taille finale — le logo s'affiche alors tel quel, sans
+   aucune animation. */
+@media (prefers-reduced-motion: no-preference) {
+  .onina-logo-path {
+    fill-opacity: 0;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation-name: onina-logo-draw;
+    animation-duration: 900ms;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+  }
+  .onina-logo-shine {
+    animation-name: onina-logo-shine;
+    animation-duration: 650ms;
+    animation-delay: 1650ms;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: both;
+  }
+  .onina-logo-scale-wrap {
+    display: inline-block;
+    animation-name: onina-logo-scale;
+    animation-duration: 550ms;
+    animation-delay: 1150ms;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+  }
+  .splash-tagline {
+    animation-name: splash-text-in;
+    animation-duration: 500ms;
+    animation-delay: 1900ms;
+    animation-timing-function: ease-out;
+    animation-fill-mode: both;
+  }
 }
+@keyframes onina-logo-draw {
+  0% { stroke-dashoffset: 1; stroke-opacity: 1; fill-opacity: 0; }
+  55% { stroke-dashoffset: 0; stroke-opacity: 1; fill-opacity: 0; }
+  80% { fill-opacity: 1; stroke-opacity: 1; }
+  100% { fill-opacity: 1; stroke-opacity: 0; }
+}
+@keyframes onina-logo-scale {
+  from { transform: scale(0.88); }
+  to { transform: scale(1); }
+}
+@keyframes onina-logo-shine {
+  from { transform: translateX(-40px) skewX(-20deg); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  to { transform: translateX(280px) skewX(-20deg); opacity: 0; }
+}
+
+/* Apparition du slogan sous le logo sur l'écran de démarrage PWA (voir splash-screen.tsx). */
 @keyframes splash-text-in {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
