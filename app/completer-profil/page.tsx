@@ -3,8 +3,9 @@
 import { getPhoneNotVerified } from '@/features/auth/utils/phone-not-verified';
 import { usePhoneVerificationRedirect } from '@/features/auth/hooks/use-phone-verification-redirect';
 import { markWelcomePending } from '@/lib/auth/welcome-flag';
-import { useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { getSafeNextPath } from '@/lib/auth/safe-next-path';
+import { Suspense, useEffect, useRef, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Home, Key, Handshake, Building2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
@@ -35,7 +36,7 @@ const ROLES: { value: Role; icon: typeof Home; titleKey: 'roleOwner' | 'roleTena
 // jamais). Un seul rôle par défaut ("owner", choisi à la création côté serveur) à confirmer ou
 // changer, puis les champs obligatoires du rôle choisi — mêmes champs que les formulaires
 // d'inscription classiques, sans mot de passe (déjà généré côté serveur pour ce compte).
-export default function CompleterProfilPage() {
+function CompleterProfilForm() {
   const router = useRouter();
   const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
@@ -43,6 +44,12 @@ export default function CompleterProfilPage() {
   const setSession = useAuthStore((state) => state.setSession);
   const goToVerification = usePhoneVerificationRedirect();
   const hasHydrated = useAuthHasHydrated();
+  // Reporté depuis /connexion (voir useGoogleAuth) quand un compte Google flambant neuf devait
+  // d'abord passer par ici avant de rejoindre sa destination d'origine (ex. /demandes/nouvelle
+  // depuis "Aucun résultat") — sans ça, cette étape intermédiaire perdrait l'intention initiale et
+  // renverrait toujours à l'accueil.
+  const searchParams = useSearchParams();
+  const nextPath = getSafeNextPath(searchParams.get('next'));
 
   const [role, setRole] = useState<Role>('owner');
   const [phone, setPhone] = useState('');
@@ -66,13 +73,13 @@ export default function CompleterProfilPage() {
   useEffect(() => {
     if (!hasHydrated || leavingForVerification.current) return;
     if (!isAuthenticated) {
-      router.replace('/connexion');
+      router.replace(nextPath ? `/connexion?next=${encodeURIComponent(nextPath)}` : '/connexion');
       return;
     }
     if (user?.phone) {
-      router.replace('/');
+      router.replace(nextPath ?? '/');
     }
-  }, [hasHydrated, isAuthenticated, user, router]);
+  }, [hasHydrated, isAuthenticated, user, router, nextPath]);
 
   if (!hasHydrated || !isAuthenticated || !user || user.phone) return null;
 
@@ -112,7 +119,7 @@ export default function CompleterProfilPage() {
       markWelcomePending(updatedUser.id);
       setStoredTheme(updatedUser.themePreference);
       setStoredFeedDisplay(updatedUser.feedDisplay);
-      router.push('/');
+      router.push(nextPath ?? '/');
     } catch (error) {
       // Propriétaire / intermédiaire / agence : le backend a envoyé le code SMS et refuse la session
       // tant que le numéro n'est pas vérifié — on ferme la session Google en cours et on passe à
@@ -199,5 +206,13 @@ export default function CompleterProfilPage() {
         </form>
       </div>
     </AuthPageShell>
+  );
+}
+
+export default function CompleterProfilPage() {
+  return (
+    <Suspense fallback={null}>
+      <CompleterProfilForm />
+    </Suspense>
   );
 }

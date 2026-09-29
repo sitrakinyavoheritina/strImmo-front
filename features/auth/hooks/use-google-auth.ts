@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { trackEvent } from '@/lib/analytics/track';
 import { authService } from '../services/auth-service';
 import { useAuthStore } from '@/lib/state/use-auth-store';
@@ -10,6 +10,7 @@ import { usePhoneVerificationRedirect } from './use-phone-verification-redirect'
 import { getErrorMessage } from '@/lib/api/get-error-message';
 import { setStoredTheme } from '@/lib/theme/use-theme-preference';
 import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
+import { getSafeNextPath } from '@/lib/auth/safe-next-path';
 
 // Connecte immédiatement, sans rien demander de plus — même logique post-connexion que useLogin
 // (session, préférences), sauf la redirection : un compte fraîchement créé via Google n'a jamais
@@ -18,6 +19,7 @@ import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
 // crée le compte à la volée avec `phone: null`).
 export function useGoogleAuth() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setSession = useAuthStore((state) => state.setSession);
   const goToVerification = usePhoneVerificationRedirect();
   const [isLoading, setIsLoading] = useState(false);
@@ -32,8 +34,16 @@ export function useGoogleAuth() {
       trackEvent('login', { method: 'google', role: user.role });
       setStoredTheme(user.themePreference);
       setStoredFeedDisplay(user.feedDisplay);
+      const next = getSafeNextPath(searchParams.get('next'));
       if (!user.phone) {
-        router.push('/completer-profil');
+        // Compte flambant neuf (voir loginWithGoogle) : `next` doit encore attendre le choix du
+        // rôle + téléphone sur /completer-profil, qui le reprendra à son tour une fois ce compte
+        // complété (voir ce fichier).
+        router.push(next ? `/completer-profil?next=${encodeURIComponent(next)}` : '/completer-profil');
+        return;
+      }
+      if (next) {
+        router.push(next);
         return;
       }
       router.push(user.role === 'admin' || user.role === 'superadmin' ? '/admin' : '/');

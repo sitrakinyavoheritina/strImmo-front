@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 import { getErrorMessage } from '@/lib/api/get-error-message';
@@ -24,32 +24,54 @@ type Step = 'form' | 'summary';
 // plutôt que de le supprimer et devoir tout réécrire plus tard.
 const AI_MODE_ENABLED = false;
 
+const VALID_KINDS: ListingKind[] = ['sale', 'rent'];
+const VALID_PROPERTY_TYPES: PropertyType[] = ['house', 'apartment', 'villa', 'land'];
+
 // Création d'une demande (recherche enregistrée) — voir strImmo/src/property-requests/. Le type de
 // transaction, le quartier et le budget maximum sont obligatoires (voir CreatePropertyRequestDto) :
 // une demande trop vague ne serait pas assez précise pour être comparée utilement à une nouvelle
 // annonce (voir matchAndNotify). Les critères "Plus de critères" réutilisent tel quel le composant
 // des filtres de recherche avancés de l'accueil (FilterFields, mode="compact") — mêmes champs,
 // mêmes noms, pour ne pas dupliquer cette longue liste dans un second composant.
-export default function NouvelleDemandePage() {
+function NouvelleDemandeForm() {
   const { t, locale } = useTranslation();
   const router = useRouter();
+  const pathname = usePathname();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthHasHydrated();
   const { data: communes } = useCommunes();
   const { mutateAsync: createRequest, isPending: isCreating } = useCreatePropertyRequest();
 
+  // Préremplissage depuis "Aucun résultat" (voir app/recherche/page.tsx, noResultsCtaHref) : reprend
+  // ce que la personne cherchait déjà plutôt que de lui faire tout ressaisir. Lu une seule fois au
+  // montage (lazy initializer) — un changement d'URL ultérieur ne doit pas écraser ce que la
+  // personne a déjà modifié dans le formulaire.
+  const searchParams = useSearchParams();
+
+  // Accessible sans être connecté (le bouton "Créer une demande" de "Aucun résultat" reste visible
+  // pour tout le monde) — mais publier une demande exige un compte : `next` reporte les critères
+  // déjà choisis (voir ci-dessous) jusqu'après la connexion plutôt que les perdre en route (voir
+  // useLogin/useGoogleAuth, qui redirigent vers ce `next` une fois connecté).
   useEffect(() => {
-    if (hasHydrated && !isAuthenticated) router.replace('/connexion');
-  }, [hasHydrated, isAuthenticated, router]);
+    if (!hasHydrated || isAuthenticated) return;
+    const query = searchParams.toString();
+    router.replace(`/connexion?next=${encodeURIComponent(query ? `${pathname}?${query}` : pathname)}`);
+  }, [hasHydrated, isAuthenticated, router, pathname, searchParams]);
 
   const [step, setStep] = useState<Step>('form');
-  const [kind, setKind] = useState<ListingKind | undefined>('rent');
-  const [propertyType, setPropertyType] = useState<PropertyType | undefined>();
-  const [communeId, setCommuneId] = useState<string | undefined>();
+  const [kind, setKind] = useState<ListingKind | undefined>(() => {
+    const value = searchParams.get('kind');
+    return value && VALID_KINDS.includes(value as ListingKind) ? (value as ListingKind) : 'rent';
+  });
+  const [propertyType, setPropertyType] = useState<PropertyType | undefined>(() => {
+    const value = searchParams.get('propertyType');
+    return value && VALID_PROPERTY_TYPES.includes(value as PropertyType) ? (value as PropertyType) : undefined;
+  });
+  const [communeId, setCommuneId] = useState<string | undefined>(() => searchParams.get('communeId') ?? undefined);
   const [fokontanyId, setFokontanyId] = useState<string | undefined>();
   const { data: fokontanyList } = useFokontany(communeId);
   const [minBudget, setMinBudget] = useState('');
-  const [maxBudget, setMaxBudget] = useState('');
+  const [maxBudget, setMaxBudget] = useState(() => searchParams.get('maxBudget') ?? '');
   const [rawDescription, setRawDescription] = useState<string | undefined>();
   const [isPublic, setIsPublic] = useState(false);
 
@@ -354,5 +376,13 @@ export default function NouvelleDemandePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function NouvelleDemandePage() {
+  return (
+    <Suspense fallback={null}>
+      <NouvelleDemandeForm />
+    </Suspense>
   );
 }

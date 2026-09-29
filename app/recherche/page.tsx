@@ -8,6 +8,7 @@ import { useProperties } from '@/features/search/hooks/use-properties';
 import { useDebouncedSearchFilters } from '@/features/search/hooks/use-debounced-search-filters';
 import { SearchSection } from '@/features/search/components/search-section';
 import { FeedList } from '@/features/feed/components/feed-list';
+import { NoResultsCta } from '@/features/search/components/no-results-cta';
 import { RightRail } from '@/features/feed/components/right-rail';
 import { filtersToSearchParams, searchParamsToFilters } from '@/features/search/utils/filters-query';
 
@@ -63,7 +64,7 @@ function SearchResultsContent() {
           ) : properties && properties.length > 0 ? (
             <FeedList properties={properties} />
           ) : (
-            <p className="text-sm text-content-muted py-12 text-center">{t.search.noResults}</p>
+            <NoResultsCta filters={debouncedFilters} />
           )}
         </div>
       </div>

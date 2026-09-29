@@ -350,6 +350,10 @@ const translations = {
       searching: 'Recherche...',
       showResults: 'Afficher les résultats',
       noResults: 'Aucun résultat',
+      noResultsCtaTitle: 'Rien pour l’instant ? Publiez une demande',
+      noResultsCtaBody:
+        'On vous préviendra par email ou par notification dès qu’un bien correspondant sera publié. Rendue publique, votre demande peut aussi être vue directement par les propriétaires qui cherchent à qui louer ou vendre.',
+      noResultsCtaButton: 'Créer une demande',
       sortRecent: 'Plus récent',
       sortPriceAsc: 'Moins cher',
       sortPriceDesc: 'Plus cher',
@@ -1259,6 +1263,10 @@ const translations = {
       searching: 'Mikatsaka...',
       showResults: 'Asehoy ny valiny',
       noResults: 'Tsy misy valiny',
+      noResultsCtaTitle: 'Tsy mbola misy? Mamoaha fangatahana',
+      noResultsCtaBody:
+        'Hampandrenesinay anao amin’ny mailaka na fampahafantarana (notification) ianao rehefa misy trano na tany mifanaraka amin’izay tadiavinao. Raha ataonao miharihary ny fangatahanao, dia afaka mahita izany avy hatrany ireo tompon-trano mitady olona hanofa na hividy.',
+      noResultsCtaButton: 'Mamoaha fangatahana',
       sortRecent: 'Vaovao indrindra',
       sortPriceAsc: 'Mora indrindra',
       sortPriceDesc: 'Lafo indrindra',

@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react';
 import { WelcomeModal } from '@/features/auth/components/welcome-modal';
 import { FeaturedStories } from '@/features/feed/components/featured-stories';
 import { FeedList } from '@/features/feed/components/feed-list';
+import { NoResultsCta } from '@/features/search/components/no-results-cta';
 import { RightRail } from '@/features/feed/components/right-rail';
 import { SearchSection } from '@/features/search/components/search-section';
 import { useInfiniteProperties } from '@/features/search/hooks/use-infinite-properties';
@@ -76,7 +77,7 @@ export function HomeClient({ initialProperties }: { initialProperties: Property[
               )}
             </>
           ) : (
-            <p className="text-sm text-content-muted">{t.search.noResults}</p>
+            <NoResultsCta filters={debouncedFilters} />
           )}
         </div>
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { loginSchema, LoginFormData } from '../schemas';
@@ -13,9 +13,11 @@ import { usePhoneVerificationRedirect } from './use-phone-verification-redirect'
 import { getErrorMessage } from '@/lib/api/get-error-message';
 import { setStoredTheme } from '@/lib/theme/use-theme-preference';
 import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
+import { getSafeNextPath } from '@/lib/auth/safe-next-path';
 
 export function useLogin() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const setSession = useAuthStore((state) => state.setSession);
   const goToVerification = usePhoneVerificationRedirect();
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +40,14 @@ export function useLogin() {
       // n'importe quel autre appareil une fois connecté (voir /auth/preferences).
       setStoredTheme(user.themePreference);
       setStoredFeedDisplay(user.feedDisplay);
+      // `next` (ex. redirigé depuis /demandes/nouvelle sans être connecté) passe avant tout le
+      // reste : la personne avait une intention précise avant d'atterrir ici, pas seulement
+      // "se connecter" dans l'absolu.
+      const next = getSafeNextPath(searchParams.get('next'));
+      if (next) {
+        router.push(next);
+        return;
+      }
       // Déviation volontaire par rapport à l'app mobile (qui envoie admin/superadmin sur le
       // profil) : un admin arrive directement sur son tableau de bord (voir app/admin/) plutôt
       // que sur une fiche de profil qui ne lui sert à rien en priorité — demandé explicitement.

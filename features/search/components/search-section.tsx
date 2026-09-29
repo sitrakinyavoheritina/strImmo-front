@@ -17,7 +17,7 @@ import type { PropertyFilters } from '../types/listing.types';
 // un scroll franc, pas le moindre pixel. La sentinelle observée est positionnée exactement à cette
 // distance (voir plus bas) : ajuster cette seule valeur suffit à changer la sensibilité du repli,
 // sans toucher au mécanisme (IntersectionObserver) qui, lui, ne doit pas changer.
-const COLLAPSE_SCROLL_DISTANCE = 120;
+const COLLAPSE_SCROLL_DISTANCE = 150;
 
 /** Section recherche de l'accueil, au-dessus du fil — onglets Recherche / Recherche IA, puis
  * (location/vente + type de bien) sur la même ligne que les onglets, et (prix min/max, publié

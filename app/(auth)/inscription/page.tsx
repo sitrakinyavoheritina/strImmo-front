@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { AuthPageShell } from '@/features/auth/components/auth-page-shell';
 import { RoleSelect } from '@/features/auth/components/role-select';
@@ -8,7 +9,7 @@ import { GoogleSignInButton } from '@/features/auth/components/google-sign-in-bu
 // Le bouton Google connecte/crée un compte directement (voir
 // strImmo/src/auth/auth.service.ts:loginWithGoogle) sans passer par ces 4 formulaires — un
 // nouveau compte est redirigé vers /completer-profil juste après (choix du rôle + téléphone).
-export default function InscriptionPage() {
+function InscriptionContent() {
   const { t } = useTranslation();
 
   return (
@@ -25,5 +26,13 @@ export default function InscriptionPage() {
         <GoogleSignInButton />
       </div>
     </AuthPageShell>
+  );
+}
+
+export default function InscriptionPage() {
+  return (
+    <Suspense fallback={null}>
+      <InscriptionContent />
+    </Suspense>
   );
 }
