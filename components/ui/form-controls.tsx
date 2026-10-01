@@ -8,16 +8,23 @@ export function Chip({
   active,
   onClick,
   children,
+  // `'lg'` : légèrement plus grand que les autres puces d'un même groupe (ex. "Intermédiaire
+  // (Panera)" face à "Propriétaire"/"Agence", demandé explicitement) — jamais le défaut, pour ne
+  // rien changer aux innombrables autres usages de `Chip` qui ne passent pas ce prop.
+  size = 'default',
 }: {
   active: boolean;
   onClick: () => void;
   children: React.ReactNode;
+  size?: 'default' | 'lg';
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-full text-[0.85rem] font-semibold border transition ${
+      className={`rounded-full font-semibold border transition ${
+        size === 'lg' ? 'px-4 py-2 text-[0.95rem]' : 'px-3 py-1.5 text-[0.85rem]'
+      } ${
         active
           ? 'bg-brand-primary text-white border-brand-primary'
           : 'bg-surface-app text-content-muted border-stroke-default hover:border-brand-primary'

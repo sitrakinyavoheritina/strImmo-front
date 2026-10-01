@@ -73,7 +73,10 @@ export function MapPositionPicker({
 
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
+      // Style satellite (pas `streets-v12`, routes seules) : même correction que property-map.tsx
+      // (page détail) — on doit pouvoir distinguer les bâtiments en positionnant son bien, comme
+      // sur Google Maps.
+      style: 'mapbox://styles/mapbox/satellite-streets-v12',
       center: initialCenter,
       zoom: DEFAULT_ZOOM,
     });

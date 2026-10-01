@@ -316,8 +316,8 @@ const translations = {
     search: {
       searchTab: 'Recherche',
       aiTab: 'Recherche IA',
-      rent: 'Louer',
-      buy: 'Acheter',
+      rent: 'Location',
+      buy: 'Vente',
       neighborhood: 'Ville ou Quartier',
       neighborhoodPlaceholder: 'ex: Ivandry, Majunga...',
       propertyType: 'Type de bien',

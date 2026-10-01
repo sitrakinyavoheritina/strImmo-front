@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useHomeSearchFiltersStore } from '@/lib/state/use-home-search-filters-store';
 import { FilterModal } from './filter-modal';
 import { ActiveFilterChips } from './active-filter-chips';
-import { PROPERTY_TYPES, PUBLISHER_TYPES } from './filter-fields';
+import { PROPERTY_TYPES, PUBLISHER_TYPES, PublisherTypeLabel } from './filter-fields';
 import { filtersToSearchParams } from '../utils/filters-query';
 import type { PropertyFilters, PublisherType } from '../types/listing.types';
 
@@ -20,11 +20,13 @@ function SegmentedRow<T extends string>({
   onChange,
 }: {
   value: T | undefined;
-  options: { value: T; label: string }[];
+  // `grow` (défaut 1) : poids flex de ce segment par rapport aux autres — ex. "Intermédiaire
+  // (Panera)" en `2` face à `1` pour Propriétaire/Agence, demandé explicitement.
+  options: { value: T; label: ReactNode; grow?: number }[];
   onChange: (value: T) => void;
 }) {
   return (
-    <div className="flex rounded-full border border-stroke-default overflow-hidden bg-surface-card shadow-sm">
+    <div className="flex flex-nowrap rounded-full border border-stroke-default overflow-hidden bg-surface-card shadow-sm">
       {options.map((option) => {
         const isSelected = value === option.value;
         return (
@@ -32,7 +34,12 @@ function SegmentedRow<T extends string>({
             key={option.value}
             type="button"
             onClick={() => onChange(option.value)}
-            className={`flex-1 py-2.5 text-sm font-semibold transition ${
+            style={{ flexGrow: option.grow ?? 1 }}
+            // `whitespace-nowrap` : jamais de retour à la ligne à l'intérieur d'un bouton (ex.
+            // "Intermédiaire (Panera)") — demandé explicitement, ces 3 boutons restent toujours sur
+            // une seule ligne. `text-[13px]` (pas `text-sm`) : laisse un peu plus de place au
+            // libellé le plus long sans avoir à l'agrandir, lui.
+            className={`flex-shrink min-w-0 py-2.5 px-1 text-[13px] font-semibold whitespace-nowrap transition ${
               isSelected ? 'bg-brand-primary text-white' : 'text-content-main hover:bg-surface-app'
             }`}
           >
@@ -201,7 +208,11 @@ export function MobileSearchPanel({
 
           <SegmentedRow<PublisherType>
             value={filters.publisherType}
-            options={PUBLISHER_TYPES.map(({ value, labelKey }) => ({ value, label: t.search[labelKey] }))}
+            options={PUBLISHER_TYPES.map(({ value, labelKey, smallSuffix }) => ({
+              value,
+              label: <PublisherTypeLabel label={t.search[labelKey]} smallSuffix={smallSuffix} />,
+              grow: value === 'agent' ? 2 : 1,
+            }))}
             onChange={(value) => update('publisherType', filters.publisherType === value ? undefined : value)}
           />
 

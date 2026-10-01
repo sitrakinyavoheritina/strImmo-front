@@ -25,11 +25,32 @@ export const LAND_STATUSES: { value: LandStatus; labelKey: 'legalStatusTitled' |
 // vente, un même "ex: 500 000" n'aurait aucun sens pour les deux (même logique que le mobile).
 export const PRICE_CEILING = { rent: 6_000_000, sale: 700_000_000 };
 
-export const PUBLISHER_TYPES: { value: PublisherType; labelKey: 'publisherOwner' | 'publisherAgent' | 'publisherAgency' }[] = [
+export const PUBLISHER_TYPES: {
+  value: PublisherType;
+  labelKey: 'publisherOwner' | 'publisherAgent' | 'publisherAgency';
+  // "Panera" (intermédiaire, en malgache) : affiché entre parenthèses mais en plus petit que le
+  // reste du libellé — demandé explicitement, pour les 3 écrans qui affichent ces boutons.
+  smallSuffix?: string;
+}[] = [
   { value: 'owner', labelKey: 'publisherOwner' },
-  { value: 'agent', labelKey: 'publisherAgent' },
+  { value: 'agent', labelKey: 'publisherAgent', smallSuffix: 'Panera' },
   { value: 'agency', labelKey: 'publisherAgency' },
 ];
+
+/** Libellé "Intermédiaire (Panera)" avec le suffixe en plus petit — partagé par les 3 écrans qui
+ *  affichent les boutons Propriétaire/Intermédiaire/Agence (filter-fields.tsx, quick-search-form.tsx,
+ *  mobile-search-panel.tsx), pour ne pas dupliquer ce rendu. `whitespace-nowrap` : jamais de retour
+ *  à la ligne à l'intérieur du libellé lui-même, en plus du conteneur (voir `flex-nowrap` sur les
+ *  rangées qui les affichent) — demandé explicitement, les 3 boutons doivent toujours rester sur
+ *  une seule ligne. */
+export function PublisherTypeLabel({ label, smallSuffix }: { label: string; smallSuffix?: string }) {
+  return (
+    <span className="whitespace-nowrap">
+      {label}
+      {smallSuffix && <span className="text-[0.85em] font-normal"> ({smallSuffix})</span>}
+    </span>
+  );
+}
 
 export const SORT_OPTIONS: { value: NonNullable<PropertyFilters['sortBy']>; labelKey: 'sortRecent' | 'sortPriceAsc' | 'sortPriceDesc' | 'sortPopular' }[] = [
   { value: 'recent', labelKey: 'sortRecent' },
@@ -178,17 +199,18 @@ export function FilterFields({
           <Section>
             <div>
               <FieldLabel>{t.search.publisherType}</FieldLabel>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-nowrap gap-2 overflow-x-auto">
                 <Chip active={!draft.publisherType} onClick={() => onUpdate('publisherType', undefined)}>
                   {t.search.allPublishers}
                 </Chip>
-                {PUBLISHER_TYPES.map(({ value, labelKey }) => (
+                {PUBLISHER_TYPES.map(({ value, labelKey, smallSuffix }) => (
                   <Chip
                     key={value}
                     active={draft.publisherType === value}
                     onClick={() => onUpdate('publisherType', draft.publisherType === value ? undefined : value)}
+                    size={value === 'agent' ? 'lg' : 'default'}
                   >
-                    {t.search[labelKey]}
+                    <PublisherTypeLabel label={t.search[labelKey]} smallSuffix={smallSuffix} />
                   </Chip>
                 ))}
               </div>

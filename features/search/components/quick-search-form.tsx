@@ -8,7 +8,7 @@ import { useHomeSearchFiltersStore } from '@/lib/state/use-home-search-filters-s
 import { Button } from '@/components/ui/button';
 import { Chip } from '@/components/ui/form-controls';
 import { FilterModal } from './filter-modal';
-import { PUBLISHER_TYPES } from './filter-fields';
+import { PUBLISHER_TYPES, PublisherTypeLabel } from './filter-fields';
 import { filtersToSearchParams } from '../utils/filters-query';
 import { hasActiveAdvancedFilters } from '../utils/has-active-advanced-filters';
 
@@ -60,18 +60,19 @@ export function QuickSearchForm() {
           </div>
 
           {/* `mx-auto` : « Publié par » reste centré dans la place restante, sur la même ligne que le prix. */}
-          <div className="mx-auto flex flex-wrap items-center justify-center gap-1.5">
+          <div className="mx-auto flex flex-nowrap items-center justify-center gap-1.5 overflow-x-auto">
             <span className="text-[0.85rem] font-semibold text-content-muted shrink-0">{t.search.publisherType} :</span>
             <Chip active={!filters.publisherType} onClick={() => update('publisherType', undefined)}>
               {t.search.allPublishers}
             </Chip>
-            {PUBLISHER_TYPES.map(({ value, labelKey }) => (
+            {PUBLISHER_TYPES.map(({ value, labelKey, smallSuffix }) => (
               <Chip
                 key={value}
                 active={filters.publisherType === value}
                 onClick={() => update('publisherType', filters.publisherType === value ? undefined : value)}
+                size={value === 'agent' ? 'lg' : 'default'}
               >
-                {t.search[labelKey]}
+                <PublisherTypeLabel label={t.search[labelKey]} smallSuffix={smallSuffix} />
               </Chip>
             ))}
           </div>
