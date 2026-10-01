@@ -17,25 +17,32 @@ import { AuthPageShell } from '@/features/auth/components/auth-page-shell';
 import { FileInput } from '@/features/auth/components/file-input';
 import { EMPTY_NIF_STAT, NifStatFields, toNifStatPayload, type NifStatValue } from '@/features/auth/components/nif-stat-fields';
 import { SHOW_CIN_UPLOAD } from '@/features/auth/config';
-import { FieldLabel, FormInput, Chip } from '@/components/ui/form-controls';
+import { FormInput } from '@/components/ui/form-controls';
 import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
 
 type Role = 'owner' | 'tenant' | 'agent' | 'agency';
-type FormErrors = Partial<Record<'phone' | 'agencyName' | 'address', string>>;
+type FormErrors = Partial<Record<'agencyName' | 'address', string>>;
 
-const ROLES: { value: Role; icon: typeof Home; titleKey: 'roleOwner' | 'roleTenant' | 'roleAgentChoice' | 'roleAgency' }[] = [
-  { value: 'owner', icon: Home, titleKey: 'roleOwner' },
-  { value: 'tenant', icon: Key, titleKey: 'roleTenant' },
-  { value: 'agent', icon: Handshake, titleKey: 'roleAgentChoice' },
-  { value: 'agency', icon: Building2, titleKey: 'roleAgency' },
+const ROLES: {
+  value: Role;
+  icon: typeof Home;
+  titleKey: 'roleOwnerChoice' | 'roleTenantChoice' | 'roleAgentChoice' | 'roleAgency';
+  descKey: 'roleOwnerDescription' | 'roleTenantDescription' | 'roleAgentDescription' | 'roleAgencyDescription';
+}[] = [
+  { value: 'owner', icon: Home, titleKey: 'roleOwnerChoice', descKey: 'roleOwnerDescription' },
+  { value: 'tenant', icon: Key, titleKey: 'roleTenantChoice', descKey: 'roleTenantDescription' },
+  { value: 'agent', icon: Handshake, titleKey: 'roleAgentChoice', descKey: 'roleAgentDescription' },
+  { value: 'agency', icon: Building2, titleKey: 'roleAgency', descKey: 'roleAgencyDescription' },
 ];
 
 // Dernière étape après "Se connecter avec Google" pour un compte fraîchement créé (voir
-// use-google-auth.ts, redirigé ici dès que `user.phone` est absent — Google ne le fournit
-// jamais). Un seul rôle par défaut ("owner", choisi à la création côté serveur) à confirmer ou
-// changer, puis les champs obligatoires du rôle choisi — mêmes champs que les formulaires
-// d'inscription classiques, sans mot de passe (déjà généré côté serveur pour ce compte).
+// use-google-auth.ts, redirigé ici tant que `user.hasCompletedProfile` est faux). Un seul rôle
+// par défaut ("owner", choisi à la création côté serveur) à confirmer ou changer, puis les champs
+// obligatoires du rôle choisi — le numéro de téléphone n'en fait plus partie (demandé
+// explicitement : pas de friction juste après "Se connecter avec Google"). Il sera exigé et
+// vérifié par OTP plus tard, au moment de publier une annonce ou créer une demande (voir
+// strImmo/src/properties/properties.service.ts, property-requests.service.ts).
 function CompleterProfilForm() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -52,7 +59,6 @@ function CompleterProfilForm() {
   const nextPath = getSafeNextPath(searchParams.get('next'));
 
   const [role, setRole] = useState<Role>('owner');
-  const [phone, setPhone] = useState('');
   const [agencyName, setAgencyName] = useState('');
   const [address, setAddress] = useState('');
   const [cinRecto, setCinRecto] = useState<File | null>(null);
@@ -67,21 +73,21 @@ function CompleterProfilForm() {
   // vers /verification-telephone. Ce drapeau la fait ignorer cette sortie volontaire.
   const leavingForVerification = useRef(false);
 
-  // Rien à faire ici pour un compte déjà complet (téléphone déjà renseigné) ou pas connecté —
-  // même garde par `useEffect` + `hasHydrated` que les autres pages authentifiées (voir
-  // app/profil/modifier/page.tsx), pour ne pas rediriger à tort le temps de la réhydratation.
+  // Rien à faire ici pour un compte déjà complet ou pas connecté — même garde par `useEffect` +
+  // `hasHydrated` que les autres pages authentifiées (voir app/profil/modifier/page.tsx), pour ne
+  // pas rediriger à tort le temps de la réhydratation.
   useEffect(() => {
     if (!hasHydrated || leavingForVerification.current) return;
     if (!isAuthenticated) {
       router.replace(nextPath ? `/connexion?next=${encodeURIComponent(nextPath)}` : '/connexion');
       return;
     }
-    if (user?.phone) {
+    if (user?.hasCompletedProfile) {
       router.replace(nextPath ?? '/');
     }
   }, [hasHydrated, isAuthenticated, user, router, nextPath]);
 
-  if (!hasHydrated || !isAuthenticated || !user || user.phone) return null;
+  if (!hasHydrated || !isAuthenticated || !user || user.hasCompletedProfile) return null;
 
   function clearError(key: keyof FormErrors) {
     setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
@@ -89,7 +95,6 @@ function CompleterProfilForm() {
 
   function validate(): FormErrors {
     const next: FormErrors = {};
-    if (!phone.trim()) next.phone = t.auth.phoneRequired;
     if (role === 'agency') {
       if (!agencyName.trim()) next.agencyName = t.auth.agencyNameRequired;
       if (!address.trim()) next.address = t.auth.addressRequired;
@@ -108,7 +113,6 @@ function CompleterProfilForm() {
     try {
       const { user: updatedUser, token } = await authService.completeProfile({
         role,
-        phone,
         agencyName: role === 'agency' ? agencyName : undefined,
         address: role === 'agency' ? address : undefined,
         cinRecto,
@@ -142,30 +146,28 @@ function CompleterProfilForm() {
         <FormErrorBanner message={errorMessage} />
 
         <form className="space-y-3.5" onSubmit={handleSubmit}>
-          <div>
-            <FieldLabel>{t.auth.completeProfileRoleLabel}</FieldLabel>
-            <div className="flex flex-wrap gap-2">
-              {ROLES.map(({ value, icon: Icon, titleKey }) => (
-                <Chip key={value} active={role === value} onClick={() => setRole(value)}>
-                  <span className="inline-flex items-center gap-1.5">
-                    <Icon size={16} />
-                    {t.auth[titleKey]}
-                  </span>
-                </Chip>
-              ))}
-            </div>
+          <div className="space-y-2.5">
+            {ROLES.map(({ value, icon: Icon, titleKey, descKey }) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setRole(value)}
+                className={`w-full flex items-center gap-3 text-left bg-surface-card border rounded-xl sm:rounded-2xl p-4 transition ${
+                  role === value
+                    ? 'border-brand-primary bg-brand-primary-soft'
+                    : 'border-stroke-default/80 hover:border-brand-primary'
+                }`}
+              >
+                <span className="shrink-0 basis-1/5 aspect-square flex items-center justify-center rounded-xl bg-brand-primary-soft text-brand-primary">
+                  <Icon size={20} />
+                </span>
+                <span className="min-w-0">
+                  <p className="font-semibold text-content-main text-sm">{t.auth[titleKey]}</p>
+                  <p className="text-[0.85rem] text-content-muted mt-0.5">{t.auth[descKey]}</p>
+                </span>
+              </button>
+            ))}
           </div>
-
-          <FormInput
-            label={t.auth.phone}
-            value={phone}
-            onChange={(value) => {
-              setPhone(value);
-              clearError('phone');
-            }}
-            placeholder={t.auth.phonePlaceholder}
-            error={errors.phone}
-          />
 
           {role === 'agent' && SHOW_CIN_UPLOAD && (
             <>

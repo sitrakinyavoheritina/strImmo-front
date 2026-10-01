@@ -15,6 +15,7 @@ export type ApiUser = {
   phone2: string | null;
   isEmailVerified: boolean;
   isPhoneVerified?: boolean;
+  hasCompletedProfile?: boolean;
   hasPassword: boolean;
   role: UserRole;
   themePreference: ThemePreference;
@@ -89,6 +90,14 @@ export const authApi = {
 
   upgradeToPublisher: (payload: { role: 'owner' | 'agent'; code: string }) =>
     apiClient.post<AuthenticatedResponse>('/auth/publisher-upgrade', payload).then((r) => r.data),
+
+  // Compte déjà owner/agent/agency (ex. Google) qui doit juste prouver son numéro avant de
+  // publier une annonce ou créer une demande — pas de changement de rôle, contrairement à
+  // requestPublisherUpgrade. La confirmation réutilise /auth/verify-phone ci-dessus.
+  requestPhoneConfirmation: (phone?: string) =>
+    apiClient
+      .post<{ phone: string }>('/auth/phone-confirmation/send-code', { phone })
+      .then((r) => r.data),
 
   updateProfile: (formData: FormData) =>
     apiClient

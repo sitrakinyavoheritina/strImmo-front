@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
+import { getErrorMessage } from '@/lib/api/get-error-message';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 import { useCreateProperty } from '@/features/search/hooks/use-create-property';
 import { PropertyForm, type PropertyFormHandle } from '@/features/listings/components/property-form';
@@ -51,7 +52,7 @@ export default function NouvelleAnnoncePage() {
       await mutateAsync({ values: draft, photos: draftPhotos });
       setIsPublished(true);
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : String(error));
+      setErrorMessage(getErrorMessage(error, t.listing.publishError));
     }
   }
 

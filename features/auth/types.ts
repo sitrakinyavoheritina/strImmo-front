@@ -55,7 +55,10 @@ export type RegisterResult =
 // selon le rôle choisi, sans mot de passe (déjà géré côté serveur pour un compte Google).
 export interface CompleteProfilePayload {
   role: 'owner' | 'tenant' | 'agent' | 'agency';
-  phone: string;
+  /** Facultatif : plus demandé à cette étape (voir /completer-profil), vérifié plus tard par OTP
+   *  au moment de publier une annonce ou créer une demande (strImmo/src/properties/
+   *  properties.service.ts, property-requests.service.ts). */
+  phone?: string;
   agencyName?: string;
   address?: string;
   cinRecto?: File | null;
@@ -90,10 +93,8 @@ export interface User {
   firstName: string;
   lastName: string;
   fullName: string;
-  /** Absent tant qu'un compte créé via "Se connecter avec Google" n'a pas complété son profil
-   *  (Google ne fournit jamais de numéro) — c'est ce qui signale qu'il faut rediriger vers
-   *  /completer-profil, voir use-google-auth.ts et strImmo/src/auth/auth.service.ts:
-   *  loginWithGoogle/completeProfile. */
+  /** Jamais fourni par Google : reste vide tant que l'utilisateur ne le renseigne pas lui-même,
+   *  pas forcément à l'inscription (voir hasCompletedProfile, qui signale la complétion réelle). */
   phone?: string;
   email?: string;
   avatarUrl?: string;
@@ -103,6 +104,12 @@ export interface User {
   isEmailVerified: boolean;
   /** Numéro confirmé par OTP SMS (voir /verification-telephone). */
   isPhoneVerified: boolean;
+  /** `false` seulement pour un compte flambant neuf créé via "Se connecter avec Google", tant
+   *  qu'il n'a pas choisi son rôle sur /completer-profil — c'est ce qui signale qu'il faut l'y
+   *  rediriger (voir use-google-auth.ts). Ne pas utiliser `!phone` pour ça : le numéro est
+   *  facultatif à cette étape, un compte qui choisit de ne pas le renseigner y serait sinon
+   *  renvoyé indéfiniment à chaque connexion. */
+  hasCompletedProfile: boolean;
   /** `false` uniquement pour un compte créé via "Se connecter avec Google" qui n'a jamais lui-même
    *  choisi de mot de passe (voir strImmo/src/auth/entities/user.entity.ts) — /profil/modifier
    *  n'exige alors pas le mot de passe actuel, qu'il ne peut de toute façon pas connaître. */

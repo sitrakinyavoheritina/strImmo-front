@@ -13,10 +13,10 @@ import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
 import { getSafeNextPath } from '@/lib/auth/safe-next-path';
 
 // Connecte immédiatement, sans rien demander de plus — même logique post-connexion que useLogin
-// (session, préférences), sauf la redirection : un compte fraîchement créé via Google n'a jamais
-// de téléphone (`user.phone` absent, voir types.ts) tant qu'il n'a pas choisi son rôle et complété
-// son profil sur /completer-profil (voir strImmo/src/auth/auth.service.ts:loginWithGoogle, qui
-// crée le compte à la volée avec `phone: null`).
+// (session, préférences), sauf la redirection : un compte fraîchement créé via Google
+// (`hasCompletedProfile: false`, voir types.ts) doit d'abord choisir son rôle sur
+// /completer-profil avant de rejoindre sa destination (voir strImmo/src/auth/auth.service.ts:
+// loginWithGoogle).
 export function useGoogleAuth() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -35,10 +35,10 @@ export function useGoogleAuth() {
       setStoredTheme(user.themePreference);
       setStoredFeedDisplay(user.feedDisplay);
       const next = getSafeNextPath(searchParams.get('next'));
-      if (!user.phone) {
+      if (!user.hasCompletedProfile) {
         // Compte flambant neuf (voir loginWithGoogle) : `next` doit encore attendre le choix du
-        // rôle + téléphone sur /completer-profil, qui le reprendra à son tour une fois ce compte
-        // complété (voir ce fichier).
+        // rôle sur /completer-profil (le numéro y est facultatif), qui le reprendra à son tour
+        // une fois ce compte complété (voir ce fichier).
         router.push(next ? `/completer-profil?next=${encodeURIComponent(next)}` : '/completer-profil');
         return;
       }

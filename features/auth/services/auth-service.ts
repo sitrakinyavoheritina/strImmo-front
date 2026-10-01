@@ -24,6 +24,7 @@ function toUser(api: ApiUser): User {
     phone2: api.phone2 ?? undefined,
     isEmailVerified: api.isEmailVerified ?? false,
     isPhoneVerified: api.isPhoneVerified ?? true,
+    hasCompletedProfile: api.hasCompletedProfile ?? true,
     hasPassword: api.hasPassword ?? true,
     role: api.role,
     themePreference: api.themePreference,
@@ -48,7 +49,7 @@ export const authService = {
   completeProfile: async (payload: CompleteProfilePayload): Promise<{ user: User; token: string }> => {
     const form = new FormData();
     form.append('role', payload.role);
-    form.append('phone', payload.phone);
+    if (payload.phone) form.append('phone', payload.phone);
     if (payload.agencyName) form.append('agencyName', payload.agencyName);
     if (payload.address) form.append('address', payload.address);
     if (payload.cinRecto) form.append('cinRecto', payload.cinRecto);
@@ -117,6 +118,8 @@ export const authService = {
   verifyPhone: (code: string) => authApi.verifyPhone(code),
 
   requestPublisherUpgrade: (phone?: string) => authApi.requestPublisherUpgrade(phone),
+
+  requestPhoneConfirmation: (phone?: string) => authApi.requestPhoneConfirmation(phone),
 
   upgradeToPublisher: async (payload: { role: 'owner' | 'agent'; code: string }): Promise<{ user: User; token: string }> => {
     const res = await authApi.upgradeToPublisher(payload);
