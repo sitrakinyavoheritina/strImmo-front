@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useUnreadMessagesCount } from '@/features/messages/hooks/use-messages';
 import { useAuthStore } from '@/lib/state/use-auth-store';
+import { useHomeSearchFiltersStore } from '@/lib/state/use-home-search-filters-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
 import { getNavItems, isNavItemActive } from './nav-items';
 import { SidebarAdvancedFilters } from './sidebar-advanced-filters';
@@ -33,6 +34,13 @@ export function Sidebar() {
             <Link
               key={href}
               href={href}
+              // Le store de filtres de l'accueil est partagé avec /recherche (voir
+              // app/recherche/page.tsx, qui le synchronise avec l'URL) et n'est pas réinitialisé
+              // par un simple changement de route — un clic sur une commune/annonce depuis la
+              // recherche laissait sinon ce filtre actif, silencieusement, en revenant à l'accueil
+              // par ce lien (remonté explicitement : les chips "Maison"/"Propriétaire" semblaient
+              // alors ne plus rien changer, alors qu'ils s'ajoutaient à un `communeId` oublié).
+              onClick={href === '/' ? () => useHomeSearchFiltersStore.getState().reset() : undefined}
               aria-current={isActive ? 'page' : undefined}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${
                 isActive

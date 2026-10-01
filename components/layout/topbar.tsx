@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { Bell, Plus, User } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
+import { useHomeSearchFiltersStore } from '@/lib/state/use-home-search-filters-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useUnreadNotificationsCount } from '@/features/notifications/hooks/use-notifications';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
@@ -25,7 +26,13 @@ export function Topbar() {
       <div className="w-full px-3 sm:px-6 lg:px-8 h-12 sm:h-14 flex items-center gap-3 sm:gap-6">
         {/* Vers /admin (pas /) pour un admin — sinon le clic déclencherait quand même une
             redirection (voir AdminRouteGuard), visible comme un aller-retour inutile. */}
-        <Link href={isAdminUser ? '/admin' : '/'} className="flex items-center gap-3 sm:gap-3.5 shrink-0">
+        <Link
+          href={isAdminUser ? '/admin' : '/'}
+          // Voir le même onClick dans sidebar.tsx/mobile-nav-strip.tsx : le store de filtres de
+          // l'accueil, partagé avec /recherche, doit être réinitialisé en y revenant par le logo.
+          onClick={isAdminUser ? undefined : () => useHomeSearchFiltersStore.getState().reset()}
+          className="flex items-center gap-3 sm:gap-3.5 shrink-0"
+        >
           {/* eslint-disable-next-line @next/next/no-img-element -- logo décoratif (SVG statique dans /public), pas besoin de l'optimiseur next/image */}
           <img src="/logo.svg" alt="Onina" className="h-8 sm:h-10 w-auto" />
           <span className="font-extrabold tracking-tight">

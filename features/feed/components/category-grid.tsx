@@ -29,7 +29,7 @@ export function CategoryGrid() {
           <Link
             key={href}
             href={href}
-            className="group grid grid-cols-[1fr_4fr] items-stretch overflow-hidden rounded-lg border border-stroke-default bg-surface-card text-xs leading-tight font-medium text-content-main hover:border-brand-primary hover:text-brand-primary transition"
+            className="group grid grid-cols-[1fr_4fr] items-stretch overflow-hidden rounded-lg border border-stroke-default bg-surface-card text-[13px] leading-tight font-medium text-content-main hover:border-brand-primary hover:text-brand-primary transition"
           >
             {/* 1/5 de la carte pour l'icône (fond coloré), 4/5 pour le texte. */}
             <span className="flex items-center justify-center bg-brand-primary-soft text-brand-primary py-1">

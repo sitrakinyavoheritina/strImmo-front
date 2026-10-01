@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useUnreadMessagesCount } from '@/features/messages/hooks/use-messages';
 import { useAuthStore } from '@/lib/state/use-auth-store';
+import { useHomeSearchFiltersStore } from '@/lib/state/use-home-search-filters-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
 import { getNavItems, isNavItemActive } from './nav-items';
 
@@ -36,6 +37,9 @@ export function MobileNavStrip() {
           <Link
             key={href}
             href={href}
+            // Voir le même onClick dans sidebar.tsx : le store de filtres de l'accueil, partagé
+            // avec /recherche, doit être réinitialisé en y revenant par ce lien.
+            onClick={href === '/' ? () => useHomeSearchFiltersStore.getState().reset() : undefined}
             aria-current={isActive ? 'page' : undefined}
             className="relative flex-1 flex items-center justify-center py-1.5 min-h-12 transition active:bg-surface-app"
           >

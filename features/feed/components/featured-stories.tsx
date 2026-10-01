@@ -228,7 +228,7 @@ export function FeaturedStories({
               <div className="relative w-full h-20 bg-stroke-default">
                 {cover && <Image src={cover} alt={property.title} fill className="object-cover" />}
                 <span
-                  className={`absolute top-1 left-1 text-white text-[8px] font-bold px-1.5 py-0.5 rounded uppercase ${
+                  className={`absolute top-1 left-1 text-white text-[11px] font-bold px-1.5 py-0.5 rounded uppercase ${
                     property.kind === 'rent' ? 'bg-brand-primary' : 'bg-brand-secondary'
                   }`}
                 >
@@ -245,7 +245,7 @@ export function FeaturedStories({
                   <span className="truncate">{property.location}</span>
                 </p>
                 {spec && (
-                  <p className="text-[9px] text-content-muted border-t border-stroke-default pt-0.5 line-clamp-1">
+                  <p className="text-[12px] font-medium text-content-muted border-t border-stroke-default pt-0.5 line-clamp-1">
                     {spec}
                   </p>
                 )}
