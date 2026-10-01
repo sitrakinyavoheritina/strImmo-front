@@ -45,7 +45,7 @@ export default function MesBiensPage() {
 
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
-      <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl">
+      <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl mx-auto">
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-1.5">
             <button

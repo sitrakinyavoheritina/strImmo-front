@@ -117,7 +117,14 @@ export default function VerificationTelephonePage() {
             </div>
           </div>
         )}
-        <OtpInput label={t.auth.verifyPhoneCodeLabel} value={code} onChange={setCode} hasError={!!error} autoFocus />
+        <OtpInput
+          label={t.auth.verifyPhoneCodeLabel}
+          hint={t.auth.verifyPhoneDeliveryHint}
+          value={code}
+          onChange={setCode}
+          hasError={!!error}
+          autoFocus
+        />
         {email && (
           <p className="text-[0.85rem] text-content-muted">{t.auth.verifyPhoneAlsoEmail.replace('%email%', email)}</p>
         )}

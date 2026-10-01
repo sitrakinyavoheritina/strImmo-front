@@ -58,7 +58,7 @@ export default function AdminAnnoncesPage() {
 
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
-      <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl">
+      <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl mx-auto">
         <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text mb-4">{t.adminAnnoncesPage.title}</h1>
 
         <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-[0.85rem] font-semibold mb-4 max-w-sm">

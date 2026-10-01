@@ -124,7 +124,13 @@ export default function MotDePasseOubliePage() {
           </form>
         ) : (
           <form className="space-y-3 sm:space-y-5" onSubmit={handleResetPassword}>
-            <OtpInput label={t.forgotPasswordPage.codeLabel} value={code} onChange={setCode} autoFocus />
+            <OtpInput
+              label={t.forgotPasswordPage.codeLabel}
+              hint={t.forgotPasswordPage.codeDeliveryHint}
+              value={code}
+              onChange={setCode}
+              autoFocus
+            />
             <div>
               <label className="block text-[0.85rem] font-medium text-content-main mb-0.5 sm:mb-1">
                 {t.forgotPasswordPage.newPasswordLabel}

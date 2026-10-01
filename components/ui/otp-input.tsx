@@ -11,12 +11,14 @@ export function OtpInput({
   value,
   onChange,
   label,
+  hint,
   autoFocus = false,
   hasError = false,
 }: {
   value: string;
   onChange: (value: string) => void;
   label: string;
+  hint?: string;
   autoFocus?: boolean;
   hasError?: boolean;
 }) {
@@ -88,6 +90,7 @@ export function OtpInput({
           />
         ))}
       </div>
+      {hint && <p className="mt-1.5 text-[0.8rem] text-content-muted">{hint}</p>}
     </div>
   );
 }

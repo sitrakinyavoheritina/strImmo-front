@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/use-translation';
+import translations from '@/lib/i18n/translations';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 import { getErrorMessage } from '@/lib/api/get-error-message';
 import { Chip, FieldLabel, FormInput } from '@/components/ui/form-controls';
@@ -87,6 +88,7 @@ function NouvelleDemandeForm() {
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [continueError, setContinueError] = useState<string | null>(null);
   const [created, setCreated] = useState(false);
 
   function handleSelectPropertyType(value: PropertyType | undefined) {
@@ -132,8 +134,19 @@ function NouvelleDemandeForm() {
 
   const canContinue = !!kind && !!communeId && !!fokontanyId && !!maxBudget;
 
+  // Bouton volontairement TOUJOURS cliquable (pas `disabled`) : sur un bouton désactivé, le clic
+  // ne déclenche rien du tout (aucun événement), donc personne ne voit jamais pourquoi rien ne se
+  // passe — remonté explicitement par l'utilisateur. Le message combine français ET malgache dans
+  // le même message (pas seulement la langue actuellement choisie, voir le sélecteur FR/MG en
+  // haut) — demandé explicitement pour ce message précis.
   function handleContinue() {
-    if (!canContinue) return;
+    if (!canContinue) {
+      setContinueError(
+        `${translations.fr.propertyRequestsPage.requiredFields} / ${translations.mg.propertyRequestsPage.requiredFields}`
+      );
+      return;
+    }
+    setContinueError(null);
     setStep('summary');
   }
 
@@ -353,8 +366,10 @@ function NouvelleDemandeForm() {
         )}
       </div>
 
-      {step === 'form' && !isAiMode && !canContinue && (
-        <p className="mt-2 text-[0.85rem] text-content-muted">{t.propertyRequestsPage.requiredFields}</p>
+      {step === 'form' && !isAiMode && !canContinue && continueError && (
+        <div className="mt-2">
+          <FormErrorBanner message={continueError} />
+        </div>
       )}
 
       <div className="mt-4 flex items-center gap-3">
@@ -365,7 +380,7 @@ function NouvelleDemandeForm() {
         )}
         <div className="flex-1">
           {step === 'form' ? (
-            <Button type="button" className="w-full" disabled={!canContinue} onClick={handleContinue}>
+            <Button type="button" className="w-full" onClick={handleContinue}>
               {t.propertyRequestsPage.next}
             </Button>
           ) : (

@@ -69,7 +69,7 @@ export default function AdminUserDetailPage() {
 
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
-      <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl">
+      <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl mx-auto">
         <Link
           href="/admin/utilisateurs"
           className="inline-flex items-center gap-1 text-sm font-semibold text-content-muted hover:text-content-main"

@@ -361,7 +361,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
                 kind === 'rent' ? 'bg-brand-primary text-white' : 'text-content-muted hover:bg-surface-app'
               }`}
             >
-              {t.search.rent}
+              {t.listing.kindRentOption}
             </button>
             <button
               type="button"
@@ -375,7 +375,7 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
                 kind === 'sale' ? 'bg-brand-primary text-white' : 'text-content-muted hover:bg-surface-app'
               }`}
             >
-              {t.search.buy}
+              {t.listing.kindSaleOption}
             </button>
           </div>
 

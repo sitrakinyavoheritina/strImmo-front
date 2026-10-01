@@ -118,7 +118,7 @@ export default function AdminErrorLogsPage() {
 
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
-      <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl">
+      <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl mx-auto">
         <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text">{t.adminErrorLogsPage.title}</h1>
         <p className="mt-1 text-[0.85rem] text-content-muted">
           {t.adminErrorLogsPage.subtitle.replace('%days%', String(data?.retentionDays ?? 20))}
