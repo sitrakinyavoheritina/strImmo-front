@@ -64,10 +64,13 @@ export function NearbyPropertiesMapWidget() {
 
     const map = new mapboxgl.Map({
       container: containerRef.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
+      // Style satellite (pas `streets-v12`, routes seules) : on doit pouvoir distinguer les
+      // bâtiments, comme sur Google Maps — même correction que property-map.tsx.
+      style: 'mapbox://styles/mapbox/satellite-streets-v12',
       center: [position.longitude, position.latitude],
       zoom: ZOOM,
     });
+    map.addControl(new mapboxgl.NavigationControl({ showCompass: false }), 'top-right');
     // Ajouté ici (effet d'initialisation, une seule exécution) et non dans l'effet ci-dessous —
     // qui, lui, se relance à chaque mise à jour de `nearby`, ce qui dupliquait ce marqueur à
     // chaque rechargement des données (constaté explicitement en testant).
@@ -112,11 +115,11 @@ export function NearbyPropertiesMapWidget() {
       <h3 className="text-sm font-semibold text-content-main mb-2.5">{t.feed.nearbyProperties}</h3>
       {position ? (
         <>
-          <div ref={containerRef} className="h-48 rounded-xl overflow-hidden border border-stroke-default" />
+          <div ref={containerRef} className="h-56 rounded-xl overflow-hidden border border-stroke-default" />
           {nearby && nearby.length === 0 && <p className="mt-1.5 text-[0.85rem] text-content-muted">{t.feed.nearbyEmpty}</p>}
         </>
       ) : !error ? (
-        <div className="flex items-center justify-center h-48 rounded-xl border border-stroke-default bg-surface-app text-content-muted text-[0.85rem] font-semibold">
+        <div className="flex items-center justify-center h-56 rounded-xl border border-stroke-default bg-surface-app text-content-muted text-[0.85rem] font-semibold">
           {t.feed.locatingNearby}
         </div>
       ) : null}
