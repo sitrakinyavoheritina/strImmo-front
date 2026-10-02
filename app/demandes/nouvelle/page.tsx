@@ -10,6 +10,7 @@ import { Chip, FieldLabel, FormInput } from '@/components/ui/form-controls';
 import { SearchableSelect } from '@/components/ui/searchable-select';
 import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
+import { MissingFieldsModal, type MissingField } from '@/components/ui/missing-fields-modal';
 import { FilterFields, PROPERTY_TYPES } from '@/features/search/components/filter-fields';
 import { useCommunes } from '@/features/listings/hooks/use-communes';
 import { useFokontany } from '@/features/listings/hooks/use-fokontany';
@@ -89,6 +90,7 @@ function NouvelleDemandeForm() {
   const [aiError, setAiError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [continueError, setContinueError] = useState<string | null>(null);
+  const [missingFields, setMissingFields] = useState<MissingField[]>([]);
   const [created, setCreated] = useState(false);
 
   function handleSelectPropertyType(value: PropertyType | undefined) {
@@ -139,8 +141,17 @@ function NouvelleDemandeForm() {
   // passe — remonté explicitement par l'utilisateur. Le message combine français ET malgache dans
   // le même message (pas seulement la langue actuellement choisie, voir le sélecteur FR/MG en
   // haut) — demandé explicitement pour ce message précis.
+  // Modal listant précisément lesquels des 4 champs obligatoires manquent, avec explication en
+  // malgache (demandé explicitement) — en plus du bandeau déjà affiché juste sous le bouton
+  // "Continuer", resté tel quel pour qui a déjà vu la liste et referme juste le modal.
   function handleContinue() {
     if (!canContinue) {
+      const missing: MissingField[] = [];
+      if (!kind) missing.push({ label: t.propertyRequestsPage.kindRequired, explanationMg: translations.mg.propertyRequestsPage.kindRequired });
+      if (!communeId) missing.push({ label: t.listing.communeRequired, explanationMg: translations.mg.listing.communeRequired });
+      if (!fokontanyId) missing.push({ label: t.listing.fokontanyRequired, explanationMg: translations.mg.listing.fokontanyRequired });
+      if (!maxBudget) missing.push({ label: t.propertyRequestsPage.maxBudgetRequired, explanationMg: translations.mg.propertyRequestsPage.maxBudgetRequired });
+      setMissingFields(missing);
       setContinueError(
         `${translations.fr.propertyRequestsPage.requiredFields} / ${translations.mg.propertyRequestsPage.requiredFields}`
       );
@@ -390,6 +401,8 @@ function NouvelleDemandeForm() {
           )}
         </div>
       </div>
+
+      <MissingFieldsModal fields={missingFields} onClose={() => setMissingFields([])} />
     </div>
   );
 }

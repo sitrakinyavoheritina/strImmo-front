@@ -1,11 +1,13 @@
 'use client';
 
-import { forwardRef, useImperativeHandle, useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
 import { Pencil } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
+import translations from '@/lib/i18n/translations';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { Chip, Toggle, FieldLabel, FormInput } from '@/components/ui/form-controls';
 import { SearchableSelect } from '@/components/ui/searchable-select';
+import { MissingFieldsModal, type MissingField } from '@/components/ui/missing-fields-modal';
 import { ListingPhotoPicker } from './listing-photo-picker';
 import { MapPositionPicker } from './map-position-picker';
 import { generateTitle } from '../utils/listing-summary';
@@ -62,6 +64,27 @@ type FormErrors = Partial<
     string
   >
 >;
+
+// Explication TOUJOURS en malgache (indépendante du sélecteur FR/MG en haut de page, demandé
+// explicitement pour le modal des champs manquants, voir handleNext1/handleNext2/handlePreview
+// plus bas) — réutilise les mêmes clés que les messages d'erreur FR déjà affichés sous chaque
+// champ, juste résolues depuis `translations.mg` plutôt que `t` (langue d'affichage courante).
+const MISSING_FIELD_MG: Record<keyof FormErrors, string> = {
+  title: translations.mg.listing.titleRequired,
+  description: translations.mg.listing.descriptionRequired,
+  price: translations.mg.listing.priceRequired,
+  commune: translations.mg.listing.communeRequired,
+  fokontany: translations.mg.listing.fokontanyRequired,
+  bedrooms: translations.mg.listing.bedroomsRequired,
+  surfaceM2: translations.mg.listing.surfaceRequired,
+  minSubdivisionM2: translations.mg.listing.minSubdivisionRequired,
+};
+
+function toMissingFields(nextErrors: FormErrors): MissingField[] {
+  return (Object.keys(nextErrors) as (keyof FormErrors)[])
+    .filter((key) => nextErrors[key])
+    .map((key) => ({ label: nextErrors[key] as string, explanationMg: MISSING_FIELD_MG[key] }));
+}
 
 export type PropertyFormHandle = { submit: () => void };
 
@@ -207,8 +230,51 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   );
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [missingFields, setMissingFields] = useState<MissingField[]>([]);
   function clearError(key: keyof FormErrors) {
     setErrors((prev) => (prev[key] ? { ...prev, [key]: undefined } : prev));
+  }
+
+  // Ajoute "au moins 3 photos" à la liste du modal si c'est le cas (voir handleNext1/handlePreview
+  // ci-dessous) — pas une entrée de `FormErrors`/`MISSING_FIELD_MG` comme les autres champs
+  // (MIN_PHOTOS n'est même pas une valeur de formulaire), donc construit à part ici.
+  function missingPhotosField(): MissingField | null {
+    if (!(mode === 'create' && photos.length < MIN_PHOTOS)) return null;
+    const vars = { min: String(MIN_PHOTOS), missing: String(MIN_PHOTOS - photos.length) };
+    const fill = (text: string) => text.replace('%min%', vars.min).replace('%missing%', vars.missing);
+    return {
+      label: fill(t.listing.photosMinError),
+      explanationMg: fill(translations.mg.listing.photosMinError),
+    };
+  }
+
+  // Le modal ne s'affiche qu'à partir du 4ᵉ clic infructueux sur "Suivant" à une même étape
+  // (demandé explicitement) — avant ça, les bordures rouges sous chaque champ (toujours affichées,
+  // voir `setErrors` dans chaque handler ci-dessous) suffisent. Une `ref` (pas un `useState`) :
+  // incrémentée sans provoquer de rendu, elle n'a besoin d'être lue qu'au moment du clic suivant.
+  const attemptCountsRef = useRef<Record<1 | 2 | 3, number>>({ 1: 0, 2: 0, 3: 0 });
+  function shouldShowModal(formStep: 1 | 2 | 3): boolean {
+    attemptCountsRef.current[formStep] += 1;
+    return attemptCountsRef.current[formStep] > 3;
+  }
+
+  // Message unique et naturel quand les DEUX champs manquent à la fois (reformulé explicitement
+  // ainsi plutôt que deux lignes séparées) — sinon, le message individuel habituel suffit.
+  function step1Missing(nextErrors: FormErrors, photosField: MissingField | null): MissingField[] {
+    if (nextErrors.price && photosField) {
+      const fill = (text: string) => text.replace('%min%', String(MIN_PHOTOS));
+      return [{ label: fill(t.listing.priceAndPhotosRequired), explanationMg: fill(translations.mg.listing.priceAndPhotosRequired) }];
+    }
+    const missing = toMissingFields(nextErrors);
+    if (photosField) missing.push(photosField);
+    return missing;
+  }
+
+  function step2Missing(nextErrors: FormErrors): MissingField[] {
+    if (nextErrors.commune && nextErrors.fokontany) {
+      return [{ label: t.listing.communeAndFokontanyRequired, explanationMg: translations.mg.listing.communeAndFokontanyRequired }];
+    }
+    return toMissingFields(nextErrors);
   }
 
   function buildValues(): PropertyFormValues {
@@ -294,7 +360,10 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
     if (!price || Number(price) <= 0) next.price = t.listing.priceRequired;
     if (!communeId) next.commune = t.listing.communeRequired;
     if (!fokontanyId) next.fokontany = t.listing.fokontanyRequired;
-    if (propertyType === 'house' && (!bedrooms || Number(bedrooms) <= 0)) next.bedrooms = t.listing.bedroomsRequired;
+    // Le nombre de chambres n'est plus obligatoire pour une maison (correction majeure demandée
+    // explicitement) — `buildValues()` retombe sur 0 si laissé vide, et le backend lui-même
+    // retombe sur 1 chambre par défaut (voir strImmo/src/properties/properties.service.ts:
+    // saveTypeDetails) si la valeur soumise est absente/invalide.
     if (
       (propertyType === 'villa' || propertyType === 'apartment' || propertyType === 'land') &&
       (!surfaceM2 || Number(surfaceM2) <= 0)
@@ -316,8 +385,13 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   function handleNext1() {
     const nextErrors = validateStep1();
     setErrors((prev) => ({ ...prev, ...nextErrors }));
-    if (mode === 'create' && photos.length < MIN_PHOTOS) setPhotosAttempted(true);
-    if (Object.keys(nextErrors).length > 0 || (mode === 'create' && photos.length < MIN_PHOTOS)) return;
+    const photosField = missingPhotosField();
+    if (photosField) setPhotosAttempted(true);
+    const missing = step1Missing(nextErrors, photosField);
+    if (missing.length > 0) {
+      if (shouldShowModal(1)) setMissingFields(missing);
+      return;
+    }
     onNext();
   }
 
@@ -333,15 +407,25 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   function handleNext2() {
     const nextErrors = validateStep2();
     setErrors((prev) => ({ ...prev, ...nextErrors }));
-    if (Object.keys(nextErrors).length > 0) return;
+    const missing = step2Missing(nextErrors);
+    if (missing.length > 0) {
+      if (shouldShowModal(2)) setMissingFields(missing);
+      return;
+    }
     onNext();
   }
 
   function handlePreview() {
     const nextErrors = validate();
     setErrors(nextErrors);
-    if (mode === 'create' && photos.length < MIN_PHOTOS) setPhotosAttempted(true);
-    if (Object.keys(nextErrors).length > 0 || (mode === 'create' && photos.length < MIN_PHOTOS)) return;
+    const photosField = missingPhotosField();
+    if (photosField) setPhotosAttempted(true);
+    const missing = toMissingFields(nextErrors);
+    if (photosField) missing.push(photosField);
+    if (missing.length > 0) {
+      if (shouldShowModal(3)) setMissingFields(missing);
+      return;
+    }
     onPreview({ ...buildValues(), title: displayedTitle }, photos);
   }
 
@@ -690,6 +774,8 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
           </div>
         </>
       )}
+
+      <MissingFieldsModal fields={missingFields} onClose={() => setMissingFields([])} />
     </div>
   );
 });

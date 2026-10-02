@@ -84,7 +84,10 @@ export function OtpInput({
               event.preventDefault();
               setDigitsFrom(index, event.clipboardData.getData('text'));
             }}
-            className={`w-full min-w-0 aspect-square max-w-12 text-center text-xl font-bold text-content-main bg-surface-app border rounded-xl focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
+            // `surface-card` (pas `surface-app`) : blanc en thème clair (demandé explicitement),
+            // reste une teinte sombre dédiée en thème sombre — même jeton que le reste des
+            // cartes/champs "en relief" sur le fond crème/sombre de la page.
+            className={`w-full min-w-0 aspect-square max-w-12 text-center text-xl font-bold text-content-main bg-surface-card border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition ${
               hasError ? 'border-danger' : 'border-stroke-default'
             }`}
           />
