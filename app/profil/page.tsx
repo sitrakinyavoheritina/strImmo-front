@@ -3,11 +3,12 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Phone, Mail, Home, Heart, LogOut, Pencil } from 'lucide-react';
+import { Phone, Mail, Home, Heart, LogOut, Pencil, Building2, MapPin, Globe, Link2, FileText } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { useFavoriteIds } from '@/features/search/hooks/use-favorites';
 import { useProperties } from '@/features/search/hooks/use-properties';
+import { useAgencyProfile } from '@/features/auth/hooks/use-agency-profile';
 import { ROLE_LABEL_KEY } from '@/features/auth/utils/role-label';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,10 @@ export default function ProfilPage() {
     user ? { ownerId: user.id, status: 'approved' } : undefined,
     { enabled: !!user }
   );
+  // Agence : champs supplémentaires (agencyName/address/website/facebookUrl/description), absents
+  // de la session — voir strImmo/src/auth/auth.service.ts:getMyAgencyProfile. Demandé
+  // explicitement : ces champs, propres à ce rôle, doivent être visibles sur le profil.
+  const { data: agencyProfile } = useAgencyProfile(user?.role === 'agency');
 
   if (!isAuthenticated || !user) {
     return (
@@ -148,6 +153,53 @@ export default function ProfilPage() {
             )}
           </div>
         </div>
+
+        {/* Agence uniquement — champs propres à ce rôle (voir useAgencyProfile), absents pour
+            propriétaire/locataire/intermédiaire. `agencyProfile` reste `undefined` tant que la
+            requête n'a pas répondu : rien ne s'affiche à la place d'un état vide trompeur. */}
+        {user.role === 'agency' && agencyProfile && (
+          <div className="mt-4">
+            <h2 className="text-sm font-bold text-content-main mb-2">{t.profile.agencyInformation}</h2>
+            <div className="bg-surface-card border border-stroke-default/80 rounded-xl divide-y divide-stroke-default">
+              <div className="flex items-center gap-3 px-4 py-3 text-sm text-content-main">
+                <Building2 size={16} className="text-content-muted shrink-0" />
+                {agencyProfile.agencyName}
+              </div>
+              <div className="flex items-center gap-3 px-4 py-3 text-sm text-content-main">
+                <MapPin size={16} className="text-content-muted shrink-0" />
+                {agencyProfile.address}
+              </div>
+              {agencyProfile.website && (
+                <a
+                  href={agencyProfile.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-brand-primary hover:underline truncate"
+                >
+                  <Globe size={16} className="text-content-muted shrink-0" />
+                  <span className="truncate">{agencyProfile.website}</span>
+                </a>
+              )}
+              {agencyProfile.facebookUrl && (
+                <a
+                  href={agencyProfile.facebookUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 px-4 py-3 text-sm text-brand-primary hover:underline truncate"
+                >
+                  <Link2 size={16} className="text-content-muted shrink-0" />
+                  <span className="truncate">{agencyProfile.facebookUrl}</span>
+                </a>
+              )}
+              {agencyProfile.description && (
+                <div className="flex items-start gap-3 px-4 py-3 text-sm text-content-main">
+                  <FileText size={16} className="text-content-muted shrink-0 mt-0.5" />
+                  <p className="whitespace-pre-line">{agencyProfile.description}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         <div className="mt-4 bg-surface-card border border-stroke-default/80 rounded-xl p-1.5 space-y-0.5">
           <MenuRow href="/mes-biens" icon={Home} label={t.profile.myListings} />

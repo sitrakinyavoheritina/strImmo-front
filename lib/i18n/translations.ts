@@ -225,6 +225,7 @@ const translations = {
       // laissait penser à tort qu'il s'agissait de deux fonctionnalités distinctes.
       savedListings: 'Favoris',
       myInformation: 'Mes informations',
+      agencyInformation: "Informations de l'agence",
       contact: 'Contact',
       myListings: 'Mes annonces',
       myFavorites: 'Mes favoris',
@@ -1164,6 +1165,7 @@ const translations = {
       publishedListings: 'Doka navoaka',
       savedListings: 'Ny tiako',
       myInformation: 'Ny mombamomba ahy',
+      agencyInformation: 'Mombamomba ny agence',
       contact: 'Fifandraisana',
       myListings: 'Ny dokako',
       myFavorites: 'Ny tiako',

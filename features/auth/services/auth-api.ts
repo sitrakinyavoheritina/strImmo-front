@@ -129,4 +129,17 @@ export const authApi = {
 
   verifyEmail: (code: string) =>
     apiClient.post<{ isEmailVerified: boolean }>('/auth/verify-email', { code }).then((r) => r.data),
+
+  // Champs propres à une agence, absents de la session (voir User/ApiUser) — `null` si ce compte
+  // n'est pas une agence. Jamais le NIF/STAT (simple archive admin, pas affichée ici).
+  getAgencyProfile: () =>
+    apiClient
+      .get<{
+        agencyName: string;
+        address: string;
+        website: string | null;
+        facebookUrl: string | null;
+        description: string | null;
+      } | null>('/auth/agency-profile')
+      .then((r) => r.data),
 };
