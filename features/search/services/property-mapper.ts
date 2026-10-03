@@ -3,10 +3,17 @@ import type {
   ApartmentProperty,
   HouseProperty,
   LandProperty,
+  ListingPhotoItem,
   Property,
   PropertyFormValues,
   VillaProperty,
 } from '../types/listing.types';
+
+// Ne garde que les fichiers locaux ("new") — en création, tous les items le sont déjà (voir
+// property-form.tsx), ce filtre reste défensif plutôt qu'une simple assertion de type.
+export function extractNewPhotoFiles(items: ListingPhotoItem[]): File[] {
+  return items.filter((item): item is Extract<ListingPhotoItem, { kind: 'new' }> => item.kind === 'new').map((item) => item.file);
+}
 
 // Reconstitue l'union à plat `Property` à partir de la réponse imbriquée du backend (une
 // sous-table de détails par type, une seule renseignée selon `propertyType`). Port direct de
@@ -135,65 +142,75 @@ export function buildCreatePropertyFormData(values: PropertyFormValues, photos: 
 }
 
 // Port du sous-ensemble modifiable après publication (voir
-// strImmo/src/properties/dto/update-property.dto.ts) — pas de `propertyType` (immuable une fois
-// l'annonce créée, les tables de détails par type en dépendent) ni de photos (route JSON, pas
-// multipart ; les modifier nécessiterait la même logique que la création, pas ajoutée pour
-// l'instant). JSON classique avec les vrais types (nombres/booléens), contrairement au FormData de
-// la création où tout part en chaîne de caractères.
-export function buildUpdatePropertyPayload(values: PropertyFormValues): Record<string, unknown> {
-  const payload: Record<string, unknown> = {
-    title: values.title,
-    description: values.description,
-    price: values.price,
-    kind: values.kind,
-    communeId: values.communeId,
-    fokontanyId: values.fokontanyId,
-    address: values.address,
-    latitude: values.latitude,
-    longitude: values.longitude,
-    available: values.available,
-    // Absents jusqu'ici de ce payload (donc jamais modifiables après publication, contrairement à
-    // la création) — remonté explicitement. `undefined` pour un propriétaire (jamais ces champs) :
-    // `JSON.stringify` les omet du corps envoyé, pas besoin de les exclure explicitement ici.
-    commission: values.commission,
-    caution: values.caution,
-    visitFee: values.visitFee,
-  };
+// strImmo/src/properties/dto/update-property.dto.ts) — `propertyType` et les photos sont
+// désormais modifiables eux aussi (demandé explicitement, ce n'était pas le cas avant), ce qui
+// exige du multipart (comme buildCreatePropertyFormData) plutôt que le JSON classique d'avant :
+// les nouvelles photos sont des fichiers, impossibles à envoyer en JSON.
+export function buildUpdatePropertyFormData(values: PropertyFormValues, photos: ListingPhotoItem[]): FormData {
+  const form = new FormData();
+  form.append('propertyType', values.propertyType);
+  form.append('kind', values.kind);
+  form.append('title', values.title);
+  form.append('description', values.description);
+  form.append('price', String(values.price));
+  form.append('available', String(values.available));
+  if (values.communeId) form.append('communeId', values.communeId);
+  if (values.fokontanyId) form.append('fokontanyId', values.fokontanyId);
+  if (values.address) form.append('address', values.address);
+  if (values.latitude != null) form.append('latitude', String(values.latitude));
+  if (values.longitude != null) form.append('longitude', String(values.longitude));
+  if (values.phone2) form.append('phone2', values.phone2);
+  if (values.commission !== undefined) form.append('commission', String(values.commission));
+  if (values.caution !== undefined) form.append('caution', String(values.caution));
+  if (values.visitFee !== undefined) form.append('visitFee', String(values.visitFee));
 
   if (values.propertyType === 'house') {
-    Object.assign(payload, {
-      bedrooms: values.bedrooms,
-      hasCarAccess: values.hasCarAccess,
-      hasMotorbikeAccess: values.hasMotorbikeAccess,
-      waterSource: values.waterSource,
-      bathroomLocation: values.bathroomLocation,
-      hasIndividualMeter: values.hasIndividualMeter,
-    });
+    form.append('bedrooms', String(values.bedrooms));
+    form.append('hasCarAccess', String(values.hasCarAccess));
+    form.append('hasMotorbikeAccess', String(values.hasMotorbikeAccess));
+    form.append('waterSource', values.waterSource);
+    form.append('bathroomLocation', values.bathroomLocation);
+    form.append('hasIndividualMeter', String(values.hasIndividualMeter));
   } else if (values.propertyType === 'villa' || values.propertyType === 'apartment') {
-    Object.assign(payload, {
-      surfaceM2: values.surfaceM2,
-      isIndependent: values.isIndependent,
-      roomType: values.roomType,
-      parkingSpots: values.parkingSpots,
-      isFurnished: values.isFurnished,
-      hasComfort: values.hasComfort,
-      hasCaretakerAnnex: values.hasCaretakerAnnex,
-    });
+    form.append('surfaceM2', String(values.surfaceM2));
+    form.append('isIndependent', String(values.isIndependent));
+    form.append('roomType', values.roomType);
+    form.append('parkingSpots', String(values.parkingSpots));
+    form.append('isFurnished', String(values.isFurnished));
+    form.append('hasComfort', String(values.hasComfort));
+    form.append('hasCaretakerAnnex', String(values.hasCaretakerAnnex));
   } else {
-    Object.assign(payload, {
-      legalStatus: values.legalStatus,
-      hasCarAccess: values.hasCarAccess,
-      isResidentialArea: values.isResidentialArea,
-      hasWaterAvailable: values.hasWaterAvailable,
-      hasElectricityAvailable: values.hasElectricityAvailable,
-      isBuildReady: values.isBuildReady,
-      isLotissement: values.isLotissement,
-      priceType: values.priceType,
-      surfaceM2: values.surfaceM2,
-      isSubdivisible: values.isSubdivisible,
-      minSubdivisionM2: values.minSubdivisionM2,
-    });
+    form.append('legalStatus', values.legalStatus);
+    form.append('hasCarAccess', String(values.hasCarAccess));
+    form.append('isResidentialArea', String(values.isResidentialArea));
+    form.append('hasWaterAvailable', String(values.hasWaterAvailable));
+    form.append('hasElectricityAvailable', String(values.hasElectricityAvailable));
+    form.append('isBuildReady', String(values.isBuildReady));
+    form.append('isLotissement', String(values.isLotissement));
+    form.append('priceType', values.priceType);
+    form.append('surfaceM2', String(values.surfaceM2));
+    form.append('isSubdivisible', String(values.isSubdivisible));
+    if (values.minSubdivisionM2 != null) {
+      form.append('minSubdivisionM2', String(values.minSubdivisionM2));
+    }
   }
 
-  return payload;
+  // Ordre final des photos, couverture = première entrée (voir strImmo/src/properties/dto/
+  // update-property.dto.ts:photoOrder) — une photo déjà hébergée est référencée par son URL
+  // (jamais retéléversée), une nouvelle par son index dans `newPhotos`, dans le même ordre que son
+  // ajout ici, pour que le backend puisse faire correspondre les deux.
+  const order: string[] = [];
+  let newIndex = 0;
+  for (const item of photos) {
+    if (item.kind === 'existing') {
+      order.push(`existing:${item.url}`);
+    } else {
+      order.push(`new:${newIndex}`);
+      form.append('newPhotos', item.file);
+      newIndex += 1;
+    }
+  }
+  form.append('photoOrder', JSON.stringify(order));
+
+  return form;
 }

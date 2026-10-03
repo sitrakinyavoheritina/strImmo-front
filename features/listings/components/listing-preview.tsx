@@ -8,25 +8,27 @@ import { PROPERTY_TYPE_LABEL_KEY, titleRepeatsTypeLabel } from '@/features/searc
 import { getPropertyDetailStats } from '@/features/search/utils/get-property-detail-stats';
 import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import { PropertyFees } from './property-fees';
-import type { PropertyFormValues } from '@/features/search/types/listing.types';
+import type { ListingPhotoItem, PropertyFormValues } from '@/features/search/types/listing.types';
 
 /** Aperçu fidèle de l'annonce telle qu'elle apparaîtra une fois publiée, avant validation finale —
  * reprend la même structure que la fiche détail publiée (app/annonce/[id]/page.tsx : galerie
  * photo complète avec vignettes, caractéristiques, équipements, description) plutôt qu'une
  * version simplifiée n'affichant que la couverture (constaté explicitement : les autres photos
  * n'apparaissaient pas dans l'aperçu). */
-export function ListingPreview({ values, photos }: { values: PropertyFormValues; photos: File[] }) {
+export function ListingPreview({ values, photos }: { values: PropertyFormValues; photos: ListingPhotoItem[] }) {
   const { t } = useTranslation();
   const role = useAuthStore((state) => state.user?.role);
   const [activePhoto, setActivePhoto] = useState(0);
   // Pas de révocation via useEffect ici : en Strict Mode (dev), React monte/démonte/remonte les
   // effets une fois par exercice, ce qui révoquerait ces URL blob avant que l'aperçu n'ait fini de
   // les afficher. Au plus 8 petites photos déjà compressées le temps de ce formulaire — le
-  // navigateur les libère de toute façon au déchargement de la page.
-  // En mode édition, aucune nouvelle photo n'est sélectionnée (`photos` reste vide, les photos
-  // n'étant pas modifiables) — on retombe alors sur les URL distantes déjà publiées.
+  // navigateur les libère de toute façon au déchargement de la page. Une photo déjà hébergée garde
+  // simplement son URL distante, jamais retéléversée pour cet aperçu.
   const photoUrls = useMemo(
-    () => (photos.length > 0 ? photos.map((file) => URL.createObjectURL(file)) : values.photoUrls),
+    () =>
+      photos.length > 0
+        ? photos.map((item) => (item.kind === 'existing' ? item.url : URL.createObjectURL(item.file)))
+        : values.photoUrls,
     [photos, values.photoUrls]
   );
   const { stats, amenities } = getPropertyDetailStats(values, t);

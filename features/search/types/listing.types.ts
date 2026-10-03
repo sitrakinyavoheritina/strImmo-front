@@ -182,6 +182,12 @@ export type PropertyFormValues = DistributiveOmit<
   'id' | 'ownerId' | 'createdAt' | 'viewCount' | 'moderationStatus' | 'likesCount'
 >;
 
+/** Un item du sélecteur de photos (voir listing-photo-picker.tsx) — en modification, la galerie
+ *  mélange des photos déjà hébergées (jamais retéléversées, juste réordonnées/retirées) et de
+ *  nouveaux fichiers locaux ; en création, tout est toujours `'new'`. Le premier item de la liste
+ *  est toujours la couverture. */
+export type ListingPhotoItem = { kind: 'existing'; url: string } | { kind: 'new'; file: File };
+
 // Miroir de la forme renvoyée par PropertiesService.findDeletedForAdmin (strImmo) — vue admin
 // uniquement (GET /properties/deleted), aperçu allégé, pas l'union complète `Property` (pas de
 // photos/détails par type chargés côté serveur pour cette liste).

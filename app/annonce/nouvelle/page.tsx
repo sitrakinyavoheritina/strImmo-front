@@ -14,7 +14,7 @@ import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
 import { BecomePublisherPanel } from '@/features/auth/components/become-publisher-panel';
 import { RightRail } from '@/features/feed/components/right-rail';
-import type { PropertyFormValues } from '@/features/search/types/listing.types';
+import type { ListingPhotoItem, PropertyFormValues } from '@/features/search/types/listing.types';
 
 type Step = 'step1' | 'step2' | 'step3' | 'preview';
 
@@ -32,7 +32,7 @@ export default function NouvelleAnnoncePage() {
 
   const [step, setStep] = useState<Step>('step1');
   const [draft, setDraft] = useState<PropertyFormValues | null>(null);
-  const [draftPhotos, setDraftPhotos] = useState<File[]>([]);
+  const [draftPhotos, setDraftPhotos] = useState<ListingPhotoItem[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isPublished, setIsPublished] = useState(false);
   const formRef = useRef<PropertyFormHandle>(null);

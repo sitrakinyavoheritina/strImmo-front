@@ -3,10 +3,11 @@
 import { useId, useMemo, useRef, useState } from 'react';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
+import type { ListingPhotoItem } from '@/features/search/types/listing.types';
 
 type ListingPhotoPickerProps = {
-  photos: File[];
-  onChange: (photos: File[]) => void;
+  photos: ListingPhotoItem[];
+  onChange: (photos: ListingPhotoItem[]) => void;
   min: number;
   max: number;
   /** Vrai après un clic sur « Suivant » avec trop peu de photos : le message passe en rouge. */
@@ -55,7 +56,11 @@ export function ListingPhotoPicker({ photos, onChange, min, max, showMinError = 
   // effets une fois par exercice, ce qui révoquait ces URL blob avant que les vignettes n'aient
   // fini de s'afficher (miniatures cassées). Au plus `max` (8) petites photos déjà compressées le
   // temps de ce formulaire — le navigateur les libère de toute façon au déchargement de la page.
-  const previewUrls = useMemo(() => photos.map((file) => URL.createObjectURL(file)), [photos]);
+  // Une photo déjà hébergée (modification) n'a pas besoin de ça : son URL distante sert telle quelle.
+  const previewUrls = useMemo(
+    () => photos.map((item) => (item.kind === 'existing' ? item.url : URL.createObjectURL(item.file))),
+    [photos]
+  );
 
   async function handleFilesSelected(event: React.ChangeEvent<HTMLInputElement>) {
     const selected = Array.from(event.target.files ?? []).slice(0, remaining);
@@ -68,7 +73,8 @@ export function ListingPhotoPicker({ photos, onChange, min, max, showMinError = 
     setIsProcessing(true);
     try {
       const shrunk = await Promise.all(accepted.map(shrinkPhoto));
-      onChange([...photos, ...shrunk].slice(0, max));
+      const newItems: ListingPhotoItem[] = shrunk.map((file) => ({ kind: 'new', file }));
+      onChange([...photos, ...newItems].slice(0, max));
     } finally {
       setIsProcessing(false);
     }

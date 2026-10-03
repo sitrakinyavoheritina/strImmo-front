@@ -12,7 +12,7 @@ import { PropertyForm, type PropertyFormHandle } from '@/features/listings/compo
 import { ListingPreview } from '@/features/listings/components/listing-preview';
 import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
-import type { PropertyFormValues } from '@/features/search/types/listing.types';
+import type { ListingPhotoItem, PropertyFormValues } from '@/features/search/types/listing.types';
 
 type Step = 'step1' | 'step2' | 'step3' | 'preview';
 
@@ -34,6 +34,7 @@ export default function ModifierAnnoncePage() {
 
   const [step, setStep] = useState<Step>('step1');
   const [draft, setDraft] = useState<PropertyFormValues | null>(null);
+  const [draftPhotos, setDraftPhotos] = useState<ListingPhotoItem[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const formRef = useRef<PropertyFormHandle>(null);
 
@@ -66,6 +67,9 @@ export default function ModifierAnnoncePage() {
     if (property && !hasInitializedDraftRef.current) {
       hasInitializedDraftRef.current = true;
       setDraft(property);
+      // Chaque photo déjà publiée démarre en item `'existing'` (voir ListingPhotoItem) — jamais
+      // retéléversée tant qu'elle n'est pas retirée puis rajoutée dans PropertyForm/ListingPhotoPicker.
+      setDraftPhotos(property.photoUrls.map((url): ListingPhotoItem => ({ kind: 'existing', url })));
     }
   }, [property]);
 
@@ -73,7 +77,7 @@ export default function ModifierAnnoncePage() {
     if (!draft || !property) return;
     setErrorMessage(null);
     try {
-      await mutateAsync({ id: property.id, values: draft });
+      await mutateAsync({ id: property.id, values: draft, photos: draftPhotos });
       router.push(`/annonce/${property.id}`);
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : String(error));
@@ -135,16 +139,18 @@ export default function ModifierAnnoncePage() {
 
       <div className="mt-5 bg-surface-card border border-stroke-default/80 rounded-2xl p-4 sm:p-5">
         {step === 'preview' ? (
-          <ListingPreview values={draft} photos={[]} />
+          <ListingPreview values={draft} photos={draftPhotos} />
         ) : (
           <PropertyForm
             ref={formRef}
             step={step === 'step1' ? 1 : step === 'step2' ? 2 : 3}
             initialValues={draft}
+            initialPhotos={draftPhotos}
             mode="edit"
             onNext={() => setStep(step === 'step1' ? 'step2' : 'step3')}
-            onPreview={(values) => {
+            onPreview={(values, photos) => {
               setDraft(values);
+              setDraftPhotos(photos);
               setStep('preview');
             }}
           />

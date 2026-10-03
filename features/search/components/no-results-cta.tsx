@@ -3,6 +3,12 @@ import { ClipboardList } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import type { PropertyFilters } from '../types/listing.types';
 
+// Masqué "pour le moment" (demandé explicitement, code gardé pour le réactiver d'un coup plutôt
+// que de tout réécrire plus tard) — même principe que AI_MODE_ENABLED dans
+// app/demandes/nouvelle/page.tsx. Seul le bloc "Publiez une demande" est masqué ; le simple
+// message "Aucun résultat" juste au-dessus reste affiché.
+const NO_RESULTS_CTA_ENABLED = false;
+
 // Repris par /demandes/nouvelle (voir ce fichier) pour préremplir le formulaire : mêmes noms de
 // champs que PropertyFilters là où ça a un sens (kind/propertyType/communeId), `maxPrice` devient
 // `maxBudget` (nom différent côté demande). `location` (texte libre) n'a pas d'équivalent — une
@@ -28,19 +34,21 @@ export function NoResultsCta({ filters }: { filters: PropertyFilters }) {
     <div className="flex flex-col items-center text-center py-10 px-4">
       <p className="text-sm text-content-muted">{t.search.noResults}</p>
 
-      <div className="mt-6 w-full max-w-sm bg-surface-card border border-stroke-default/80 rounded-2xl p-5">
-        <span className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-primary-soft text-brand-primary mb-3">
-          <ClipboardList size={24} />
-        </span>
-        <p className="font-bold text-content-main text-base">{t.search.noResultsCtaTitle}</p>
-        <p className="text-sm text-content-muted mt-1.5">{t.search.noResultsCtaBody}</p>
-        <Link
-          href={noResultsCtaHref(filters)}
-          className="mt-4 inline-flex items-center justify-center w-full rounded-xl bg-brand-primary text-white font-semibold text-sm py-2.5 hover:bg-brand-primary-hover active:scale-[0.98] transition-all"
-        >
-          {t.search.noResultsCtaButton}
-        </Link>
-      </div>
+      {NO_RESULTS_CTA_ENABLED && (
+        <div className="mt-6 w-full max-w-sm bg-surface-card border border-stroke-default/80 rounded-2xl p-5">
+          <span className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-brand-primary-soft text-brand-primary mb-3">
+            <ClipboardList size={24} />
+          </span>
+          <p className="font-bold text-content-main text-base">{t.search.noResultsCtaTitle}</p>
+          <p className="text-sm text-content-muted mt-1.5">{t.search.noResultsCtaBody}</p>
+          <Link
+            href={noResultsCtaHref(filters)}
+            className="mt-4 inline-flex items-center justify-center w-full rounded-xl bg-brand-primary text-white font-semibold text-sm py-2.5 hover:bg-brand-primary-hover active:scale-[0.98] transition-all"
+          >
+            {t.search.noResultsCtaButton}
+          </Link>
+        </div>
+      )}
     </div>
   );
 }

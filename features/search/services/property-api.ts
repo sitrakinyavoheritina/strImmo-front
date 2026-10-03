@@ -148,8 +148,10 @@ export const propertyApi = {
       .post<ApiProperty>('/properties', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
       .then((r) => r.data),
 
-  update: (id: string, payload: Record<string, unknown>) =>
-    apiClient.patch<ApiProperty>(`/properties/${id}`, payload).then((r) => r.data),
+  update: (id: string, formData: FormData) =>
+    apiClient
+      .patch<ApiProperty>(`/properties/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+      .then((r) => r.data),
 
   remove: (id: string) => apiClient.delete<void>(`/properties/${id}`).then((r) => r.data),
 
