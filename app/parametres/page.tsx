@@ -17,6 +17,11 @@ import { MenuRow } from '@/components/ui/menu-row';
 import { LanguageSwitcher } from '@/components/ui/language-switcher';
 import { RightRail } from '@/features/feed/components/right-rail';
 
+// Masqué "pour le moment" (demandé explicitement, code gardé pour le réactiver d'un coup plutôt
+// que de tout réécrire plus tard) — même drapeau que features/feed/components/right-rail.tsx,
+// l'autre endroit qui pointe vers /politique-de-confidentialite.
+const PRIVACY_POLICY_LINK_ENABLED = false;
+
 // Page dédiée (pas /profil directement) pour le nouvel onglet "Menu" de la bande mobile — /profil
 // reste l'affiche complète du compte (avatar, activités, coordonnées), /parametres est le hub
 // réglages qui y renvoie ainsi que vers modifier le profil, la langue, mes annonces, etc. Demandé
@@ -190,9 +195,11 @@ export default function ParametresPage() {
 
         {/* Visible que le visiteur soit connecté ou non, admin ou non — un document légal doit
             rester accessible à tout le monde, pas seulement à un compte actif. */}
-        <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-1.5">
-          <MenuRow href="/politique-de-confidentialite" icon={Shield} label={t.profile.privacyPolicy} />
-        </div>
+        {PRIVACY_POLICY_LINK_ENABLED && (
+          <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-1.5">
+            <MenuRow href="/politique-de-confidentialite" icon={Shield} label={t.profile.privacyPolicy} />
+          </div>
+        )}
 
         {isAuthenticated && (
           <div className="bg-surface-card border border-stroke-default/80 rounded-xl p-1.5">
