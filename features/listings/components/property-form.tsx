@@ -45,6 +45,25 @@ const ROOM_TYPES: RoomType[] = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6plus'];
 // simple côté données (pas un enum comme `roomType`) : "6+" soumet directement 6, il n'existe pas
 // de représentation "6 ou plus" à part entière.
 const BEDROOM_OPTIONS = [1, 2, 3, 4, 5, 6];
+// Choix fermé de commission/caution (demandé explicitement, plus de montant libre pour aucun des
+// deux) — % du prix affiché (loyer mensuel en location, prix de vente en vente), voir le calcul
+// dans buildValues. `0` inclus et choisi par défaut pour une nouvelle annonce (demandé
+// explicitement) — un intermédiaire/une agence sans commission, ou une location sans caution,
+// reste un choix explicite plutôt qu'un champ simplement vide.
+const FEE_PERCENT_OPTIONS = [0, 25, 50, 75, 100];
+
+// Pourcentage le plus proche (parmi FEE_PERCENT_OPTIONS) d'un montant déjà enregistré par rapport
+// au prix de l'annonce — utilisé pour commission ET caution en modification. `0` si le montant/le
+// prix est absent, ou si l'écart dépasse 1 point (valeur saisie librement avant ce changement, ne
+// correspond vraiment à aucun des choix).
+function closestFeePercent(amount: number | undefined, price: number | undefined): number {
+  if (!amount || !price) return 0;
+  const ratio = (amount / price) * 100;
+  const closest = FEE_PERCENT_OPTIONS.reduce((best, option) =>
+    Math.abs(option - ratio) < Math.abs(best - ratio) ? option : best
+  );
+  return Math.abs(closest - ratio) <= 1 ? closest : 0;
+}
 const PROPERTY_TYPES: { value: PropertyType; labelKey: 'typeHouse' | 'typeApartment' | 'typeVilla' | 'typeLand' }[] = [
   { value: 'house', labelKey: 'typeHouse' },
   { value: 'land', labelKey: 'typeLand' },
@@ -126,14 +145,19 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   const [isTitleEditing, setIsTitleEditing] = useState(Boolean(initialValues?.title));
   const [description, setDescription] = useState(initialValues?.description ?? '');
   const [price, setPrice] = useState(initialValues ? String(initialValues.price) : '');
-  const [commission, setCommission] = useState(
-    initialValues?.commission !== undefined ? String(initialValues.commission) : ''
+  // Choix fermé (0/25/50/75/100%), pas un montant libre (demandé explicitement, pour les deux) —
+  // % du prix affiché (loyer mensuel en location, prix de vente total en vente, selon `kind`). Le
+  // montant réel en Ariary (`commission`/`caution` dans PropertyFormValues) est calculé à partir
+  // de ce pourcentage, voir buildValues plus bas. En modification, retrouve le pourcentage déjà
+  // "équivalent" par comparaison au prix de l'annonce — `0` (le défaut) si ça ne correspond à
+  // aucun des 5 choix (ancienne valeur saisie librement avant ce changement), pour ne jamais
+  // présélectionner un pourcentage faux.
+  const [commissionPercent, setCommissionPercent] = useState<number>(() =>
+    closestFeePercent(initialValues?.commission, initialValues?.price)
   );
-  const [caution, setCaution] = useState(
-    initialValues?.caution !== undefined ? String(initialValues.caution) : ''
+  const [cautionPercent, setCautionPercent] = useState<number>(() =>
+    closestFeePercent(initialValues?.caution, initialValues?.price)
   );
-  // Facultatif même pour intermédiaire/agence (contrairement à commission/caution ci-dessus,
-  // obligatoires pour eux) — jamais de validation "requis" associée, voir plus bas.
   // Après un clic sur « Suivant » / « Aperçu » avec moins de MIN_PHOTOS photos (voir ListingPhotoPicker).
   const [photosAttempted, setPhotosAttempted] = useState(false);
   const [visitFee, setVisitFee] = useState(
@@ -301,8 +325,10 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
       // rémunère une intermédiation) ; caution et droit de visite, eux, concernent tout le monde
       // désormais — un propriétaire loue aussi contre une caution — remonté explicitement. Les
       // trois sont facultatifs (0 par défaut, jamais bloquant), plus aucun n'est "obligatoire".
-      commission: requiresCommission ? Number(commission) || 0 : undefined,
-      caution: kind === 'sale' ? undefined : Number(caution) || 0,
+      // Montants calculés à partir du pourcentage choisi (voir commissionPercent/cautionPercent) ×
+      // le prix affiché — jamais saisis directement en Ariary.
+      commission: requiresCommission ? Math.round(((Number(price) || 0) * commissionPercent) / 100) : undefined,
+      caution: kind === 'sale' ? undefined : Math.round(((Number(price) || 0) * cautionPercent) / 100),
       visitFee: requiresCommission ? Number(visitFee) || 0 : undefined,
     };
 
@@ -456,9 +482,10 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
               type="button"
               onClick={() => {
                 setKind('sale');
-                // Une caution n'a de sens que pour une location — vidée pour ne rien envoyer côté
-                // serveur (voir buildValues plus bas, qui n'inclut plus le champ pour un bien à vendre).
-                setCaution('');
+                // Une caution n'a de sens que pour une location — remise à 0 pour ne rien envoyer
+                // côté serveur (voir buildValues plus bas, qui n'inclut plus le champ pour un bien
+                // à vendre).
+                setCautionPercent(0);
               }}
               className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-stroke-default ${
                 kind === 'sale' ? 'bg-brand-primary text-white' : 'text-content-muted hover:bg-surface-app'
@@ -516,54 +543,56 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
             error={errors.price}
           />
 
-          {/* Propriétaire : caution seule. Intermédiaire/agence : caution + droit de visite côte à
-              côte pour économiser de la place. */}
-          <div className={requiresCommission ? 'grid grid-cols-2 gap-3' : ''}>
-            <FormInput
-              label={t.listing.caution}
-              value={kind === 'sale' ? '' : caution}
-              onChange={(value) => setCaution(onlyDigits(value))}
-              placeholder="0"
-              type="number"
-              suffix="Ar"
-              disabled={kind === 'sale'}
-              hint={kind === 'sale' ? t.listing.cautionNotApplicable : undefined}
-            />
-            {requiresCommission && (
-              <FormInput
-                label={t.listing.visitFee}
-                value={visitFee}
-                onChange={(value) => setVisitFee(onlyDigits(value))}
-                placeholder="0"
-                type="number"
-                suffix="Ar"
-              />
+          {/* Propriétaire : caution seule. Intermédiaire/agence : caution + commission + droit de
+              visite. Caution n'a de sens que pour une location — remplacée par un simple message
+              pour une vente plutôt que des puces désactivées. */}
+          <div>
+            <FieldLabel>{t.listing.caution}</FieldLabel>
+            {kind === 'sale' ? (
+              <p className="text-[0.85rem] text-content-muted">{t.listing.cautionNotApplicable}</p>
+            ) : (
+              <div className="flex gap-2">
+                {FEE_PERCENT_OPTIONS.map((percent) => (
+                  <Chip key={percent} active={cautionPercent === percent} onClick={() => setCautionPercent(percent)}>
+                    {percent}%
+                  </Chip>
+                ))}
+              </div>
             )}
           </div>
 
-          {/* Commission côte à côte avec le contact 2 — réservée à intermédiaire/agence (rémunère
-              une intermédiation, n'a pas de sens pour un propriétaire qui traite en direct),
-              contrairement à caution et droit de visite juste au-dessus, désormais communs à
-              tout le monde. Aucun des trois n'est obligatoire (0 par défaut si laissé vide, voir
-              buildValues plus haut). */}
-          <div className={requiresCommission ? 'grid grid-cols-2 gap-3' : ''}>
+          {requiresCommission && (
+            <div>
+              <FieldLabel>{t.listing.commission}</FieldLabel>
+              <div className="flex gap-2">
+                {FEE_PERCENT_OPTIONS.map((percent) => (
+                  <Chip key={percent} active={commissionPercent === percent} onClick={() => setCommissionPercent(percent)}>
+                    {percent}%
+                  </Chip>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Facultatif même pour intermédiaire/agence (contrairement à commission/caution
+              ci-dessus), jamais de validation "requis" associée — reste un montant libre, pas un
+              pourcentage (pas demandé pour celui-ci). */}
+          <FormInput
+            label={t.listing.formPhone2}
+            value={phone2}
+            onChange={setPhone2}
+            placeholder={t.listing.formPhone2Placeholder}
+          />
+          {requiresCommission && (
             <FormInput
-              label={t.listing.formPhone2}
-              value={phone2}
-              onChange={setPhone2}
-              placeholder={t.listing.formPhone2Placeholder}
+              label={t.listing.visitFee}
+              value={visitFee}
+              onChange={(value) => setVisitFee(onlyDigits(value))}
+              placeholder="0"
+              type="number"
+              suffix="Ar"
             />
-            {requiresCommission && (
-              <FormInput
-                label={t.listing.commission}
-                value={commission}
-                onChange={(value) => setCommission(onlyDigits(value))}
-                placeholder="0"
-                type="number"
-                suffix="Ar"
-              />
-            )}
-          </div>
+          )}
 
           <ListingPhotoPicker
             photos={photos}
