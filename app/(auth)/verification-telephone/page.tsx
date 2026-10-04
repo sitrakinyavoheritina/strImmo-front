@@ -12,6 +12,7 @@ import { setStoredTheme } from '@/lib/theme/use-theme-preference';
 import { setStoredFeedDisplay } from '@/lib/theme/use-feed-display-preference';
 import { AuthPageShell } from '@/features/auth/components/auth-page-shell';
 import { authService } from '@/features/auth/services/auth-service';
+import { useResendCountdown } from '@/features/auth/hooks/use-resend-countdown';
 import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
 import { OtpInput } from '@/components/ui/otp-input';
@@ -38,6 +39,9 @@ export default function VerificationTelephonePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  // Écran du code affiché dès le montage de cette page (le code est déjà parti avant d'y arriver,
+  // contrairement à BecomePublisherPanel/VerifyPhonePanel) : le compte à rebours tourne tout le temps.
+  const { canResend, reset: resetResendCountdown } = useResendCountdown(true);
 
   useEffect(() => {
     if (hasHydrated && !isAuthenticated && !pending) router.replace('/connexion');
@@ -81,6 +85,7 @@ export default function VerificationTelephonePage() {
       if (pending) await authService.resendPhoneVerification(pending.verificationToken);
       else await authService.resendPhoneCode();
       setInfo(t.auth.verifyPhoneResent);
+      resetResendCountdown();
     } catch (e) {
       setError(getErrorMessage(e, t.auth.verifyPhoneError));
     }
@@ -134,9 +139,13 @@ export default function VerificationTelephonePage() {
           {isLoading ? t.auth.verifyPhoneSubmitting : t.auth.verifyPhoneSubmit}
         </Button>
         <div className="flex items-center justify-between">
-          <Button type="button" variant="ghost" size="sm" onClick={handleResend}>
-            {pending ? t.auth.verifyPhoneResendTo.replace('%phone%', phone) : t.auth.verifyPhoneResend}
-          </Button>
+          {canResend ? (
+            <Button type="button" variant="ghost" size="sm" onClick={handleResend}>
+              {pending ? t.auth.verifyPhoneResendTo.replace('%phone%', phone) : t.auth.verifyPhoneResend}
+            </Button>
+          ) : (
+            <span />
+          )}
           <Button type="button" variant="ghost" size="sm" onClick={handleLeave}>
             {pending ? t.auth.verifyPhoneBack : t.auth.verifyPhoneLater}
           </Button>

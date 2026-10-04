@@ -10,6 +10,7 @@ import { FormInput } from '@/components/ui/form-controls';
 import { OtpInput } from '@/components/ui/otp-input';
 import { isValidMalagasyPhone } from '../schemas';
 import { authService } from '../services/auth-service';
+import { useResendCountdown } from '../hooks/use-resend-countdown';
 
 type PublisherRole = 'owner' | 'agent';
 
@@ -32,6 +33,7 @@ export function BecomePublisherPanel() {
   const [phone, setPhone] = useState(user?.phone ?? '');
   const [sentTo, setSentTo] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const { canResend, reset: resetResendCountdown } = useResendCountdown(isCodeSent);
 
   async function confirm(withCode: string) {
     setIsConfirming(true);
@@ -56,6 +58,7 @@ export function BecomePublisherPanel() {
       const result = await authService.requestPublisherUpgrade(phone);
       setSentTo(result.phone);
       setIsCodeSent(true);
+      resetResendCountdown();
     } catch (e) {
       setError(getErrorMessage(e, t.listing.becomePublisherError));
     } finally {
@@ -123,9 +126,11 @@ export function BecomePublisherPanel() {
           >
             {isConfirming ? t.listing.becomePublisherConfirming : t.listing.becomePublisherConfirm}
           </Button>
-          <Button type="button" variant="ghost" size="sm" className="w-full" disabled={isSending} onClick={handleSendCode}>
-            {t.listing.becomePublisherResend}
-          </Button>
+          {canResend && (
+            <Button type="button" variant="ghost" size="sm" className="w-full" disabled={isSending} onClick={handleSendCode}>
+              {t.listing.becomePublisherResend}
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">

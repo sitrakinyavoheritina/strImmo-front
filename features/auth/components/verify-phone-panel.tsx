@@ -10,6 +10,7 @@ import { FormInput } from '@/components/ui/form-controls';
 import { OtpInput } from '@/components/ui/otp-input';
 import { isValidMalagasyPhone } from '../schemas';
 import { authService } from '../services/auth-service';
+import { useResendCountdown } from '../hooks/use-resend-countdown';
 
 /** Affiché à la place de la destination demandée (publier une annonce, créer une demande...)
  *  quand le compte connecté n'a pas encore de numéro vérifié — typiquement un compte créé via
@@ -32,6 +33,7 @@ export function VerifyPhonePanel({ onVerified }: { onVerified: () => void }) {
   const [phone, setPhone] = useState(user?.phone ?? '');
   const [sentTo, setSentTo] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const { canResend, reset: resetResendCountdown } = useResendCountdown(isCodeSent);
 
   async function handleSendCode() {
     setError(null);
@@ -45,6 +47,7 @@ export function VerifyPhonePanel({ onVerified }: { onVerified: () => void }) {
       setSentTo(result.phone);
       updateUser({ phone: result.phone });
       setIsCodeSent(true);
+      resetResendCountdown();
     } catch (e) {
       setError(getErrorMessage(e, t.listing.verifyPhoneGateError));
     } finally {
@@ -101,9 +104,11 @@ export function VerifyPhonePanel({ onVerified }: { onVerified: () => void }) {
           >
             {isConfirming ? t.listing.verifyPhoneGateConfirming : t.listing.verifyPhoneGateConfirm}
           </Button>
-          <Button type="button" variant="ghost" size="sm" className="w-full" disabled={isSending} onClick={handleSendCode}>
-            {t.listing.verifyPhoneGateResend}
-          </Button>
+          {canResend && (
+            <Button type="button" variant="ghost" size="sm" className="w-full" disabled={isSending} onClick={handleSendCode}>
+              {t.listing.verifyPhoneGateResend}
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">

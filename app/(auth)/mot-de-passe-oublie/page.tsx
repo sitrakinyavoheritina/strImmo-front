@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
 import { OtpInput } from '@/components/ui/otp-input';
 import { isValidMalagasyPhone } from '@/features/auth/schemas';
+import { useResendCountdown } from '@/features/auth/hooks/use-resend-countdown';
 
 type Step = 'request' | 'reset';
 
@@ -38,6 +39,7 @@ export default function MotDePasseOubliePage() {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [infoMessage, setInfoMessage] = useState<string | null>(null);
+  const { canResend, reset: resetResendCountdown } = useResendCountdown(step === 'reset');
 
   async function handleRequestCode(event: React.FormEvent) {
     event.preventDefault();
@@ -64,6 +66,7 @@ export default function MotDePasseOubliePage() {
     try {
       await authService.forgotPassword(identifier.trim());
       setInfoMessage(t.forgotPasswordPage.codeResent);
+      resetResendCountdown();
     } catch (error) {
       setErrorMessage(getErrorMessage(error, "Impossible d'envoyer le code."));
     }
@@ -146,14 +149,16 @@ export default function MotDePasseOubliePage() {
             <Button type="submit" disabled={isLoading} variant="secondary" className="w-full">
               {isLoading ? t.forgotPasswordPage.resetting : t.forgotPasswordPage.resetPassword}
             </Button>
-            <button
-              type="button"
-              onClick={handleResend}
-              disabled={isLoading}
-              className="w-full text-center text-[0.85rem] font-semibold text-brand-primary hover:text-brand-primary-hover transition disabled:opacity-50"
-            >
-              {t.forgotPasswordPage.resendCode}
-            </button>
+            {canResend && (
+              <button
+                type="button"
+                onClick={handleResend}
+                disabled={isLoading}
+                className="w-full text-center text-[0.85rem] font-semibold text-brand-primary hover:text-brand-primary-hover transition disabled:opacity-50"
+              >
+                {t.forgotPasswordPage.resendCode}
+              </button>
+            )}
             <button
               type="button"
               onClick={() => {
