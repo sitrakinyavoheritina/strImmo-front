@@ -14,4 +14,9 @@ export const adminApi = {
     apiClient.get<ErrorLogsResponse>('/error-logs', { params }).then((r) => r.data),
 
   deleteUser: (id: string) => apiClient.delete<{ deleted: boolean }>(`/auth/users/${id}`).then((r) => r.data),
+
+  // Contourne l'OTP pour un compte owner/agent/agency bloqué faute de l'avoir reçu/confirmé — voir
+  // strImmo/src/auth/auth.service.ts:adminVerifyPhone.
+  verifyUserPhone: (id: string) =>
+    apiClient.patch<{ isPhoneVerified: boolean }>(`/auth/users/${id}/verify-phone`).then((r) => r.data),
 };

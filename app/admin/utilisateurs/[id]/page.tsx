@@ -5,10 +5,13 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { AlertCircle, ArrowLeft, CheckCircle2, Eye } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { useTranslation } from '@/lib/i18n/use-translation';
+import { getErrorMessage } from '@/lib/api/get-error-message';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useAdminUserDetail } from '@/features/admin/hooks/use-admin-user-detail';
+import { useAdminVerifyPhone } from '@/features/admin/hooks/use-admin-verify-phone';
 import { isUnvalidatedAccount } from '@/features/admin/components/admin-user-list-item';
 import { STATUS_BADGE_CLASS, STATUS_LABEL_KEY } from '@/features/listings/utils/status-badge';
 import { formatPrice } from '@/features/search/utils/format-price';
@@ -42,8 +45,10 @@ function Card({ title, children }: { title: string; children: React.ReactNode })
   );
 }
 
-// Fiche d'un compte, en LECTURE SEULE (admin/superadmin) : aucune action de modification ici —
-// la suppression reste dans la liste, les annonces s'ouvrent dans leur page de détail.
+// Fiche d'un compte, essentiellement en LECTURE SEULE (admin/superadmin) — la suppression reste
+// dans la liste, les annonces s'ouvrent dans leur page de détail. Seule action possible ici :
+// valider manuellement le numéro d'un compte bloqué (voir useAdminVerifyPhone, demandé
+// explicitement), qui contourne l'OTP plutôt que de modifier le contenu du profil lui-même.
 export default function AdminUserDetailPage() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -52,6 +57,7 @@ export default function AdminUserDetailPage() {
   const currentUser = useAuthStore((state) => state.user);
   const hasHydrated = useAuthHasHydrated();
   const isAdminUser = isAdmin(currentUser);
+  const { mutate: verifyPhone, isPending: isVerifyingPhone, error: verifyPhoneError } = useAdminVerifyPhone();
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -116,9 +122,25 @@ export default function AdminUserDetailPage() {
             </p>
 
             {isUnvalidatedAccount(user) && (
-              <p className="mt-2 rounded-xl border border-amber-300 bg-amber-50 p-2.5 text-[0.85rem] font-semibold text-amber-900">
-                {t.adminUsersPage.notValidatedHint}
-              </p>
+              <div className="mt-2 rounded-xl border border-amber-300 bg-amber-50 p-2.5">
+                <p className="text-[0.85rem] font-semibold text-amber-900">{t.adminUsersPage.notValidatedHint}</p>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="mt-2"
+                  disabled={isVerifyingPhone}
+                  onClick={() => {
+                    if (window.confirm(t.adminUsersPage.validatePhoneConfirm)) verifyPhone(user.id);
+                  }}
+                >
+                  {isVerifyingPhone ? t.adminUsersPage.validatingPhone : t.adminUsersPage.validatePhone}
+                </Button>
+                {verifyPhoneError && (
+                  <p className="mt-1.5 text-[0.8rem] text-danger">
+                    {getErrorMessage(verifyPhoneError, 'Impossible de valider ce compte.')}
+                  </p>
+                )}
+              </div>
             )}
 
             <Card title={d.contact}>
