@@ -85,8 +85,7 @@ export default function PrivacyPolicyPage() {
               <li>
                 <strong>Assistant de recherche (IA)</strong> : si vous utilisez l’assistant de
                 recherche conversationnel, le texte de votre conversation est transmis au
-                fournisseur qui fait tourner ce modèle (voir « Partage avec des tiers ») pour
-                générer une réponse.
+                fournisseur qui fait tourner ce modèle pour générer une réponse.
               </li>
               <li>
                 <strong>Codes de vérification</strong> : un code temporaire est envoyé par SMS ou
@@ -125,28 +124,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </Section>
 
-          <Section title="4. Partage avec des tiers">
-            <p>
-              Certaines données transitent par des prestataires techniques, uniquement pour rendre
-              le service possible — aucun d’eux n’est autorisé à réutiliser vos données pour son
-              propre compte :
-            </p>
-            <ul className="list-disc pl-5 space-y-1.5 mt-2">
-              <li><strong>Cloudflare R2</strong> — hébergement des photos et documents (CIN, NIF, STAT).</li>
-              <li><strong>Google</strong> — « Se connecter avec Google » si vous l’utilisez, et Google Analytics 4 (statistiques de visite anonymisées).</li>
-              <li><strong>Mapbox</strong> — affichage des cartes et positions des annonces.</li>
-              <li><strong>OpenAI</strong> — uniquement le texte échangé avec l’assistant de recherche IA, si vous l’utilisez.</li>
-              <li><strong>Brevo</strong> — envoi des emails (codes de vérification, réinitialisation de mot de passe).</li>
-              <li><strong>Orange Madagascar</strong> — envoi des codes de vérification par SMS.</li>
-            </ul>
-            <p className="mt-2">
-              Nous ne partageons jamais votre mot de passe, ni vos documents d’identité, avec un
-              autre utilisateur — seules les informations que vous choisissez d’afficher sur votre
-              profil ou vos annonces sont visibles publiquement.
-            </p>
-          </Section>
-
-          <Section title="5. Combien de temps nous les gardons">
+          <Section title="4. Combien de temps nous les gardons">
             <p>
               Vos données sont conservées tant que votre compte existe. Un code de vérification
               expire en quelques minutes. Si vous supprimez votre compte, vos données personnelles
@@ -155,7 +133,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </Section>
 
-          <Section title="6. Sécurité">
+          <Section title="5. Sécurité">
             <p>
               Votre mot de passe n’est jamais stocké en clair (il est haché, une transformation à
               sens unique). Les échanges entre votre appareil et nos serveurs sont chiffrés
@@ -164,7 +142,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </Section>
 
-          <Section title="7. Stockage local et cookies">
+          <Section title="6. Stockage local et cookies">
             <p>
               Onina n’utilise pas de cookies de suivi publicitaire. Le site garde quelques
               informations directement sur votre appareil (stockage local du navigateur, jamais
@@ -175,7 +153,7 @@ export default function PrivacyPolicyPage() {
             </p>
           </Section>
 
-          <Section title="8. Vos droits">
+          <Section title="7. Vos droits">
             <p>
               Conformément à la réglementation malgache applicable en matière de protection des
               données à caractère personnel, vous disposez d’un droit d’accès, de rectification,
@@ -190,14 +168,14 @@ export default function PrivacyPolicyPage() {
             </p>
           </Section>
 
-          <Section title="9. Mineurs">
+          <Section title="8. Mineurs">
             <p>
               Onina s’adresse à des personnes en âge de conclure un contrat immobilier (location,
               vente). Le service n’est pas destiné aux personnes mineures.
             </p>
           </Section>
 
-          <Section title="10. Modifications de cette politique">
+          <Section title="9. Modifications de cette politique">
             <p>
               Cette politique peut évoluer avec le service. La date de dernière mise à jour est
               indiquée en haut de cette page ; en cas de changement important, nous vous en

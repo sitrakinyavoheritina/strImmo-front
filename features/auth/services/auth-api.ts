@@ -122,6 +122,12 @@ export const authApi = {
   resetPassword: (payload: { identifier: string; code: string; newPassword: string }) =>
     apiClient.post<{ success: boolean }>('/auth/reset-password', payload).then((r) => r.data),
 
+  // Formulaire public de /suppression-compte (exigence Google Play Console) — voir
+  // strImmo/src/auth/auth.service.ts:requestAccountDeletion. N'efface rien automatiquement,
+  // alerte juste l'équipe Onina.
+  requestAccountDeletion: (payload: { identifier: string; message?: string }) =>
+    apiClient.post<{ received: boolean }>('/auth/request-account-deletion', payload).then((r) => r.data),
+
   // Vérification d'email (facultative, voir /parametres) — authentifiées, contrairement aux deux
   // ci-dessus.
   sendEmailVerification: () =>

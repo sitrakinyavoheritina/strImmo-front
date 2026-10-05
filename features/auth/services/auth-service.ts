@@ -149,6 +149,9 @@ export const authService = {
   resetPassword: (payload: { identifier: string; code: string; newPassword: string }) =>
     authApi.resetPassword(payload),
 
+  requestAccountDeletion: (payload: { identifier: string; message?: string }) =>
+    authApi.requestAccountDeletion(payload),
+
   sendEmailVerification: () => authApi.sendEmailVerification(),
 
   verifyEmail: (code: string) => authApi.verifyEmail(code),
