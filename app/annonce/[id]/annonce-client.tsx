@@ -608,6 +608,11 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
           alt={property.title}
           onClose={() => setIsPhotoFullscreen(false)}
           closeLabel={t.messages.closePhotoPreview}
+          photos={property.photoUrls}
+          index={activePhoto}
+          onNavigate={setActivePhoto}
+          previousLabel={t.messages.previousPhotoAlt}
+          nextLabel={t.messages.nextPhotoAlt}
         />
       )}
       <RightRail />
