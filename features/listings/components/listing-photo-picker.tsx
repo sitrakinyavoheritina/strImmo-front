@@ -54,7 +54,7 @@ export function ListingPhotoPicker({ photos, onChange, min, max, showMinError = 
 
   // Pas de révocation via useEffect ici : en Strict Mode (dev), React monte/démonte/remonte les
   // effets une fois par exercice, ce qui révoquait ces URL blob avant que les vignettes n'aient
-  // fini de s'afficher (miniatures cassées). Au plus `max` (8) petites photos déjà compressées le
+  // fini de s'afficher (miniatures cassées). Au plus `max` (10) petites photos déjà compressées le
   // temps de ce formulaire — le navigateur les libère de toute façon au déchargement de la page.
   // Une photo déjà hébergée (modification) n'a pas besoin de ça : son URL distante sert telle quelle.
   const previewUrls = useMemo(

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Check, Copy, Heart, MapPin, MessageCircle, Pencil, Phone, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, Copy, Heart, Maximize2, MapPin, MessageCircle, Pencil, Phone, Trash2 } from 'lucide-react';
 import type { Property } from '@/features/search/types/listing.types';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useLikesStore } from '@/lib/state/use-likes-store';
@@ -27,6 +27,7 @@ import { RightRail } from '@/features/feed/components/right-rail';
 import { InlineChatPanel } from '@/features/property-detail/components/inline-chat-panel';
 import { PropertyMap } from '@/features/property-detail/components/property-map';
 import { CardOptionsMenu } from '@/features/feed/components/card-options-menu';
+import { ImageLightbox } from '@/components/ui/image-lightbox';
 
 // Statistiques du propriétaire ("Statistiques de mon annonce") masquées pour le moment (demandé
 // explicitement) — un seul drapeau à repasser à true pour les réafficher, plutôt que de retirer le
@@ -45,6 +46,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
   const { mutate: toggleLike } = useLikeProperty();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const [activePhoto, setActivePhoto] = useState(0);
+  const [isPhotoFullscreen, setIsPhotoFullscreen] = useState(false);
   const [manualChatOpen, setManualChatOpen] = useState(false);
   const { mutate: approve, isPending: isApproving } = useApproveProperty();
   const { mutate: reject, isPending: isRejecting } = useRejectProperty();
@@ -224,13 +226,25 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
         <div className="lg:h-full lg:flex lg:flex-col lg:min-h-0">
           <div className="relative w-full aspect-[4/3] sm:aspect-[16/9] rounded-xl sm:rounded-2xl overflow-hidden bg-stroke-default">
             {property.photoUrls[activePhoto] && (
-              <Image
-                src={property.photoUrls[activePhoto]}
-                alt={property.title}
-                fill
-                priority
-                className="object-cover"
-              />
+              <button
+                type="button"
+                onClick={() => setIsPhotoFullscreen(true)}
+                aria-label={t.messages.viewPhotoAlt}
+                className="absolute inset-0 cursor-zoom-in"
+              >
+                <Image
+                  src={property.photoUrls[activePhoto]}
+                  alt={property.title}
+                  fill
+                  priority
+                  className="object-cover"
+                />
+                {/* Indication visuelle que la photo s'agrandit au clic (demandé explicitement) —
+                    purement décoratif, le clic est déjà géré par ce bouton lui-même. */}
+                <span className="absolute bottom-2 right-2 sm:bottom-3 sm:right-3 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-black/50 flex items-center justify-center">
+                  <Maximize2 size={14} className="text-white" />
+                </span>
+              </button>
             )}
             <span
               className={`absolute top-2 left-2 sm:top-3 sm:left-3 text-white text-[10px] sm:text-[0.85rem] font-bold px-2 py-1 rounded-md uppercase ${
@@ -586,6 +600,14 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
           onConfirm={handleConfirmDelete}
           isDeleting={isDeleting}
           error={deleteError}
+        />
+      )}
+      {isPhotoFullscreen && property.photoUrls[activePhoto] && (
+        <ImageLightbox
+          src={property.photoUrls[activePhoto]}
+          alt={property.title}
+          onClose={() => setIsPhotoFullscreen(false)}
+          closeLabel={t.messages.closePhotoPreview}
         />
       )}
       <RightRail />

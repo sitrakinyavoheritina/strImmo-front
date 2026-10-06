@@ -27,8 +27,8 @@ import type {
 } from '@/features/search/types/listing.types';
 
 const MIN_PHOTOS = 3;
-const MAX_PHOTOS = 8;
-const DESCRIPTION_MAX_LENGTH = 200;
+const MAX_PHOTOS = 10;
+const DESCRIPTION_MAX_LENGTH = 800;
 
 // Prix (Ariary) et surface (m²) doivent rester des nombres entiers — ni l'un ni l'autre ne
 // s'utilise avec une décimale dans la pratique (l'ariary n'a pas de sous-unité courante), et
@@ -46,24 +46,11 @@ const ROOM_TYPES: RoomType[] = ['T1', 'T2', 'T3', 'T4', 'T5', 'T6plus'];
 // de représentation "6 ou plus" à part entière.
 const BEDROOM_OPTIONS = [1, 2, 3, 4, 5, 6];
 // Choix fermé de commission/caution (demandé explicitement, plus de montant libre pour aucun des
-// deux) — % du prix affiché (loyer mensuel en location, prix de vente en vente), voir le calcul
-// dans buildValues. `0` inclus et choisi par défaut pour une nouvelle annonce (demandé
-// explicitement) — un intermédiaire/une agence sans commission, ou une location sans caution,
-// reste un choix explicite plutôt qu'un champ simplement vide.
+// deux) — % du prix affiché (loyer mensuel en location, prix de vente en vente), envoyé tel quel
+// (voir buildValues), jamais converti en montant Ariary. `0` inclus et choisi par défaut pour une
+// nouvelle annonce (demandé explicitement) — un intermédiaire/une agence sans commission, ou une
+// location sans caution, reste un choix explicite plutôt qu'un champ simplement vide.
 const FEE_PERCENT_OPTIONS = [0, 25, 50, 75, 100];
-
-// Pourcentage le plus proche (parmi FEE_PERCENT_OPTIONS) d'un montant déjà enregistré par rapport
-// au prix de l'annonce — utilisé pour commission ET caution en modification. `0` si le montant/le
-// prix est absent, ou si l'écart dépasse 1 point (valeur saisie librement avant ce changement, ne
-// correspond vraiment à aucun des choix).
-function closestFeePercent(amount: number | undefined, price: number | undefined): number {
-  if (!amount || !price) return 0;
-  const ratio = (amount / price) * 100;
-  const closest = FEE_PERCENT_OPTIONS.reduce((best, option) =>
-    Math.abs(option - ratio) < Math.abs(best - ratio) ? option : best
-  );
-  return Math.abs(closest - ratio) <= 1 ? closest : 0;
-}
 const PROPERTY_TYPES: { value: PropertyType; labelKey: 'typeHouse' | 'typeApartment' | 'typeVilla' | 'typeLand' }[] = [
   { value: 'house', labelKey: 'typeHouse' },
   { value: 'land', labelKey: 'typeLand' },
@@ -146,18 +133,10 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
   const [description, setDescription] = useState(initialValues?.description ?? '');
   const [price, setPrice] = useState(initialValues ? String(initialValues.price) : '');
   // Choix fermé (0/25/50/75/100%), pas un montant libre (demandé explicitement, pour les deux) —
-  // % du prix affiché (loyer mensuel en location, prix de vente total en vente, selon `kind`). Le
-  // montant réel en Ariary (`commission`/`caution` dans PropertyFormValues) est calculé à partir
-  // de ce pourcentage, voir buildValues plus bas. En modification, retrouve le pourcentage déjà
-  // "équivalent" par comparaison au prix de l'annonce — `0` (le défaut) si ça ne correspond à
-  // aucun des 5 choix (ancienne valeur saisie librement avant ce changement), pour ne jamais
-  // présélectionner un pourcentage faux.
-  const [commissionPercent, setCommissionPercent] = useState<number>(() =>
-    closestFeePercent(initialValues?.commission, initialValues?.price)
-  );
-  const [cautionPercent, setCautionPercent] = useState<number>(() =>
-    closestFeePercent(initialValues?.caution, initialValues?.price)
-  );
+  // % du prix affiché (loyer mensuel en location, prix de vente total en vente, selon `kind`),
+  // stocké tel quel (`commissionPercent`/`cautionPercent`) — jamais converti en montant Ariary.
+  const [commissionPercent, setCommissionPercent] = useState<number>(initialValues?.commissionPercent ?? 0);
+  const [cautionPercent, setCautionPercent] = useState<number>(initialValues?.cautionPercent ?? 0);
   // Après un clic sur « Suivant » / « Aperçu » avec moins de MIN_PHOTOS photos (voir ListingPhotoPicker).
   const [photosAttempted, setPhotosAttempted] = useState(false);
   const [visitFee, setVisitFee] = useState(
@@ -325,10 +304,10 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
       // rémunère une intermédiation) ; caution et droit de visite, eux, concernent tout le monde
       // désormais — un propriétaire loue aussi contre une caution — remonté explicitement. Les
       // trois sont facultatifs (0 par défaut, jamais bloquant), plus aucun n'est "obligatoire".
-      // Montants calculés à partir du pourcentage choisi (voir commissionPercent/cautionPercent) ×
-      // le prix affiché — jamais saisis directement en Ariary.
-      commission: requiresCommission ? Math.round(((Number(price) || 0) * commissionPercent) / 100) : undefined,
-      caution: kind === 'sale' ? undefined : Math.round(((Number(price) || 0) * cautionPercent) / 100),
+      // Le pourcentage choisi est envoyé tel quel (pas de montant Ariary calculé, voir
+      // Property.commissionPercent/cautionPercent côté backend).
+      commissionPercent: requiresCommission ? commissionPercent : undefined,
+      cautionPercent: kind === 'sale' ? undefined : cautionPercent,
       visitFee: requiresCommission ? Number(visitFee) || 0 : undefined,
     };
 

@@ -29,6 +29,11 @@ export function AdminPropertyListItem({ property }: { property: Property }) {
         >
           {t.myPropertiesPage[STATUS_LABEL_KEY[property.moderationStatus]]}
         </span>
+        {property.createdByAdminId && (
+          <span className="ml-1.5 inline-block text-[10px] font-bold px-1.5 py-0.5 rounded uppercase bg-brand-primary-soft text-brand-primary">
+            {t.adminAnnoncesPage.createdByAdmin}
+          </span>
+        )}
         <p className="text-sm font-semibold text-content-main truncate mt-0.5">{property.title}</p>
         <p className="text-[0.85rem] text-content-muted truncate">{property.location}</p>
         <p className="text-sm font-bold text-brand-secondary-text mt-0.5">

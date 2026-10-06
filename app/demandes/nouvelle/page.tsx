@@ -16,6 +16,7 @@ import { useCommunes } from '@/features/listings/hooks/use-communes';
 import { useFokontany } from '@/features/listings/hooks/use-fokontany';
 import { chatApi } from '@/features/search/services/chat-api';
 import { useCreatePropertyRequest } from '@/features/property-requests/hooks/use-property-requests';
+import { useCreatePropertyRequestAsAdmin } from '@/features/admin/hooks/use-create-property-request-as-admin';
 import { requestSentence } from '@/features/property-requests/utils/request-summary';
 import type { ListingKind, PropertyFilters, PropertyType } from '@/features/search/types/listing.types';
 
@@ -35,14 +36,21 @@ const VALID_PROPERTY_TYPES: PropertyType[] = ['house', 'apartment', 'villa', 'la
 // annonce (voir matchAndNotify). Les critères "Plus de critères" réutilisent tel quel le composant
 // des filtres de recherche avancés de l'accueil (FilterFields, mode="compact") — mêmes champs,
 // mêmes noms, pour ne pas dupliquer cette longue liste dans un second composant.
-function NouvelleDemandeForm() {
+// `targetUserId` : renseigné uniquement par app/admin/demandes/nouveau (création pour le compte
+// d'un utilisateur, voir PropertyRequestsService.createAsAdmin) — bascule la soumission vers
+// useCreatePropertyRequestAsAdmin et ignore la redirection /connexion ci-dessous (un admin est
+// déjà forcément connecté). Les deux hooks sont appelés sans condition (règle des hooks React),
+// seul celui correspondant au mode est réellement utilisé pour la mutation.
+export function NouvelleDemandeForm({ targetUserId }: { targetUserId?: string } = {}) {
   const { t, locale } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const hasHydrated = useAuthHasHydrated();
   const { data: communes } = useCommunes();
-  const { mutateAsync: createRequest, isPending: isCreating } = useCreatePropertyRequest();
+  const normalCreate = useCreatePropertyRequest();
+  const adminCreate = useCreatePropertyRequestAsAdmin();
+  const isCreating = targetUserId ? adminCreate.isPending : normalCreate.isPending;
 
   // Préremplissage depuis "Aucun résultat" (voir app/recherche/page.tsx, noResultsCtaHref) : reprend
   // ce que la personne cherchait déjà plutôt que de lui faire tout ressaisir. Lu une seule fois au
@@ -55,10 +63,10 @@ function NouvelleDemandeForm() {
   // déjà choisis (voir ci-dessous) jusqu'après la connexion plutôt que les perdre en route (voir
   // useLogin/useGoogleAuth, qui redirigent vers ce `next` une fois connecté).
   useEffect(() => {
-    if (!hasHydrated || isAuthenticated) return;
+    if (targetUserId || !hasHydrated || isAuthenticated) return;
     const query = searchParams.toString();
     router.replace(`/connexion?next=${encodeURIComponent(query ? `${pathname}?${query}` : pathname)}`);
-  }, [hasHydrated, isAuthenticated, router, pathname, searchParams]);
+  }, [targetUserId, hasHydrated, isAuthenticated, router, pathname, searchParams]);
 
   const [step, setStep] = useState<Step>('form');
   const [kind, setKind] = useState<ListingKind | undefined>(() => {
@@ -164,25 +172,30 @@ function NouvelleDemandeForm() {
   async function handleSubmit() {
     if (!kind || !communeId || !fokontanyId || !maxBudget) return;
     setSubmitError(null);
+    const payload = {
+      ...advancedCriteria,
+      kind,
+      propertyType,
+      communeId,
+      fokontanyId,
+      minBudget: minBudget ? Number(minBudget) : undefined,
+      maxBudget: Number(maxBudget),
+      rawDescription,
+      isPublic,
+    };
     try {
-      await createRequest({
-        ...advancedCriteria,
-        kind,
-        propertyType,
-        communeId,
-        fokontanyId,
-        minBudget: minBudget ? Number(minBudget) : undefined,
-        maxBudget: Number(maxBudget),
-        rawDescription,
-        isPublic,
-      });
+      if (targetUserId) {
+        await adminCreate.mutateAsync({ ...payload, targetUserId });
+      } else {
+        await normalCreate.mutateAsync(payload);
+      }
       setCreated(true);
     } catch (error) {
       setSubmitError(getErrorMessage(error, t.propertyRequestsPage.submitError));
     }
   }
 
-  if (!isAuthenticated) return null;
+  if (!targetUserId && !isAuthenticated) return null;
 
   const communeName = communes?.find((c) => c.id === communeId)?.name;
   const fokontanyName = fokontanyList?.find((f) => f.id === fokontanyId)?.name;
@@ -193,7 +206,11 @@ function NouvelleDemandeForm() {
       <div className="max-w-md mx-auto px-4 py-16 text-center space-y-3">
         <p className="text-content-main font-semibold">{t.propertyRequestsPage.createdTitle}</p>
         <p className="text-sm text-content-muted">{t.propertyRequestsPage.createdText}</p>
-        <Button type="button" className="mt-2" onClick={() => router.push('/demandes')}>
+        <Button
+          type="button"
+          className="mt-2"
+          onClick={() => router.push(targetUserId ? '/admin/demandes' : '/demandes')}
+        >
           {t.propertyRequestsPage.viewMySearches}
         </Button>
       </div>

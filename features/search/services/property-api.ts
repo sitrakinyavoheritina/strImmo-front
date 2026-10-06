@@ -85,9 +85,13 @@ export type ApiProperty = {
   moderationStatus: PropertyModerationStatus;
   rejectionReason?: string | null;
   moderatedBy?: { id: string; firstName?: string; lastName?: string } | null;
+  // Admin-only (voir ApiProperty ci-dessus) — absent pour tout visiteur non-admin.
+  createdByAdminId?: string | null;
   phone2: string | null;
-  commission: string | null;
-  caution: string | null;
+  // Colonnes `int` (pas `decimal`, contrairement à `visitFee`) : le driver pg les renvoie déjà en
+  // nombre, pas en chaîne.
+  commissionPercent: number | null;
+  cautionPercent: number | null;
   visitFee: string | null;
   viewCount: number;
   likesCount: number;

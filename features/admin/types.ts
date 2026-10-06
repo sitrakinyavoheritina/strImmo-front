@@ -17,6 +17,8 @@ export interface AdminUser {
   createdAt: string;
   moderationStatus?: 'pending' | 'approved' | 'rejected';
   agencyName?: string;
+  createdByAdmin: boolean;
+  isAnonymous: boolean;
 }
 
 // Forme renvoyée par GET /error-logs (voir strImmo/src/error-logs) — téléphone/email jamais en clair
@@ -68,6 +70,8 @@ export interface AdminUserDetail {
   isPhoneVerified: boolean;
   createdAt: string;
   updatedAt: string;
+  createdByAdmin: boolean;
+  isAnonymous: boolean;
   agentProfile: { status: 'pending' | 'approved' | 'rejected'; rejectionReason: string | null; hasCin: boolean } | null;
   agencyProfile: {
     agencyName: string;
@@ -92,4 +96,49 @@ export interface AdminUserDetail {
     moderationStatus: 'pending' | 'approved' | 'rejected';
     createdAt: string;
   }[];
+}
+
+// Payload de POST /auth/admin/users (voir strImmo/src/auth/dto/create-user-as-admin.dto.ts) —
+// `agency` ne demande ni CIN ni document (seuls agencyName/address sont obligatoires), `agent`
+// reste hors de ce formulaire (voir AuthService.createUserAsAdmin).
+export interface CreateUserAsAdminPayload {
+  role: 'owner' | 'tenant' | 'agency';
+  isAnonymous: boolean;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  email?: string;
+  // Obligatoires si role === 'agency', ignorés sinon.
+  agencyName?: string;
+  address?: string;
+}
+
+// Forme renvoyée par POST /auth/admin/users (voir AuthService.createUserAsAdmin) — `sharedPassword`
+// est le mot de passe fixe partagé par tous les comptes créés par un admin, à communiquer
+// soi-même (jamais envoyé par SMS/email).
+export interface CreateUserAsAdminResponse {
+  user: {
+    id: string;
+    firstName: string;
+    lastName: string;
+    phone: string | null;
+    email: string | null;
+    role: 'owner' | 'tenant' | 'agency';
+    isPhoneVerified: boolean;
+    createdByAdmin: boolean;
+    isAnonymous: boolean;
+    agencyName?: string;
+  };
+  sharedPassword: string;
+}
+
+// Forme renvoyée par GET /auth/admin/search-users (voir AuthService.searchUsersAsAdmin) — pour
+// choisir l'utilisateur "pour le compte de qui" publier une annonce/demande.
+export interface AdminSearchUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  phone: string | null;
+  role: UserRole;
+  isAnonymous: boolean;
 }

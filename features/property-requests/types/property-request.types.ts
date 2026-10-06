@@ -96,4 +96,8 @@ export type AdminPropertyRequestRow = {
   authorPhone: string;
   authorName: string;
   reportCount: number;
+  // Admin-only (voir PropertyRequestsService.queryAdminRows) — présent uniquement si un admin a
+  // créé cette demande pour le compte de l'auteur, jamais exposé sur le tableau public.
+  createdByAdminId?: string;
+  createdByAdminName?: string;
 };

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { ClipboardList, Flag } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
@@ -12,6 +13,7 @@ import {
   useAdminDeletePropertyRequest,
 } from '@/features/property-requests/hooks/use-property-requests';
 import { requestSentence, requestTitle } from '@/features/property-requests/utils/request-summary';
+import { Button } from '@/components/ui/button';
 import { RightRail } from '@/features/feed/components/right-rail';
 
 type Tab = 'active' | 'deleted';
@@ -57,7 +59,14 @@ export default function AdminDemandesPage() {
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
       <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl mx-auto">
-        <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text">{t.adminDemandesPage.title}</h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text">{t.adminDemandesPage.title}</h1>
+          <Link href="/admin/demandes/nouveau">
+            <Button type="button" size="sm">
+              {t.adminDemandesPage.newRequest}
+            </Button>
+          </Link>
+        </div>
         <p className="text-[0.85rem] text-content-muted mt-1">{t.adminDemandesPage.subtitle}</p>
 
         <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-[0.85rem] font-semibold mt-3 mb-4 max-w-xs">
@@ -110,6 +119,11 @@ export default function AdminDemandesPage() {
                 <p className="text-[0.85rem] text-content-muted mt-2">
                   {t.adminDemandesPage.by} {request.authorName} · {request.authorPhone}
                 </p>
+                {request.createdByAdminId && (
+                  <p className="text-[12px] font-semibold text-brand-primary mt-0.5">
+                    {t.adminDemandesPage.createdByAdmin} {request.createdByAdminName}
+                  </p>
+                )}
 
                 {tab === 'active' && request.reportCount > 0 && (
                   <p className="flex items-center gap-1 text-[0.85rem] font-semibold text-danger mt-1">

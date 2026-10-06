@@ -42,8 +42,8 @@ export function mapApiPropertyToProperty(api: ApiProperty): Property {
     moderationStatus: api.moderationStatus,
     rejectionReason: api.rejectionReason ?? undefined,
     phone2: api.phone2 ?? undefined,
-    commission: api.commission != null ? Number(api.commission) : undefined,
-    caution: api.caution != null ? Number(api.caution) : undefined,
+    commissionPercent: api.commissionPercent ?? undefined,
+    cautionPercent: api.cautionPercent ?? undefined,
     visitFee: api.visitFee != null ? Number(api.visitFee) : undefined,
     viewCount: api.viewCount,
     authorName:
@@ -59,6 +59,7 @@ export function mapApiPropertyToProperty(api: ApiProperty): Property {
       api.moderatedBy?.firstName || api.moderatedBy?.lastName
         ? [api.moderatedBy.firstName, api.moderatedBy.lastName].filter(Boolean).join(' ')
         : undefined,
+    createdByAdminId: api.createdByAdminId ?? undefined,
   };
 
   if (api.propertyType === 'house' && api.houseDetails) {
@@ -99,8 +100,8 @@ export function buildCreatePropertyFormData(values: PropertyFormValues, photos: 
   if (values.latitude != null) form.append('latitude', String(values.latitude));
   if (values.longitude != null) form.append('longitude', String(values.longitude));
   if (values.phone2) form.append('phone2', values.phone2);
-  if (values.commission !== undefined) form.append('commission', String(values.commission));
-  if (values.caution !== undefined) form.append('caution', String(values.caution));
+  if (values.commissionPercent !== undefined) form.append('commissionPercent', String(values.commissionPercent));
+  if (values.cautionPercent !== undefined) form.append('cautionPercent', String(values.cautionPercent));
   if (values.visitFee !== undefined) form.append('visitFee', String(values.visitFee));
 
   if (values.propertyType === 'house') {
@@ -160,8 +161,8 @@ export function buildUpdatePropertyFormData(values: PropertyFormValues, photos: 
   if (values.latitude != null) form.append('latitude', String(values.latitude));
   if (values.longitude != null) form.append('longitude', String(values.longitude));
   if (values.phone2) form.append('phone2', values.phone2);
-  if (values.commission !== undefined) form.append('commission', String(values.commission));
-  if (values.caution !== undefined) form.append('caution', String(values.caution));
+  if (values.commissionPercent !== undefined) form.append('commissionPercent', String(values.commissionPercent));
+  if (values.cautionPercent !== undefined) form.append('cautionPercent', String(values.cautionPercent));
   if (values.visitFee !== undefined) form.append('visitFee', String(values.visitFee));
 
   if (values.propertyType === 'house') {

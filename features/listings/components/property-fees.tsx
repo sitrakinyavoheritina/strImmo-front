@@ -2,12 +2,19 @@ import { Shield, Percent, DoorOpen, type LucideIcon } from 'lucide-react';
 import type { Translations } from '@/lib/i18n/translations';
 import { formatPrice } from '@/features/search/utils/format-price';
 
-type FeeValues = { commission?: number | null; caution?: number | null; visitFee?: number | null; kind?: 'sale' | 'rent' };
+type FeeValues = {
+  commissionPercent?: number | null;
+  cautionPercent?: number | null;
+  visitFee?: number | null;
+  kind?: 'sale' | 'rent';
+};
 
 /** Caution / commission / droit de visite, sous forme de petites cartes iconifiées plutôt que de
  * texte brut séparé par des virgules — partagé entre l'aperçu avant publication
  * (listing-preview.tsx) et la fiche détail publiée (app/annonce/[id]/page.tsx) pour qu'ils
- * affichent exactement le même rendu. */
+ * affichent exactement le même rendu. Caution/commission affichées en % tel que choisi dans le
+ * formulaire (voir property-form.tsx FEE_PERCENT_OPTIONS) — jamais un montant Ariary recalculé ;
+ * droit de visite, lui, reste un vrai montant. */
 export function PropertyFees({
   values,
   t,
@@ -21,16 +28,20 @@ export function PropertyFees({
   publisherType?: string;
   className?: string;
 }) {
-  const items: { key: string; icon: LucideIcon; label: string; value: number }[] = [];
+  const items: { key: string; icon: LucideIcon; label: string; value: string }[] = [];
   // Une caution n'a de sens que pour une location — jamais affichée pour un bien à vendre, même
   // si une valeur est encore présente en base (ancienne annonce, champ pas toujours nettoyé au
   // changement de type de transaction).
-  if (values.caution != null && values.kind !== 'sale') {
-    items.push({ key: 'caution', icon: Shield, label: t.listing.caution, value: values.caution });
+  if (values.cautionPercent != null && values.kind !== 'sale') {
+    items.push({ key: 'caution', icon: Shield, label: t.listing.caution, value: `${values.cautionPercent} %` });
   }
   const isOwner = publisherType === 'owner';
-  if (values.commission != null && !isOwner) items.push({ key: 'commission', icon: Percent, label: t.listing.commission, value: values.commission });
-  if (values.visitFee != null && !isOwner) items.push({ key: 'visitFee', icon: DoorOpen, label: t.propertyDetail.visitFee, value: values.visitFee });
+  if (values.commissionPercent != null && !isOwner) {
+    items.push({ key: 'commission', icon: Percent, label: t.listing.commission, value: `${values.commissionPercent} %` });
+  }
+  if (values.visitFee != null && !isOwner) {
+    items.push({ key: 'visitFee', icon: DoorOpen, label: t.propertyDetail.visitFee, value: formatPrice(values.visitFee) });
+  }
   if (items.length === 0) return null;
 
   return (
@@ -45,7 +56,7 @@ export function PropertyFees({
           <item.icon size={14} className="text-brand-primary shrink-0" />
           <div className="leading-tight">
             <p className="text-[12px] text-content-muted">{item.label}</p>
-            <p className="text-[12px] font-bold text-content-main">{formatPrice(item.value)}</p>
+            <p className="text-[12px] font-bold text-content-main">{item.value}</p>
           </div>
         </div>
       ))}

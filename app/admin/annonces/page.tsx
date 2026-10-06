@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Building2 } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
@@ -9,6 +10,7 @@ import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useProperties, useDeletedProperties } from '@/features/search/hooks/use-properties';
 import { AdminPropertyListItem } from '@/features/listings/components/admin-property-list-item';
 import { formatPrice } from '@/features/search/utils/format-price';
+import { Button } from '@/components/ui/button';
 import { RightRail } from '@/features/feed/components/right-rail';
 
 type Tab = 'approved' | 'rejected' | 'deleted';
@@ -59,7 +61,14 @@ export default function AdminAnnoncesPage() {
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
       <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl mx-auto">
-        <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text mb-4">{t.adminAnnoncesPage.title}</h1>
+        <div className="flex items-center justify-between gap-3 mb-4">
+          <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text">{t.adminAnnoncesPage.title}</h1>
+          <Link href="/admin/annonces/nouveau">
+            <Button type="button" size="sm">
+              {t.adminAnnoncesPage.newProperty}
+            </Button>
+          </Link>
+        </div>
 
         <div className="flex items-center gap-1 rounded-xl border border-stroke-default bg-surface-app p-1 text-[0.85rem] font-semibold mb-4 max-w-sm">
           {tabs.map(({ key, label }) => (

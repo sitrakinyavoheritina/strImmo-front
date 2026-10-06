@@ -47,11 +47,19 @@ type PropertyBase = {
   /** Nom de l'admin/superadmin ayant validé ou refusé l'annonce — absent tant qu'elle est
    *  "pending" (voir /admin, statistiques "par équipe"). */
   moderatorName?: string;
+  /** Présent uniquement pour un visiteur admin/superadmin (voir
+   *  strImmo/src/properties/properties.service.ts:toPublicView/findAll) — jamais exposé
+   *  publiquement. Identifie l'admin qui a publié cette annonce pour le compte de l'utilisateur. */
+  createdByAdminId?: string;
   phone2?: string;
-  commission?: number;
-  caution?: number;
-  /** Frais facturé par un intermédiaire/une agence pour faire visiter le bien — facultatif même
-   *  pour eux (contrairement à commission/caution), jamais présent pour un propriétaire. */
+  /** % du prix (loyer mensuel en location, prix de vente en vente), choisi parmi une liste
+   *  fermée (voir property-form.tsx FEE_PERCENT_OPTIONS) — jamais un montant Ariary calculé,
+   *  affiché directement ("75 %", voir property-fees.tsx). */
+  commissionPercent?: number;
+  cautionPercent?: number;
+  /** Frais facturé par un intermédiaire/une agence pour faire visiter le bien — un vrai montant
+   *  en Ariary (pas un %, contrairement à commissionPercent/cautionPercent), facultatif même pour
+   *  eux, jamais présent pour un propriétaire. */
   visitFee?: number;
   viewCount: number;
   // Renseignés seulement quand le backend renvoie `user` (toujours sur le détail, nom/avatar/rôle

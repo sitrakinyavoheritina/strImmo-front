@@ -93,6 +93,16 @@ export function AdminUserListItem({ user }: { user: AdminUser }) {
                 {t.adminUsersPage.notValidated}
               </span>
             )}
+            {user.createdByAdmin && (
+              <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase bg-brand-primary-soft text-brand-primary">
+                {t.adminUsersPage.createdByAdmin}
+              </span>
+            )}
+            {user.isAnonymous && (
+              <span className="shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase bg-surface-app text-content-muted border border-stroke-default">
+                {t.adminUsersPage.anonymous}
+              </span>
+            )}
             {user.moderationStatus && (
               <span
                 className={`shrink-0 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase ${STATUS_BADGE_CLASS[user.moderationStatus]}`}

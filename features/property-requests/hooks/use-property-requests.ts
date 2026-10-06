@@ -14,7 +14,9 @@ const MINE_KEY = ['property-requests', 'mine'];
 // usePublicPropertyRequests) — un create/toggle/delete peut changer ce qui y apparaît, donc toutes
 // les variantes doivent être invalidées, pas juste celle actuellement affichée.
 const PUBLIC_KEY_PREFIX = ['property-requests', 'public'];
-const ADMIN_KEY = ['property-requests', 'admin'];
+// Exportée : réutilisée par useCreatePropertyRequestAsAdmin (features/admin/hooks) pour
+// invalidater la liste admin après une création "pour le compte de" un utilisateur.
+export const ADMIN_KEY = ['property-requests', 'admin'];
 
 export function useMyPropertyRequests(enabled: boolean) {
   return useQuery({

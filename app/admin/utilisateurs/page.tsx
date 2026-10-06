@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Users } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
@@ -9,6 +10,7 @@ import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useAdminUsers } from '@/features/admin/hooks/use-admin-users';
 import { AdminUserListItem, isUnvalidatedAccount } from '@/features/admin/components/admin-user-list-item';
 import { Chip } from '@/components/ui/form-controls';
+import { Button } from '@/components/ui/button';
 import { RightRail } from '@/features/feed/components/right-rail';
 
 // Liste de tous les comptes inscrits sur la plateforme — demandé explicitement ("liste des
@@ -39,7 +41,14 @@ export default function AdminUtilisateursPage() {
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">
       <div className="flex-1 min-w-0 py-3 sm:py-6 max-w-2xl mx-auto">
-        <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text">{t.adminUsersPage.title}</h1>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="text-lg sm:text-xl font-bold text-brand-secondary-text">{t.adminUsersPage.title}</h1>
+          <Link href="/admin/utilisateurs/nouveau">
+            <Button type="button" size="sm">
+              {t.adminUsersPage.newUser}
+            </Button>
+          </Link>
+        </div>
         <p className="text-sm text-content-muted mt-1">
           {isLoading ? t.search.searching : `${users?.length ?? 0} ${t.adminUsersPage.subtitle}`}
         </p>
