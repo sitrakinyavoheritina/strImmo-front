@@ -110,6 +110,12 @@ type PropertyFormProps = {
    *  plutôt qu'un formulaire de modification distinct) — type de bien et photos sont modifiables
    *  dans les deux cas (voir strImmo/src/properties/properties.service.ts:update). */
   mode?: 'create' | 'edit';
+  /** Rôle du VRAI publieur, à fournir uniquement quand ce formulaire publie pour le compte d'un
+   *  autre utilisateur (voir app/admin/annonces/nouveau/page.tsx) — sans ça, `requiresCommission`
+   *  se basait sur le rôle de l'admin connecté (toujours 'admin', jamais 'agent'/'agency'), donc
+   *  les champs commission/droit de visite ne s'affichaient jamais dans ce flux même pour un
+   *  intermédiaire/une agence cible. Absent sinon : retombe sur le rôle du compte connecté. */
+  publisherRole?: string;
 };
 
 // Formulaire de création d'annonce en 2 étapes suivies d'une prévisualisation, port de
@@ -117,14 +123,17 @@ type PropertyFormProps = {
 // `propertyType` choisi à l'étape 1. Expose `submit()` via ref pour que le pied de page fixe de
 // l'écran parent déclenche la validation de l'étape courante sans dupliquer l'état du formulaire.
 export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(function PropertyForm(
-  { step, onNext, onPreview, initialValues, initialPhotos, mode = 'create' },
+  { step, onNext, onPreview, initialValues, initialPhotos, mode = 'create', publisherRole },
   ref
 ) {
   const { t } = useTranslation();
   const user = useAuthStore((state) => state.user);
   // Commission/caution : jamais pour un propriétaire, obligatoires pour un intermédiaire/une
   // agence — même règle appliquée côté serveur (strImmo/src/properties/properties.service.ts).
-  const requiresCommission = user?.role === 'agent' || user?.role === 'agency';
+  // `publisherRole` prend le dessus sur le rôle du compte connecté quand ce formulaire publie
+  // pour quelqu'un d'autre (voir le commentaire sur ce prop).
+  const effectiveRole = publisherRole ?? user?.role;
+  const requiresCommission = effectiveRole === 'agent' || effectiveRole === 'agency';
 
   const [kind, setKind] = useState<ListingKind>(initialValues?.kind ?? 'rent');
   const [propertyType, setPropertyType] = useState<PropertyType>(initialValues?.propertyType ?? 'house');

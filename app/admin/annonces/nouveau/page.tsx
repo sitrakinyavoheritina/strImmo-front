@@ -99,6 +99,7 @@ export default function NouvelleAnnonceAdminPage() {
               step={step === 'step1' ? 1 : step === 'step2' ? 2 : 3}
               initialValues={draft ?? undefined}
               initialPhotos={draftPhotos}
+              publisherRole={targetUser.role}
               onNext={() => setStep(step === 'step1' ? 'step2' : 'step3')}
               onPreview={(values, photos) => {
                 setDraft(values);
