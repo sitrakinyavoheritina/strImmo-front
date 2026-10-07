@@ -9,14 +9,13 @@ import { FormErrorBanner } from '@/components/ui/form-error-banner';
 import { useCreateAdminUser } from '../hooks/use-create-admin-user';
 import type { CreateUserAsAdminResponse } from '../types';
 
-type Role = 'owner' | 'tenant' | 'agency';
+type Role = 'owner' | 'tenant' | 'agent' | 'agency';
 
-// Formulaire de /admin/utilisateurs/nouveau — owner/tenant/agency (voir CreateUserAsAdminDto :
-// `agent` reste hors de ce formulaire, seul rôle à exiger une pièce d'identité). "Anonyme" vide
-// et désactive les champs nom/prénom (le pseudo est généré côté serveur, voir
-// AuthService.createUserAsAdmin) plutôt que de les laisser visibles mais ignorés, pour ne pas
-// laisser croire qu'ils comptent — option absente pour une agence (son identité EST son nom
-// commercial, jamais anonyme).
+// Formulaire de /admin/utilisateurs/nouveau — owner/tenant/agent/agency (voir
+// CreateUserAsAdminDto : aucun des quatre n'exige de document ici). "Anonyme" vide et désactive
+// les champs nom/prénom (le pseudo est généré côté serveur, voir AuthService.createUserAsAdmin)
+// plutôt que de les laisser visibles mais ignorés, pour ne pas laisser croire qu'ils comptent —
+// option absente pour une agence (son identité EST son nom commercial, jamais anonyme).
 export function AdminCreateUserForm({ onCreated }: { onCreated: (result: CreateUserAsAdminResponse) => void }) {
   const { t } = useTranslation();
   const { mutate: createUser, isPending, error } = useCreateAdminUser();
@@ -73,6 +72,9 @@ export function AdminCreateUserForm({ onCreated }: { onCreated: (result: CreateU
           </Chip>
           <Chip active={role === 'tenant'} onClick={() => handleRoleChange('tenant')}>
             {t.auth.roleTenant}
+          </Chip>
+          <Chip active={role === 'agent'} onClick={() => handleRoleChange('agent')}>
+            {t.auth.roleAgent}
           </Chip>
           <Chip active={role === 'agency'} onClick={() => handleRoleChange('agency')}>
             {t.auth.roleAgency}

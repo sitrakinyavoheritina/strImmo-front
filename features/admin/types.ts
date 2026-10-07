@@ -99,10 +99,9 @@ export interface AdminUserDetail {
 }
 
 // Payload de POST /auth/admin/users (voir strImmo/src/auth/dto/create-user-as-admin.dto.ts) —
-// `agency` ne demande ni CIN ni document (seuls agencyName/address sont obligatoires), `agent`
-// reste hors de ce formulaire (voir AuthService.createUserAsAdmin).
+// ni `agency` ni `agent` ne demandent de document (voir AuthService.createUserAsAdmin).
 export interface CreateUserAsAdminPayload {
-  role: 'owner' | 'tenant' | 'agency';
+  role: 'owner' | 'tenant' | 'agent' | 'agency';
   isAnonymous: boolean;
   firstName?: string;
   lastName?: string;
@@ -123,7 +122,7 @@ export interface CreateUserAsAdminResponse {
     lastName: string;
     phone: string | null;
     email: string | null;
-    role: 'owner' | 'tenant' | 'agency';
+    role: 'owner' | 'tenant' | 'agent' | 'agency';
     isPhoneVerified: boolean;
     createdByAdmin: boolean;
     isAnonymous: boolean;
