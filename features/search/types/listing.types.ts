@@ -67,6 +67,9 @@ type PropertyBase = {
   authorName?: string;
   authorAvatarUrl?: string;
   publisherType?: PublisherType;
+  /** Compte du vendeur créé directement par un admin — ne peut pas être contacté en direct (voir
+   *  MessagingService côté backend) ; sert à masquer le bouton "Discuter avec X". */
+  authorCreatedByAdmin?: boolean;
   /** Téléphone principal du vendeur (détail uniquement) — `phone2` reste le numéro secondaire
    *  optionnel saisi sur l'annonce elle-même. */
   contactPhone?: string;

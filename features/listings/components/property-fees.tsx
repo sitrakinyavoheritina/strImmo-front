@@ -32,11 +32,11 @@ export function PropertyFees({
   // Une caution n'a de sens que pour une location — jamais affichée pour un bien à vendre, même
   // si une valeur est encore présente en base (ancienne annonce, champ pas toujours nettoyé au
   // changement de type de transaction).
-  if (values.cautionPercent != null && values.kind !== 'sale') {
+  if (values.cautionPercent != null && values.cautionPercent > 0 && values.kind !== 'sale') {
     items.push({ key: 'caution', icon: Shield, label: t.listing.caution, value: `${values.cautionPercent} %` });
   }
   const isOwner = publisherType === 'owner';
-  if (values.commissionPercent != null && !isOwner) {
+  if (values.commissionPercent != null && values.commissionPercent > 0 && !isOwner) {
     items.push({ key: 'commission', icon: Percent, label: t.listing.commission, value: `${values.commissionPercent} %` });
   }
   if (values.visitFee != null && !isOwner) {

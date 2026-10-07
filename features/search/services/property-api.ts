@@ -105,6 +105,10 @@ export type ApiProperty = {
     avatarUrl?: string | null;
     role?: PublisherType;
     phone?: string;
+    // Compte créé directement par un admin (voir strImmo/src/auth/auth.service.ts:
+    // createUserAsAdmin) — ne peut pas être contacté en direct (voir MessagingService), sert à
+    // masquer le bouton "Discuter".
+    createdByAdmin?: boolean;
   };
   // Calculé à la lecture (COUNT sur la table favorites), jamais persisté côté backend.
   favoritesCount?: number;

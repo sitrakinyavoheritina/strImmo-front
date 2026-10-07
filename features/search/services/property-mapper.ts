@@ -52,6 +52,7 @@ export function mapApiPropertyToProperty(api: ApiProperty): Property {
         : undefined,
     authorAvatarUrl: api.user?.avatarUrl ?? undefined,
     publisherType: api.user?.role,
+    authorCreatedByAdmin: api.user?.createdByAdmin,
     contactPhone: api.user?.phone,
     favoritesCount: api.favoritesCount,
     likesCount: api.likesCount,

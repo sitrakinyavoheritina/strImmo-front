@@ -315,7 +315,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
               dessous de lg: le bouton lui-même est remplacé par la barre fixe en bas d'écran
               (Contacter + Discuter, voir plus bas) — seul le panneau de discussion ouvert reste
               ici, sur les deux tailles. */}
-          {!isAdminUser && property.authorName &&
+          {!isAdminUser && property.authorName && !property.authorCreatedByAdmin &&
             (!isChatOpen ? (
               // `hidden lg:block` sur ce wrapper plutôt que directement sur le Button : le Button
               // porte déjà sa propre classe `inline-flex` de base, qui entre en conflit de
@@ -542,7 +542,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
 
           {/* Réserve la place occupée par la barre fixe ci-dessous (mobile uniquement) pour que
               la description ne se retrouve pas cachée derrière une fois tout en bas du scroll. */}
-          {!isAdminUser && (hasContact || (property.authorName && !isChatOpen)) && (
+          {!isAdminUser && (hasContact || (property.authorName && !property.authorCreatedByAdmin && !isChatOpen)) && (
             <div className="h-32 lg:hidden" />
           )}
           {/* Feuille de discussion mobile (voir InlineChatPanel) : réserve sa hauteur pour que le bas
@@ -564,7 +564,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
           "Contacter" totalement inaccessible pendant qu'on discute (constaté explicitement :
           "le contact disparaît en bas de la page"). Absente pour un admin, comme les deux actions
           qu'elle contient. */}
-      {!isAdminUser && (hasContact || (property.authorName && !isChatOpen)) && (
+      {!isAdminUser && (hasContact || (property.authorName && !property.authorCreatedByAdmin && !isChatOpen)) && (
         <div className="lg:hidden fixed inset-x-0 bottom-16 z-40 bg-surface-card border-t border-stroke-default px-3 py-2.5 space-y-2 shadow-[0_-2px_12px_rgba(0,0,0,0.06)]">
           {hasContact && (
             <ContactActions
@@ -578,7 +578,7 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
               copiedLabel={t.propertyDetail.numberCopied}
             />
           )}
-          {property.authorName && !isChatOpen && (
+          {property.authorName && !property.authorCreatedByAdmin && !isChatOpen && (
             <Button
               type="button"
               variant="outline"

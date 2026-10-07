@@ -122,14 +122,16 @@ export function FeedPropertyCard({ property }: { property: Property }) {
               <Heart size={20} className={isLiked ? 'text-danger fill-danger' : ''} />
               {formatCount(property.likesCount)}
             </button>
-            <button
-              type="button"
-              onClick={handleChatClick}
-              aria-label={`${t.propertyDetail.chatWith} ${property.authorName ?? ''}`.trim()}
-              className="hover:text-brand-primary transition"
-            >
-              <MessageCircle size={20} />
-            </button>
+            {!property.authorCreatedByAdmin && (
+              <button
+                type="button"
+                onClick={handleChatClick}
+                aria-label={`${t.propertyDetail.chatWith} ${property.authorName ?? ''}`.trim()}
+                className="hover:text-brand-primary transition"
+              >
+                <MessageCircle size={20} />
+              </button>
+            )}
             <CardOptionsMenu property={property} />
           </div>
         )}
