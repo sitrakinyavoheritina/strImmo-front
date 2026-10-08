@@ -98,7 +98,12 @@ export function ViewBoostSection({ property, t }: { property: Property; t: Trans
         {s.enabledLabel}
       </label>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {/* Toujours empilé (jamais `sm:grid-cols-2`) : ce panneau s'affiche dans une colonne étroite
+          (~380px, voir la mise en page `lg:grid-cols-[1.6fr_1fr]` de la fiche annonce), pas sur
+          toute la largeur de l'écran — un point de rupture basé sur la largeur de la FENÊTRE
+          forçait Jour/Nuit côte à côte dans cet espace réduit, écrasant les champs imbriqués
+          jusqu'au chevauchement du texte (constaté en prod, voir capture d'écran). */}
+      <div className="space-y-3">
         {(
           [
             {
@@ -147,7 +152,10 @@ export function ViewBoostSection({ property, t }: { property: Property; t: Trans
                 />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-2">
+            {/* Toujours empilé aussi ici (pas de grid-cols-2) : la ligne "Déjà ajoutées : X/Y
+                (plafond configuré : Z)" sous chaque champ est longue, elle casserait n'importe
+                quelle colonne étroite si les deux objectifs étaient côte à côte. */}
+            <div className="space-y-2">
               <div>
                 <label className="block text-[0.75rem] text-content-muted mb-0.5">
                   {s.targetLabel} ({s.viewsShort})
