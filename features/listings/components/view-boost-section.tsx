@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import type { Translations } from '@/lib/i18n/translations';
 import type { Property, ViewBoostConfig } from '@/features/search/types/listing.types';
-import { useUpdateViewBoost } from '@/features/search/hooks/use-update-view-boost';
+import { useResetViewBoost, useUpdateViewBoost } from '@/features/search/hooks/use-update-view-boost';
 import { Button } from '@/components/ui/button';
 
 // Valeurs par défaut cohérentes avec celles de la migration backend (voir
@@ -53,8 +53,13 @@ const MAX_TARGET_PER_PERIOD = 500;
 export function ViewBoostSection({ property, t }: { property: Property; t: Translations }) {
   const s = t.viewBoostSection;
   const { mutate: updateViewBoost, isPending } = useUpdateViewBoost();
+  const { mutate: resetViewBoost, isPending: isResetting } = useResetViewBoost();
   const [form, setForm] = useState<FormState>(() => toFormState(property.viewBoost));
   const [error, setError] = useState(false);
+  // Quelle métrique attend une confirmation avant réinitialisation (jamais les deux en même
+  // temps) — un simple clic sur "Réinitialiser" ne déclenche rien seul, évite un clic malheureux
+  // qui remettrait brutalement un compteur à 0.
+  const [confirmReset, setConfirmReset] = useState<'views' | 'likes' | null>(null);
 
   function handleSave() {
     setError(false);
@@ -62,6 +67,11 @@ export function ViewBoostSection({ property, t }: { property: Property; t: Trans
       { id: property.id, payload: form },
       { onError: () => setError(true) },
     );
+  }
+
+  function handleReset(metric: 'views' | 'likes') {
+    resetViewBoost({ id: property.id, metric });
+    setConfirmReset(null);
   }
 
   const totalViews = property.viewCount + property.boostViews;
@@ -72,15 +82,50 @@ export function ViewBoostSection({ property, t }: { property: Property; t: Trans
     <div className="mt-3 bg-surface-app border border-stroke-default rounded-xl p-3 space-y-3">
       <p className="text-sm font-semibold text-content-main">{s.title}</p>
 
-      <div className="flex flex-wrap gap-3 text-[0.85rem] text-content-muted">
+      <div className="flex flex-wrap items-center gap-3 text-[0.85rem] text-content-muted">
         <span>{s.realViews} : <strong className="text-content-main">{property.viewCount}</strong></span>
         <span>{s.boostedViews} : <strong className="text-content-main">{property.boostViews}</strong></span>
         <span>{s.totalViews} : <strong className="text-content-main">{totalViews}</strong></span>
+        {/* Corrige une saisie malheureuse (objectif trop élevé laissé tourner) sans attendre le
+            changement de date calendaire — deux clics nécessaires (confirmation inline) pour
+            éviter un clic accidentel qui effacerait la progression. */}
+        {confirmReset === 'views' ? (
+          <span className="flex items-center gap-1.5">
+            {s.resetConfirm}
+            <button type="button" onClick={() => handleReset('views')} disabled={isResetting} className="font-semibold text-danger">
+              {s.resetConfirmYes}
+            </button>
+            <button type="button" onClick={() => setConfirmReset(null)} className="font-semibold text-content-muted">
+              {s.resetCancel}
+            </button>
+          </span>
+        ) : (
+          <button type="button" onClick={() => setConfirmReset('views')} className="underline hover:text-danger">
+            {s.resetLabel}
+          </button>
+        )}
       </div>
-      <div className="flex flex-wrap gap-3 text-[0.85rem] text-content-muted">
+      <div className="flex flex-wrap items-center gap-3 text-[0.85rem] text-content-muted">
         <span>{s.realLikes} : <strong className="text-content-main">{property.likesCount}</strong></span>
         <span>{s.boostedLikes} : <strong className="text-content-main">{property.boostLikes}</strong></span>
         <span>{s.totalLikes} : <strong className="text-content-main">{totalLikes}</strong></span>
+        {confirmReset === 'likes' ? (
+          <span className="flex items-center gap-1.5">
+            {s.resetConfirm}
+            <button type="button" onClick={() => handleReset('likes')} disabled={isResetting} className="font-semibold text-danger">
+              {s.resetConfirmYes}
+            </button>
+            <button type="button" onClick={() => setConfirmReset(null)} className="font-semibold text-content-muted">
+              {s.resetCancel}
+            </button>
+          </span>
+        ) : (
+          <button type="button" onClick={() => setConfirmReset('likes')} className="underline hover:text-danger">
+            {s.resetLabel}
+          </button>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-3 text-[0.85rem] text-content-muted">
         <span>
           {s.nextBoost} :{' '}
           <strong className="text-content-main">

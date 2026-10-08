@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { updateViewBoost, type UpdateViewBoostPayload } from '@/features/listings/services/view-boost-api';
+import { resetViewBoost, updateViewBoost, type UpdateViewBoostPayload } from '@/features/listings/services/view-boost-api';
 
 // Réservé admin/superadmin (voir /annonce/[id], section "Boost des vues") — même pattern
 // d'invalidation que use-moderate-property.ts (`['property', id]`, séparée de `['properties']`).
@@ -13,6 +13,19 @@ export function useUpdateViewBoost() {
   return useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateViewBoostPayload }) =>
       updateViewBoost(id, payload),
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({ queryKey: ['property', variables.id] });
+    },
+  });
+}
+
+// Même pattern que useUpdateViewBoost ci-dessus — réservé admin/superadmin, invalide la même clé.
+export function useResetViewBoost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, metric }: { id: string; metric: 'views' | 'likes' }) =>
+      resetViewBoost(id, metric),
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['property', variables.id] });
     },

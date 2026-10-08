@@ -615,6 +615,10 @@ const translations = {
       save: 'Enregistrer',
       saving: 'Enregistrement...',
       saveError: "Impossible d'enregistrer. Réessayez.",
+      resetLabel: 'Réinitialiser à 0',
+      resetConfirm: 'Remettre à 0 ?',
+      resetConfirmYes: 'Oui',
+      resetCancel: 'Annuler',
     },
     adminDemandesPage: {
       title: 'Toutes les demandes',
@@ -1630,6 +1634,10 @@ const translations = {
       save: 'Tahiry',
       saving: 'Mitahiry...',
       saveError: 'Tsy voatahiry. Andramo indray.',
+      resetLabel: 'Avereno amin\'ny 0',
+      resetConfirm: 'Averina amin\'ny 0 ?',
+      resetConfirmYes: 'Eny',
+      resetCancel: 'Aoka',
     },
     adminDemandesPage: {
       title: 'Fangatahana rehetra',

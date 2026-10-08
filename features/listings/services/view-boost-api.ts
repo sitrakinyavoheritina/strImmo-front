@@ -26,3 +26,12 @@ export function updateViewBoost(id: string, payload: UpdateViewBoostPayload): Pr
     .patch<ApiProperty>(`/properties/${id}/view-boost`, payload)
     .then((r) => mapApiPropertyToProperty(r.data));
 }
+
+// Remet à 0 le compteur boosté (vues OU j'aime) déjà affiché publiquement — corrige une saisie
+// malheureuse sans attendre le changement de date calendaire du lendemain. Ne touche ni aux
+// horaires ni aux objectifs configurés, voir PropertyViewBoostService.resetCounters côté backend.
+export function resetViewBoost(id: string, metric: 'views' | 'likes'): Promise<Property> {
+  return apiClient
+    .patch<ApiProperty>(`/properties/${id}/view-boost/reset`, { metric })
+    .then((r) => mapApiPropertyToProperty(r.data));
+}
