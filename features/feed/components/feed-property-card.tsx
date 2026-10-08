@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Heart, MessageCircle, MapPin } from 'lucide-react';
+import { Eye, Heart, MessageCircle, MapPin } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { CardOptionsMenu } from './card-options-menu';
 import { useTranslation } from '@/lib/i18n/use-translation';
@@ -13,6 +13,7 @@ import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useLikeProperty } from '@/features/search/hooks/use-like-property';
 import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import { formatRelativeTime } from '@/features/search/utils/format-relative-time';
+import { formatCount } from '@/features/search/utils/format-count';
 import type { Property } from '@/features/search/types/listing.types';
 import { propertyPath } from '@/lib/seo/slug';
 
@@ -21,10 +22,6 @@ const PUBLISHER_LABEL_KEY = {
   agent: 'publisherAgent',
   agency: 'publisherAgency',
 } as const;
-
-function formatCount(count: number): string {
-  return count >= 1000 ? `${(count / 1000).toFixed(1).replace('.0', '')}k` : String(count);
-}
 
 // Carte façon post social pour une annonce, utilisée dans le fil d'accueil — données réelles
 // (backend). Le badge en haut de la photo indique le type de compte (Propriétaire/Agence/
@@ -70,6 +67,17 @@ export function FeedPropertyCard({ property }: { property: Property }) {
             {t.search[PUBLISHER_LABEL_KEY[property.publisherType]]}
           </span>
         )}
+        {/* Vues — en fixe en haut à droite de la photo, façon compteur de vues Instagram/TikTok,
+            plutôt que dans la ligne d'actions du bas (déplacé explicitement). Jamais
+            `+ boostViews` ici (composant chargé par TOUT visiteur) : `property.viewCount` est
+            déjà le total à afficher — le backend l'a fusionné avec le boost pour un non-admin
+            (voir PropertiesService.toPublicView/findAll), un admin voit lui le vrai total "nu" en
+            navigation normale et la répartition complète seulement dans le panneau dédié
+            "Boost des vues" (voir view-boost-section.tsx, chargé à part). */}
+        <span className="absolute top-3 right-3 bg-surface-dark/62 backdrop-blur-sm text-white text-[11px] font-semibold px-2 py-1 rounded-md flex items-center gap-1">
+          <Eye size={13} />
+          {formatCount(property.viewCount)}
+        </span>
         {/* Bande flottante translucide (façon Instagram/Marketplace) plutôt que deux badges blancs
             séparés : regroupe location/vente et prix sans jamais se fondre dans une photo claire.
             `surface-dark` (brun très sombre du thème, pas un noir codé en dur) garde un texte

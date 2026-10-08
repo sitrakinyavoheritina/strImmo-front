@@ -66,6 +66,30 @@ export type ApiNearbyProperty = {
   distanceKm: number;
 };
 
+// Reflète exactement la forme renvoyée par PropertiesService.toPublicView (admin uniquement) —
+// horaires en "HH:mm", jamais en minutes brutes (voir strImmo/src/property-view-boost/view-boost.utils.ts).
+export type ApiViewBoost = {
+  enabled: boolean;
+  dayStart: string;
+  dayEnd: string;
+  nightStart: string;
+  nightEnd: string;
+  dayTarget: number;
+  nightTarget: number;
+  dayAdded: number;
+  nightAdded: number;
+  dayEffectiveTarget: number;
+  nightEffectiveTarget: number;
+  likeDayTarget: number;
+  likeNightTarget: number;
+  likeDayAdded: number;
+  likeNightAdded: number;
+  likeDayEffectiveTarget: number;
+  likeNightEffectiveTarget: number;
+  nextBoostAt: string | null;
+  lastBoostAt: string | null;
+};
+
 export type ApiProperty = {
   id: string;
   propertyType: PropertyType;
@@ -94,7 +118,17 @@ export type ApiProperty = {
   cautionPercent: number | null;
   visitFee: string | null;
   viewCount: number;
+  // Toujours présent (0 par défaut) — vues "boost" ajoutées par le cron backend
+  // (PropertyViewBoostService), jamais écrites par le client. `viewCount + boostViews` = le total
+  // affiché publiquement (calculé côté front, voir property-mapper.ts).
+  boostViews: number;
+  // Admin-only (comme `createdByAdminId` ci-dessus) — absent pour tout visiteur non-admin, et
+  // absent aussi si aucun boost n'a jamais été configuré pour cette annonce.
+  viewBoost?: ApiViewBoost | null;
   likesCount: number;
+  // "J'aime" boostés, même principe que `boostViews` ci-dessus — `likesCount + boostLikes` = le
+  // total affiché publiquement (façon FB), calculé côté front (voir property-mapper.ts).
+  boostLikes: number;
   // Liste (`GET /properties`) : nom/avatar/rôle seulement (jamais téléphone/email/adresse, voir
   // strImmo/src/properties/properties.service.ts:findAll). Détail (`GET /properties/:id`) : objet
   // complet, `phone` inclus (nécessaire pour "Contacter le vendeur").

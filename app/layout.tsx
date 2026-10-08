@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { AppShell } from '@/components/layout/app-shell';
 import { QueryProvider } from '@/lib/api/query-provider';
 import { Analytics } from '@/components/analytics/analytics';
@@ -67,7 +68,19 @@ export default function RootLayout({
     // supprime l'avertissement QUE pour les attributs de cet élément précis, pas pour ses enfants.
     <html lang="fr" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {/* `next/script` (pas un `<script>` brut) : un `<script>` JSX direct passe par le
+            mécanisme interne de "Resources" de React 19, qui logue "Encountered a script tag
+            while rendering..." dès que ce nœud est reconstruit côté client (ex. après une
+            navigation post-connexion) plutôt que simplement hydraté — toujours inoffensif
+            (le script s'exécute bien dans les deux cas) mais source de confusion en console.
+            `next/script` est le mécanisme officiel pour ce cas précis (script exécuté avant
+            hydratation, dans `<head>`, une seule fois par chargement de document, jamais
+            réexécuté par une navigation côté client) et n'emprunte pas ce chemin. */}
+        <Script
+          id="theme-init"
+          strategy="beforeInteractive"
+          dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }}
+        />
       </head>
       <body className="antialiased bg-surface-app text-content-main min-h-screen flex flex-col">
         <QueryProvider>

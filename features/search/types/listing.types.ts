@@ -14,6 +14,30 @@ export type RoomType = 'T1' | 'T2' | 'T3' | 'T4' | 'T5' | 'T6plus';
 
 export type PropertyModerationStatus = 'pending' | 'approved' | 'rejected';
 
+export type ViewBoostConfig = {
+  enabled: boolean;
+  dayStart: string;
+  dayEnd: string;
+  nightStart: string;
+  nightEnd: string;
+  dayTarget: number;
+  nightTarget: number;
+  dayAdded: number;
+  nightAdded: number;
+  // Plafond RÉEL visé aujourd'hui (tiré au hasard entre 60-100% de dayTarget/nightTarget) —
+  // jamais identique d'un jour à l'autre, voir strImmo/src/property-view-boost/view-boost.utils.ts.
+  dayEffectiveTarget: number;
+  nightEffectiveTarget: number;
+  likeDayTarget: number;
+  likeNightTarget: number;
+  likeDayAdded: number;
+  likeNightAdded: number;
+  likeDayEffectiveTarget: number;
+  likeNightEffectiveTarget: number;
+  nextBoostAt: string | null;
+  lastBoostAt: string | null;
+};
+
 type PropertyBase = {
   id: string;
   title: string;
@@ -51,6 +75,13 @@ type PropertyBase = {
    *  strImmo/src/properties/properties.service.ts:toPublicView/findAll) — jamais exposé
    *  publiquement. Identifie l'admin qui a publié cette annonce pour le compte de l'utilisateur. */
   createdByAdminId?: string;
+  /** Vues "boost" ajoutées par le cron backend (jamais écrites par le client) — `viewCount +
+   *  boostViews` est le total affiché publiquement. Toujours présent (0 par défaut). */
+  boostViews: number;
+  /** Config + progression du boost, présent uniquement pour un visiteur admin/superadmin, et
+   *  seulement si un boost a déjà été configuré au moins une fois pour cette annonce (voir
+   *  strImmo/src/properties/properties.service.ts:toPublicView). */
+  viewBoost?: ViewBoostConfig;
   phone2?: string;
   /** % du prix (loyer mensuel en location, prix de vente en vente), choisi parmi une liste
    *  fermée (voir property-form.tsx FEE_PERCENT_OPTIONS) — jamais un montant Ariary calculé,
@@ -79,6 +110,9 @@ type PropertyBase = {
    *  tard). Colonne persistée (`properties.likes_count`), pas de suivi "qui a aimé quoi" côté
    *  backend — voir lib/state/use-likes-store.ts pour l'état local par navigateur. */
   likesCount: number;
+  /** "J'aime" boostés (même principe que `boostViews` ci-dessus) — toujours présent (0 par
+   *  défaut). Le nombre affiché publiquement (façon FB) est `likesCount + boostLikes`. */
+  boostLikes: number;
 };
 
 export type HouseProperty = PropertyBase & {
@@ -190,7 +224,15 @@ export type PropertyFilters = {
 type DistributiveOmit<T, K extends keyof T> = T extends unknown ? Omit<T, K> : never;
 export type PropertyFormValues = DistributiveOmit<
   Property,
-  'id' | 'ownerId' | 'createdAt' | 'viewCount' | 'moderationStatus' | 'likesCount'
+  | 'id'
+  | 'ownerId'
+  | 'createdAt'
+  | 'viewCount'
+  | 'moderationStatus'
+  | 'likesCount'
+  | 'boostViews'
+  | 'boostLikes'
+  | 'viewBoost'
 >;
 
 /** Un item du sélecteur de photos (voir listing-photo-picker.tsx) — en modification, la galerie

@@ -9,15 +9,12 @@ import { useAuthStore } from '@/lib/state/use-auth-store';
 import { useRequestLikesStore } from '@/lib/state/use-request-likes-store';
 import { useStartConversation } from '@/features/messages/hooks/use-messages';
 import { formatRelativeTime } from '@/features/search/utils/format-relative-time';
+import { formatCount } from '@/features/search/utils/format-count';
 import { AnonymousAvatar } from './anonymous-avatar';
 import { PropertyRequestOptionsMenu } from './property-request-options-menu';
 import { useLikePropertyRequest } from '../hooks/use-property-requests';
 import { requestCriteriaLabels, requestSentence, requestTitle } from '../utils/request-summary';
 import type { PropertyRequest } from '../types/property-request.types';
-
-function formatCount(count: number): string {
-  return count >= 1000 ? `${(count / 1000).toFixed(1).replace('.0', '')}k` : String(count);
-}
 
 /** Carte du tableau public (vendeurs parcourant les demandes des acheteurs) — même registre
  *  visuel qu'une carte d'annonce du fil (avatar + nom, cœur, message, "...", voir

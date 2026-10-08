@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import { Heart, MessageCircle, MapPin } from 'lucide-react';
+import { Eye, Heart, MessageCircle, MapPin } from 'lucide-react';
 import { Avatar } from '@/components/ui/avatar';
 import { CardOptionsMenu } from './card-options-menu';
 import { useTranslation } from '@/lib/i18n/use-translation';
@@ -13,6 +13,7 @@ import { isAdmin } from '@/features/auth/utils/is-admin';
 import { useLikeProperty } from '@/features/search/hooks/use-like-property';
 import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
 import { formatRelativeTime } from '@/features/search/utils/format-relative-time';
+import { formatCount } from '@/features/search/utils/format-count';
 import type { Property } from '@/features/search/types/listing.types';
 import { propertyPath } from '@/lib/seo/slug';
 
@@ -21,10 +22,6 @@ const PUBLISHER_LABEL_KEY = {
   agent: 'publisherAgent',
   agency: 'publisherAgency',
 } as const;
-
-function formatCount(count: number): string {
-  return count >= 1000 ? `${(count / 1000).toFixed(1).replace('.0', '')}k` : String(count);
-}
 
 // Variante "liste" de FeedPropertyCard — même contenu, même interactions (j'aime, discuter, menu
 // "..."), juste réagencé en ligne horizontale façon Mes Biens/Favoris plutôt qu'en carte avec
@@ -65,6 +62,13 @@ export function FeedPropertyRow({ property }: { property: Property }) {
         className="relative w-32 min-h-32 sm:w-40 sm:min-h-40 self-stretch shrink-0 rounded-lg overflow-hidden bg-stroke-default"
       >
         {cover && <Image src={cover} alt={property.title} fill className="object-cover" />}
+        {/* Vues — en fixe en haut à droite de la miniature, même emplacement que FeedPropertyCard.
+            `property.viewCount` déjà le total à afficher, jamais `+ boostViews` ici — voir le
+            commentaire équivalent dans feed-property-card.tsx. */}
+        <span className="absolute top-1.5 right-1.5 bg-surface-dark/62 backdrop-blur-sm text-white text-[10px] font-semibold px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+          <Eye size={11} />
+          {formatCount(property.viewCount)}
+        </span>
       </Link>
 
       <div className="flex-1 min-w-0 flex flex-col">

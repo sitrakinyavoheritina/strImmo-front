@@ -46,6 +46,8 @@ export function mapApiPropertyToProperty(api: ApiProperty): Property {
     cautionPercent: api.cautionPercent ?? undefined,
     visitFee: api.visitFee != null ? Number(api.visitFee) : undefined,
     viewCount: api.viewCount,
+    boostViews: api.boostViews,
+    viewBoost: api.viewBoost ?? undefined,
     authorName:
       api.user?.firstName || api.user?.lastName
         ? [api.user.firstName, api.user.lastName].filter(Boolean).join(' ')
@@ -56,6 +58,7 @@ export function mapApiPropertyToProperty(api: ApiProperty): Property {
     contactPhone: api.user?.phone,
     favoritesCount: api.favoritesCount,
     likesCount: api.likesCount,
+    boostLikes: api.boostLikes,
     moderatorName:
       api.moderatedBy?.firstName || api.moderatedBy?.lastName
         ? [api.moderatedBy.firstName, api.moderatedBy.lastName].filter(Boolean).join(' ')

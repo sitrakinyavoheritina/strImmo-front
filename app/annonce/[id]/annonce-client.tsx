@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Check, Copy, Heart, Maximize2, MapPin, MessageCircle, Pencil, Phone, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, Copy, Eye, Heart, Maximize2, MapPin, MessageCircle, Pencil, Phone, Trash2 } from 'lucide-react';
 import type { Property } from '@/features/search/types/listing.types';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useLikesStore } from '@/lib/state/use-likes-store';
@@ -20,6 +21,7 @@ import { useDeleteProperty } from '@/features/search/hooks/use-delete-property';
 import { PROPERTY_TYPE_LABEL_KEY, titleRepeatsTypeLabel } from '@/features/search/utils/get-key-features';
 import { getPropertyDetailStats } from '@/features/search/utils/get-property-detail-stats';
 import { formatPrice, getPriceSuffix } from '@/features/search/utils/format-price';
+import { formatCount } from '@/features/search/utils/format-count';
 import { PropertyFees } from '@/features/listings/components/property-fees';
 import { Avatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -33,6 +35,18 @@ import { ImageLightbox } from '@/components/ui/image-lightbox';
 // explicitement) — un seul drapeau à repasser à true pour les réafficher, plutôt que de retirer le
 // composant et devoir tout réécrire plus tard (même pattern que AI_MODE_ENABLED côté demandes).
 const SHOW_OWNER_STATS = false;
+
+// Import dynamique (pas un `import` statique en haut de fichier) : sans ça, le code de ce panneau
+// (textes "Vues boostées"/"J'aime boostés", noms de champs dayTarget/likeDayTarget...) serait
+// inclus dans le bundle JS envoyé à TOUT visiteur de cette page, admin ou pas — lisible en clair
+// dans l'onglet Sources des DevTools même si le composant ne s'affiche jamais pour lui. Avec
+// `dynamic()`, ce code part dans un chunk séparé, demandé au serveur UNIQUEMENT si `isAdminUser`
+// devient vrai au moment du rendu — jamais téléchargé par un visiteur non-admin. `ssr: false` :
+// panneau strictement admin, sans valeur SEO, inutile de le pré-rendre côté serveur.
+const ViewBoostSection = dynamic(
+  () => import('@/features/listings/components/view-boost-section').then((mod) => mod.ViewBoostSection),
+  { ssr: false },
+);
 
 // `id` : identifiant réel de l'annonce, extrait côté serveur du segment d'URL (qui peut être un slug
 // SEO suivi de l'identifiant, voir lib/seo/slug.ts) — jamais lu depuis useParams ici.
@@ -253,27 +267,45 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
             >
               {property.kind === 'rent' ? t.property.forRent : t.property.forSale}
             </span>
-            {/* Cœur ("j'aime", compteur partagé) + menu "..." (enregistrer/signaler, voir
-                CardOptionsMenu) — mêmes actions que sur la carte du fil, en overlay sur la photo
-                ici faute de ligne dédiée comme dans la carte. Absent pour un admin : il ne
-                "j'aime"/enregistre/signale pas une annonce, il modère (voir plus bas). */}
-            {!isAdminUser && (
-              <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={handleLikeClick}
-                  aria-label={isLiked ? t.property.unlike : t.property.like}
-                  aria-pressed={isLiked}
-                  className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition"
-                >
-                  <Heart size={20} className={isLiked ? 'text-danger fill-danger' : 'text-content-muted'} />
-                </button>
-                <CardOptionsMenu
-                  property={property}
-                  triggerClassName="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition text-content-muted"
-                />
-              </div>
-            )}
+            {/* Vues — purement informatif, visible de tout le monde (y compris un admin,
+                contrairement au cœur/menu juste après qui restent des actions de visiteur).
+                `property.viewCount` déjà le total à afficher, jamais `+ boostViews` ici
+                (composant chargé par TOUT visiteur) — un admin y voit le vrai total "nu" en
+                navigation normale, la répartition complète restant dans le panneau dédié "Boost
+                des vues" plus bas (chargé à part, voir le commentaire de l'import dynamique en
+                tête de fichier). */}
+            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex items-center gap-1.5">
+              <span className="h-9 sm:h-10 px-3 rounded-full bg-surface-card/90 flex items-center gap-1 shadow-sm text-content-muted">
+                <Eye size={20} />
+                <span className="text-[0.85rem] font-semibold text-content-main">
+                  {formatCount(property.viewCount)}
+                </span>
+              </span>
+              {/* Cœur ("j'aime", compteur partagé, même affichage chiffré que sur la carte du fil
+                  — voir feed-property-card.tsx) + menu "..." (enregistrer/signaler, voir
+                  CardOptionsMenu) — mêmes actions que sur la carte du fil. Absent pour un admin :
+                  il ne "j'aime"/enregistre/signale pas une annonce, il modère (voir plus bas). */}
+              {!isAdminUser && (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleLikeClick}
+                    aria-label={isLiked ? t.property.unlike : t.property.like}
+                    aria-pressed={isLiked}
+                    className="h-9 sm:h-10 px-3 rounded-full bg-surface-card/90 flex items-center gap-1 shadow-sm active:scale-95 transition"
+                  >
+                    <Heart size={20} className={isLiked ? 'text-danger fill-danger' : 'text-content-muted'} />
+                    <span className="text-[0.85rem] font-semibold text-content-main">
+                      {formatCount(property.likesCount)}
+                    </span>
+                  </button>
+                  <CardOptionsMenu
+                    property={property}
+                    triggerClassName="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-card/90 flex items-center justify-center shadow-sm active:scale-95 transition text-content-muted"
+                  />
+                </>
+              )}
+            </div>
           </div>
 
           {property.photoUrls.length > 1 && (
@@ -455,6 +487,10 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
                 </div>
               ))}
             {moderationError && <p className="text-[0.85rem] text-danger mt-1.5">{moderationError}</p>}
+
+            {/* "Boost des vues" (admin/superadmin uniquement) — jamais rendu pour un autre
+                visiteur, qui ne reçoit d'ailleurs jamais `property.viewBoost` du backend. */}
+            {isAdminUser && <ViewBoostSection property={property} t={t} />}
           </div>
 
           {stats.length > 0 && (
