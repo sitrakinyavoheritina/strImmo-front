@@ -383,8 +383,11 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
     // explicitement) — `buildValues()` retombe sur 0 si laissé vide, et le backend lui-même
     // retombe sur 1 chambre par défaut (voir strImmo/src/properties/properties.service.ts:
     // saveTypeDetails) si la valeur soumise est absente/invalide.
+    // Facultatif pour un appartement UNIQUEMENT (demandé explicitement) — reste obligatoire pour
+    // une villa/un terrain. `buildValues()` retombe sur 0 si laissé vide (voir backend
+    // `saveTypeDetails`, `toIntOr(dto.surfaceM2, 0)`).
     if (
-      (propertyType === 'villa' || propertyType === 'apartment' || propertyType === 'land') &&
+      (propertyType === 'villa' || propertyType === 'land') &&
       (!surfaceM2 || Number(surfaceM2) <= 0)
     ) {
       next.surfaceM2 = t.listing.surfaceRequired;
