@@ -57,6 +57,7 @@ export function NouvelleDemandeForm({
   const router = useRouter();
   const pathname = usePathname();
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
   const hasHydrated = useAuthHasHydrated();
   const { data: communes } = useCommunes();
   const normalCreate = useCreatePropertyRequest();
@@ -114,6 +115,21 @@ export function NouvelleDemandeForm({
   const [continueError, setContinueError] = useState<string | null>(null);
   const [missingFields, setMissingFields] = useState<MissingField[]>([]);
   const [created, setCreated] = useState(false);
+
+  // Téléphone prérempli avec celui du compte (déjà vérifié à l'inscription) — demandé
+  // explicitement, pour ne pas avoir à le ressaisir à chaque demande. Seulement en création
+  // (jamais en modification, où le préremplissage ci-dessous reprend la valeur déjà enregistrée
+  // sur CETTE demande, potentiellement différente). Effet plutôt qu'un lazy initializer sur
+  // useState : `user` vient du store persisté, encore `null` le temps de la réhydratation sur un
+  // chargement direct de la page (même piège que app/profil/modifier/page.tsx) — un
+  // useState(() => user?.phone) l'aurait figé à vide. `hasInitializedPhoneRef` : ne doit jamais
+  // écraser une valeur déjà modifiée à la main par la personne.
+  const hasInitializedPhoneRef = useRef(false);
+  useEffect(() => {
+    if (editingRequestId || !hasHydrated || hasInitializedPhoneRef.current || !user?.phone) return;
+    hasInitializedPhoneRef.current = true;
+    setPhone(user.phone);
+  }, [editingRequestId, hasHydrated, user]);
 
   // Préremplissage du formulaire en mode modification (voir `editingRequestId` ci-dessus) —
   // déclenché une seule fois dès l'arrivée des données (même pattern que
