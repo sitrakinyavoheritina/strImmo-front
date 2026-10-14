@@ -55,6 +55,12 @@ export function MyRequestCard({ request }: { request: PropertyRequest }) {
         <Link href={resultsHref} className="text-[0.85rem] font-semibold text-brand-primary hover:underline">
           {t.propertyRequestsPage.viewResults}
         </Link>
+        <Link
+          href={`/demandes/${request.id}/modifier`}
+          className="text-[0.85rem] font-semibold text-content-muted hover:text-content-main"
+        >
+          {t.propertyRequestsPage.edit}
+        </Link>
         <button
           type="button"
           disabled={isTogglingVisibility}

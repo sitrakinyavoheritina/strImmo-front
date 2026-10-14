@@ -14,8 +14,12 @@ import type { User as AuthUser } from '@/features/auth/types';
 import { unsubscribeOnLogout } from '@/lib/push/push-client';
 
 /** Avatar + nom dans la topbar : ouvre un choix (voir le profil / se déconnecter) au clic,
- * plutôt que de naviguer directement vers /profil — même pattern que LanguageMenu. */
-export function UserMenu({ user }: { user: AuthUser }) {
+ * plutôt que de naviguer directement vers /profil — même pattern que LanguageMenu.
+ * `alwaysVisible` : normalement caché en dessous de `sm:` (un lien direct vers /profil le
+ * remplace sur mobile, voir topbar.tsx) — un admin n'a pas cette page de repli (ni aucune autre
+ * option de déconnexion sur mobile), donc ce menu reste son seul moyen de se déconnecter, à
+ * toutes les tailles. */
+export function UserMenu({ user, alwaysVisible = false }: { user: AuthUser; alwaysVisible?: boolean }) {
   const { t } = useTranslation();
   const router = useRouter();
   const clearSession = useAuthStore((state) => state.clearSession);
@@ -44,7 +48,7 @@ export function UserMenu({ user }: { user: AuthUser }) {
   }
 
   return (
-    <div className="relative hidden sm:block shrink-0">
+    <div className={`relative shrink-0 ${alwaysVisible ? 'block' : 'hidden sm:block'}`}>
       <button
         type="button"
         onClick={() => setIsOpen((v) => !v)}

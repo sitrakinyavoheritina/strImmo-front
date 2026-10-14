@@ -47,6 +47,10 @@ export type PropertyRequest = PropertyRequestExtraCriteria & {
   maxBudget?: number;
   minBedrooms?: number;
   rawDescription?: string;
+  // Facultatif, texte libre (pas de validation de format) — affiché publiquement sur le tableau
+  // (GET /property-requests/public) même en mode anonyme : l'anonymat ne masque que le nom de
+  // l'auteur, jamais ce contact qu'il a choisi de renseigner (voir PublicBoardCard).
+  phone?: string | null;
   isPublic: boolean;
   likesCount: number;
   createdAt: string;
@@ -68,8 +72,16 @@ export type CreatePropertyRequestPayload = PropertyRequestExtraCriteria & {
   maxBudget: number;
   minBedrooms?: number;
   rawDescription?: string;
+  phone?: string;
   isPublic?: boolean;
 };
+
+// Modification d'une demande existante (PATCH /property-requests/:id, réservé à l'auteur) —
+// mêmes champs qu'à la création, mais TOUS facultatifs ici (une modification partielle n'a pas à
+// redonner le type de transaction ou le quartier si seul le budget change, voir
+// UpdatePropertyRequestDto côté backend). Distinct de `updateVisibility` (PATCH .../visibility),
+// qui ne touche qu'`isPublic`.
+export type UpdatePropertyRequestPayload = Partial<CreatePropertyRequestPayload>;
 
 export type PublicPropertyRequestFilters = {
   kind?: ListingKind;

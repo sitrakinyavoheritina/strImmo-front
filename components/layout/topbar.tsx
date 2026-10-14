@@ -95,23 +95,25 @@ export function Topbar() {
             visible dans la topbar en dessous de `sm:` (UserMenu et les liens connexion/inscription
             juste en dessous sont tous les deux réservés au desktop) — demandé explicitement. Lien
             direct plutôt qu'un menu déroulant (comme UserMenu) : /profil affiche déjà lui-même
-            l'invite de connexion si besoin, pas la peine de dupliquer cette logique ici. */}
-        <Link
-          href={isAdminUser ? '/admin' : '/profil'}
-          aria-label={t.profile.myAccount}
-          className="sm:hidden shrink-0"
-        >
-          {isAuthenticated && user ? (
-            <Avatar name={user.fullName} imageUrl={user.avatarUrl} size={30} />
-          ) : (
-            <span className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-app border border-stroke-default text-content-muted">
-              <User size={16} />
-            </span>
-          )}
-        </Link>
+            l'invite de connexion si besoin, pas la peine de dupliquer cette logique ici.
+            Absent pour un admin : /profil ne fait pas partie de ses routes autorisées (voir
+            AdminRouteGuard), et /admin lui-même n'a aucune option de déconnexion — sans
+            alternative, un admin sur mobile n'aurait tout simplement aucun moyen de se
+            déconnecter. `UserMenu` ci-dessous prend le relais pour lui à toutes les tailles. */}
+        {!isAdminUser && (
+          <Link href="/profil" aria-label={t.profile.myAccount} className="sm:hidden shrink-0">
+            {isAuthenticated && user ? (
+              <Avatar name={user.fullName} imageUrl={user.avatarUrl} size={30} />
+            ) : (
+              <span className="flex items-center justify-center w-8 h-8 rounded-full bg-surface-app border border-stroke-default text-content-muted">
+                <User size={16} />
+              </span>
+            )}
+          </Link>
+        )}
 
         {isAuthenticated && user ? (
-          <UserMenu user={user} />
+          <UserMenu user={user} alwaysVisible={isAdminUser} />
         ) : (
           <div className="hidden sm:flex items-center gap-2 shrink-0">
             <Link href="/connexion" className="text-sm font-semibold text-content-muted hover:text-brand-primary transition">

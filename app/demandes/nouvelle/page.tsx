@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import translations from '@/lib/i18n/translations';
@@ -15,7 +15,11 @@ import { FilterFields, PROPERTY_TYPES } from '@/features/search/components/filte
 import { useCommunes } from '@/features/listings/hooks/use-communes';
 import { useFokontany } from '@/features/listings/hooks/use-fokontany';
 import { chatApi } from '@/features/search/services/chat-api';
-import { useCreatePropertyRequest } from '@/features/property-requests/hooks/use-property-requests';
+import {
+  useCreatePropertyRequest,
+  useRequest,
+  useUpdatePropertyRequest,
+} from '@/features/property-requests/hooks/use-property-requests';
 import { useCreatePropertyRequestAsAdmin } from '@/features/admin/hooks/use-create-property-request-as-admin';
 import { requestSentence } from '@/features/property-requests/utils/request-summary';
 import type { ListingKind, PropertyFilters, PropertyType } from '@/features/search/types/listing.types';
@@ -39,9 +43,16 @@ const VALID_PROPERTY_TYPES: PropertyType[] = ['house', 'apartment', 'villa', 'la
 // `targetUserId` : renseigné uniquement par app/admin/demandes/nouveau (création pour le compte
 // d'un utilisateur, voir PropertyRequestsService.createAsAdmin) — bascule la soumission vers
 // useCreatePropertyRequestAsAdmin et ignore la redirection /connexion ci-dessous (un admin est
-// déjà forcément connecté). Les deux hooks sont appelés sans condition (règle des hooks React),
-// seul celui correspondant au mode est réellement utilisé pour la mutation.
-export function NouvelleDemandeForm({ targetUserId }: { targetUserId?: string } = {}) {
+// déjà forcément connecté).
+// `editingRequestId` : renseigné uniquement par app/demandes/[id]/modifier (modification du
+// contenu d'une demande existante, voir PropertyRequestsController PATCH /:id, réservé à
+// l'auteur) — jamais utilisé en même temps que `targetUserId` (un admin ne modifie pas la demande
+// d'un tiers via ce formulaire). Les trois hooks de mutation sont appelés sans condition (règle
+// des hooks React), seul celui correspondant au mode est réellement utilisé pour la soumission.
+export function NouvelleDemandeForm({
+  targetUserId,
+  editingRequestId,
+}: { targetUserId?: string; editingRequestId?: string } = {}) {
   const { t, locale } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
@@ -50,7 +61,9 @@ export function NouvelleDemandeForm({ targetUserId }: { targetUserId?: string } 
   const { data: communes } = useCommunes();
   const normalCreate = useCreatePropertyRequest();
   const adminCreate = useCreatePropertyRequestAsAdmin();
-  const isCreating = targetUserId ? adminCreate.isPending : normalCreate.isPending;
+  const normalUpdate = useUpdatePropertyRequest();
+  const { data: existingRequest, isError: isLoadError } = useRequest(editingRequestId);
+  const isCreating = targetUserId ? adminCreate.isPending : editingRequestId ? normalUpdate.isPending : normalCreate.isPending;
 
   // Préremplissage depuis "Aucun résultat" (voir app/recherche/page.tsx, noResultsCtaHref) : reprend
   // ce que la personne cherchait déjà plutôt que de lui faire tout ressaisir. Lu une seule fois au
@@ -83,6 +96,7 @@ export function NouvelleDemandeForm({ targetUserId }: { targetUserId?: string } 
   const [minBudget, setMinBudget] = useState('');
   const [maxBudget, setMaxBudget] = useState(() => searchParams.get('maxBudget') ?? '');
   const [rawDescription, setRawDescription] = useState<string | undefined>();
+  const [phone, setPhone] = useState('');
   const [isPublic, setIsPublic] = useState(false);
 
   // Critères facultatifs supplémentaires ("Plus de critères") — mêmes champs que la recherche
@@ -100,6 +114,68 @@ export function NouvelleDemandeForm({ targetUserId }: { targetUserId?: string } 
   const [continueError, setContinueError] = useState<string | null>(null);
   const [missingFields, setMissingFields] = useState<MissingField[]>([]);
   const [created, setCreated] = useState(false);
+
+  // Préremplissage du formulaire en mode modification (voir `editingRequestId` ci-dessus) —
+  // déclenché une seule fois dès l'arrivée des données (même pattern que
+  // app/profil/modifier/page.tsx, hasInitializedRef) : un re-render après coup (ex. invalidation
+  // du cache suite à `like`/`report` d'une autre demande) ne doit jamais écraser ce que la
+  // personne a déjà modifié dans le formulaire.
+  const hasInitializedEditRef = useRef(false);
+  useEffect(() => {
+    if (!editingRequestId || !existingRequest || hasInitializedEditRef.current) return;
+    hasInitializedEditRef.current = true;
+    setKind(existingRequest.kind);
+    setPropertyType(existingRequest.propertyType);
+    setCommuneId(existingRequest.communeId);
+    setFokontanyId(existingRequest.fokontanyId);
+    setMinBudget(existingRequest.minBudget != null ? String(existingRequest.minBudget) : '');
+    setMaxBudget(existingRequest.maxBudget != null ? String(existingRequest.maxBudget) : '');
+    setRawDescription(existingRequest.rawDescription);
+    setPhone(existingRequest.phone ?? '');
+    setIsPublic(existingRequest.isPublic);
+    const {
+      hasCarAccess,
+      hasMotorbikeAccess,
+      waterSource,
+      bathroomLocation,
+      hasIndividualMeter,
+      isIndependent,
+      roomType,
+      minParkingSpots,
+      isFurnished,
+      hasComfort,
+      hasCaretakerAnnex,
+      legalStatus,
+      isResidentialArea,
+      hasWaterAvailable,
+      hasElectricityAvailable,
+      isBuildReady,
+      noCommission,
+      noCaution,
+      noVisitFee,
+    } = existingRequest;
+    setAdvancedCriteria({
+      hasCarAccess,
+      hasMotorbikeAccess,
+      waterSource,
+      bathroomLocation,
+      hasIndividualMeter,
+      isIndependent,
+      roomType,
+      minParkingSpots,
+      isFurnished,
+      hasComfort,
+      hasCaretakerAnnex,
+      legalStatus,
+      isResidentialArea,
+      hasWaterAvailable,
+      hasElectricityAvailable,
+      isBuildReady,
+      noCommission,
+      noCaution,
+      noVisitFee,
+    });
+  }, [editingRequestId, existingRequest]);
 
   function handleSelectPropertyType(value: PropertyType | undefined) {
     setPropertyType(value);
@@ -181,11 +257,19 @@ export function NouvelleDemandeForm({ targetUserId }: { targetUserId?: string } 
       minBudget: minBudget ? Number(minBudget) : undefined,
       maxBudget: Number(maxBudget),
       rawDescription,
+      phone: phone.trim() || undefined,
       isPublic,
     };
     try {
       if (targetUserId) {
         await adminCreate.mutateAsync({ ...payload, targetUserId });
+      } else if (editingRequestId) {
+        await normalUpdate.mutateAsync({ id: editingRequestId, payload });
+        // Pas d'écran "créé avec succès" en modification (voir le rendu de `created` plus bas,
+        // réservé à la création) — retour direct sur "Mes demandes" une fois la mise à jour
+        // confirmée par le backend.
+        router.push('/demandes');
+        return;
       } else {
         await normalCreate.mutateAsync(payload);
       }
@@ -196,6 +280,26 @@ export function NouvelleDemandeForm({ targetUserId }: { targetUserId?: string } 
   }
 
   if (!targetUserId && !isAuthenticated) return null;
+
+  // Demande introuvable ou n'appartenant pas à la personne connectée (403/404, voir
+  // PropertyRequestsController.findOne) — message lisible plutôt qu'un écran blanc ou un
+  // formulaire vide qui laisserait croire qu'on peut quand même le soumettre.
+  if (editingRequestId && isLoadError) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-16 text-center space-y-3">
+        <p className="text-content-main font-semibold">{t.propertyRequestsPage.loadEditError}</p>
+        <Button type="button" className="mt-2" onClick={() => router.push('/demandes')}>
+          {t.propertyRequestsPage.viewMySearches}
+        </Button>
+      </div>
+    );
+  }
+
+  // Évite d'afficher brièvement les valeurs par défaut (location, aucune zone...) avant que les
+  // vraies valeurs de la demande n'arrivent et n'écrasent ces états via l'effet ci-dessus.
+  if (editingRequestId && !existingRequest) {
+    return <p className="text-sm text-content-muted py-16 text-center">{t.search.searching}</p>;
+  }
 
   const communeName = communes?.find((c) => c.id === communeId)?.name;
   const fokontanyName = fokontanyList?.find((f) => f.id === fokontanyId)?.name;
@@ -220,7 +324,11 @@ export function NouvelleDemandeForm({ targetUserId }: { targetUserId?: string } 
   return (
     <div className="max-w-2xl mx-auto px-3 sm:px-6 py-4 sm:py-6 pb-24">
       <h1 className="text-xl sm:text-2xl font-extrabold text-brand-secondary-text">
-        {step === 'form' ? t.propertyRequestsPage.newTitle : t.propertyRequestsPage.summaryTitle}
+        {step === 'form'
+          ? editingRequestId
+            ? t.propertyRequestsPage.editTitle
+            : t.propertyRequestsPage.newTitle
+          : t.propertyRequestsPage.summaryTitle}
       </h1>
       {step === 'form' && <p className="text-content-muted text-[0.85rem] font-medium mt-1">{t.propertyRequestsPage.newSubtitle}</p>}
 
@@ -356,6 +464,14 @@ export function NouvelleDemandeForm({ targetUserId }: { targetUserId?: string } 
                     className="w-full px-3 py-2.5 bg-surface-app border border-stroke-default rounded-xl text-sm text-content-main placeholder-content-muted focus:bg-surface-card focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition resize-none"
                   />
                 </div>
+
+                <FormInput
+                  label={t.propertyRequestsPage.phoneLabel}
+                  value={phone}
+                  onChange={setPhone}
+                  placeholder={t.propertyRequestsPage.phonePlaceholder}
+                  hint={t.propertyRequestsPage.phoneHint}
+                />
               </>
             )}
           </>
@@ -413,7 +529,11 @@ export function NouvelleDemandeForm({ targetUserId }: { targetUserId?: string } 
             </Button>
           ) : (
             <Button type="button" className="w-full" disabled={isCreating} onClick={handleSubmit}>
-              {isCreating ? t.propertyRequestsPage.submitting : t.propertyRequestsPage.submit}
+              {isCreating
+                ? t.propertyRequestsPage.submitting
+                : editingRequestId
+                  ? t.propertyRequestsPage.submitEdit
+                  : t.propertyRequestsPage.submit}
             </Button>
           )}
         </div>

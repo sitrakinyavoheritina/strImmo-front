@@ -7,6 +7,7 @@ import type {
   PropertyRequest,
   PropertyRequestReportReason,
   PublicPropertyRequestFilters,
+  UpdatePropertyRequestPayload,
 } from '../types/property-request.types';
 
 const MINE_KEY = ['property-requests', 'mine'];
@@ -33,6 +34,17 @@ export function usePublicPropertyRequests(filters: PublicPropertyRequestFilters)
   });
 }
 
+// Préremplissage du formulaire de modification (app/demandes/[id]/modifier) — réservé à l'auteur
+// côté backend (403/404 sinon, voir PropertyRequestsController.findOne), jamais utilisé pour
+// afficher une demande à un tiers.
+export function useRequest(id: string | undefined) {
+  return useQuery({
+    queryKey: ['property-requests', id],
+    queryFn: () => propertyRequestApi.getOne(id as string),
+    enabled: !!id,
+  });
+}
+
 function invalidateAll(queryClient: ReturnType<typeof useQueryClient>) {
   void queryClient.invalidateQueries({ queryKey: MINE_KEY });
   void queryClient.invalidateQueries({ queryKey: PUBLIC_KEY_PREFIX });
@@ -43,6 +55,22 @@ export function useCreatePropertyRequest() {
   return useMutation({
     mutationFn: (payload: CreatePropertyRequestPayload) => propertyRequestApi.create(payload),
     onSuccess: () => invalidateAll(queryClient),
+  });
+}
+
+// Modification du contenu d'une demande (PATCH /property-requests/:id) — distinct de
+// useUpdatePropertyRequestVisibility ci-dessous, qui ne touche qu'`isPublic`. Invalide aussi la
+// demande individuelle (le formulaire de modification peut rester monté après succès le temps de
+// la redirection, voir app/demandes/nouvelle/page.tsx).
+export function useUpdatePropertyRequest() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdatePropertyRequestPayload }) =>
+      propertyRequestApi.update(id, payload),
+    onSuccess: (_data, { id }) => {
+      invalidateAll(queryClient);
+      void queryClient.invalidateQueries({ queryKey: ['property-requests', id] });
+    },
   });
 }
 

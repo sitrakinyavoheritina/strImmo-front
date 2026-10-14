@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heart, MessageCircle } from 'lucide-react';
+import { Heart, MessageCircle, Phone } from 'lucide-react';
 import { getErrorMessage } from '@/lib/api/get-error-message';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
@@ -21,9 +21,10 @@ import type { PropertyRequest } from '../types/property-request.types';
  *  FeedPropertyCard), avec deux différences volontaires liées à l'anonymat de l'auteur :
  *  - avatar générique (AnonymousAvatar) et nom générique ("Membre anonyme"), jamais l'identité
  *    réelle ni sa photo ;
- *  - "message" ouvre directement une conversation plutôt qu'un numéro de téléphone (jamais
- *    affiché tant que l'auteur n'a pas répondu lui-même, voir le texte de visibilité à la
- *    création d'une demande).
+ *  - "message" ouvre directement une conversation ; un bouton "Appeler" (`tel:`) s'ajoute à côté
+ *    uniquement si l'auteur a renseigné un numéro à la création de sa demande (`request.phone`)
+ *    — l'anonymat ne masque alors que son nom, jamais ce contact qu'il a choisi de rendre public.
+ *    Sans ce numéro, le message reste le seul moyen de contact.
  *  `authorLabel` distingue les auteurs entre eux sur le tableau ("Membre anonyme", "Membre
  *  anonyme 2"...) sans jamais révéler qui ils sont — calculé par le parent à partir de
  *  `request.userId` (le seul champ transmis par l'API qui les différencie, voir
@@ -113,6 +114,15 @@ export function PublicBoardCard({ request, authorLabel }: { request: PropertyReq
           >
             <MessageCircle size={20} />
           </button>
+          {request.phone && (
+            <a
+              href={`tel:${request.phone}`}
+              aria-label={t.propertyRequestsPage.call}
+              className="flex items-center px-2 py-1.5 rounded-full hover:bg-brand-primary/10 hover:text-brand-primary transition"
+            >
+              <Phone size={20} />
+            </a>
+          )}
         </div>
         <PropertyRequestOptionsMenu requestId={request.id} />
       </div>

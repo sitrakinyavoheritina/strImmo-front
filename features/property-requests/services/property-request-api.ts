@@ -5,6 +5,7 @@ import type {
   PropertyRequest,
   PropertyRequestReportReason,
   PublicPropertyRequestFilters,
+  UpdatePropertyRequestPayload,
 } from '../types/property-request.types';
 
 // Voir strImmo/src/property-requests/property-requests.controller.ts.
@@ -13,6 +14,14 @@ export const propertyRequestApi = {
     apiClient.post<PropertyRequest>('/property-requests', payload).then((r) => r.data),
 
   listMine: () => apiClient.get<PropertyRequest[]>('/property-requests/mine').then((r) => r.data),
+
+  // Réservé à l'auteur (403 sinon, voir le contrôleur) — sert uniquement à préremplir le
+  // formulaire de modification (app/demandes/[id]/modifier), jamais à afficher une demande à un
+  // tiers.
+  getOne: (id: string) => apiClient.get<PropertyRequest>(`/property-requests/${id}`).then((r) => r.data),
+
+  update: (id: string, payload: UpdatePropertyRequestPayload) =>
+    apiClient.patch<PropertyRequest>(`/property-requests/${id}`, payload).then((r) => r.data),
 
   listPublic: (filters: PublicPropertyRequestFilters) =>
     apiClient.get<PropertyRequest[]>('/property-requests/public', { params: filters }).then((r) => r.data),
