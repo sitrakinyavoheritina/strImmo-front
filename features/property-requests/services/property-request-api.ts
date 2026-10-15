@@ -5,8 +5,19 @@ import type {
   PropertyRequest,
   PropertyRequestReportReason,
   PublicPropertyRequestFilters,
+  RequestViewBoostConfig,
   UpdatePropertyRequestPayload,
 } from '../types/property-request.types';
+
+// Payload de PATCH /property-requests/admin/:id/view-boost — mêmes champs que
+// RequestViewBoostConfig MOINS la progression/calculs lus en retour uniquement (dayAdded,
+// nightAdded, dayEffectiveTarget, nightEffectiveTarget, nextBoostAt, lastBoostAt). Voir
+// UpdateViewBoostPayload (features/listings/services/view-boost-api.ts) pour l'équivalent
+// annonces (qui a aussi les champs `like*`, absents ici — pas de boost des "j'aime" ici).
+export type UpdateRequestViewBoostPayload = Omit<
+  RequestViewBoostConfig,
+  'dayAdded' | 'nightAdded' | 'dayEffectiveTarget' | 'nightEffectiveTarget' | 'nextBoostAt' | 'lastBoostAt'
+>;
 
 // Voir strImmo/src/property-requests/property-requests.controller.ts.
 export const propertyRequestApi = {
@@ -44,4 +55,14 @@ export const propertyRequestApi = {
     apiClient.get<AdminPropertyRequestRow[]>('/property-requests/admin/deleted').then((r) => r.data),
 
   removeAsAdmin: (id: string) => apiClient.delete<void>(`/property-requests/admin/${id}`).then(() => undefined),
+
+  // Renvoie `void` (pas la demande mise à jour, contrairement à l'équivalent annonces) — il faut
+  // invalider la query admin après succès plutôt que d'utiliser la réponse, voir
+  // use-property-requests.ts.
+  updateViewBoost: (id: string, payload: UpdateRequestViewBoostPayload) =>
+    apiClient.patch<void>(`/property-requests/admin/${id}/view-boost`, payload).then(() => undefined),
+
+  // Pas de `{ metric }` comme côté annonces : une seule métrique ici (les vues), aucun body.
+  resetViewBoost: (id: string) =>
+    apiClient.patch<void>(`/property-requests/admin/${id}/view-boost/reset`).then(() => undefined),
 };

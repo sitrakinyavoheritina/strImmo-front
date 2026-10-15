@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Heart, MessageCircle, Phone } from 'lucide-react';
+import { Eye, Heart, MessageCircle, Phone } from 'lucide-react';
 import { getErrorMessage } from '@/lib/api/get-error-message';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
@@ -74,6 +74,13 @@ export function PublicBoardCard({ request, authorLabel }: { request: PropertyReq
           <p className="text-[0.85rem] font-semibold text-content-main truncate">{authorLabel}</p>
           <p className="text-[12px] text-content-muted">{formatRelativeTime(request.createdAt)}</p>
         </div>
+        {/* Compteur de vues, visible de TOUT LE MONDE (pas conditionné par l'authentification,
+            contrairement au cœur ci-dessous) — contrairement à une annonce, piloté UNIQUEMENT par
+            le boost admin (voir AdminRequestViewBoost), pas de "vraies vues" ici. */}
+        <span className="flex items-center gap-1 text-[12px] text-content-muted shrink-0">
+          <Eye size={14} />
+          {formatCount(request.viewCount)}
+        </span>
       </div>
 
       <div className="px-3 py-2">

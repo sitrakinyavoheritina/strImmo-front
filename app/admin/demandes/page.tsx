@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ClipboardList, Flag } from 'lucide-react';
+import { ClipboardList, Eye, Flag } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore, useAuthHasHydrated } from '@/lib/state/use-auth-store';
 import { isAdmin } from '@/features/auth/utils/is-admin';
@@ -13,6 +13,7 @@ import {
   useAdminDeletePropertyRequest,
 } from '@/features/property-requests/hooks/use-property-requests';
 import { requestSentence, requestTitle } from '@/features/property-requests/utils/request-summary';
+import { AdminRequestViewBoost } from '@/features/property-requests/components/admin-request-view-boost';
 import { Button } from '@/components/ui/button';
 import { RightRail } from '@/features/feed/components/right-rail';
 
@@ -38,6 +39,20 @@ export default function AdminDemandesPage() {
   const hasHydrated = useAuthHasHydrated();
   const isAdminUser = isAdmin(user);
   const [tab, setTab] = useState<Tab>('active');
+  // Panneau "Boost des vues" replié par défaut sous chaque carte active — potentiellement
+  // plusieurs cartes sur cette page (contrairement à la fiche d'une seule annonce où
+  // ViewBoostSection est toujours visible), donc un simple Set d'ids ouverts plutôt qu'un
+  // booléen unique. Jamais pour une demande supprimée (bouton absent dans ce cas, voir plus bas).
+  const [openBoostIds, setOpenBoostIds] = useState<Set<string>>(new Set());
+
+  function toggleBoost(id: string) {
+    setOpenBoostIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -116,8 +131,12 @@ export default function AdminDemandesPage() {
                   )}
                 </div>
 
-                <p className="text-[0.85rem] text-content-muted mt-2">
+                <p className="flex items-center gap-1.5 text-[0.85rem] text-content-muted mt-2">
                   {t.adminDemandesPage.by} {request.authorName} · {request.authorPhone}
+                  <span className="flex items-center gap-1 shrink-0">
+                    <Eye size={14} />
+                    {request.viewCount}
+                  </span>
                 </p>
                 {request.createdByAdminId && (
                   <p className="text-[12px] font-semibold text-brand-primary mt-0.5">
@@ -139,17 +158,29 @@ export default function AdminDemandesPage() {
                 )}
 
                 {tab === 'active' && (
-                  <button
-                    type="button"
-                    disabled={isDeleting}
-                    onClick={() => {
-                      if (window.confirm(t.adminDemandesPage.deleteConfirm)) remove(request.id);
-                    }}
-                    className="mt-2.5 text-[0.85rem] font-semibold text-danger hover:underline disabled:opacity-50"
-                  >
-                    {t.adminDemandesPage.delete}
-                  </button>
+                  <div className="flex items-center gap-3 mt-2.5">
+                    <button
+                      type="button"
+                      onClick={() => toggleBoost(request.id)}
+                      className="text-[0.85rem] font-semibold text-brand-primary hover:underline"
+                    >
+                      {openBoostIds.has(request.id)
+                        ? t.adminDemandesPage.boostButtonHide
+                        : t.adminDemandesPage.boostButtonShow}
+                    </button>
+                    <button
+                      type="button"
+                      disabled={isDeleting}
+                      onClick={() => {
+                        if (window.confirm(t.adminDemandesPage.deleteConfirm)) remove(request.id);
+                      }}
+                      className="text-[0.85rem] font-semibold text-danger hover:underline disabled:opacity-50"
+                    >
+                      {t.adminDemandesPage.delete}
+                    </button>
+                  </div>
                 )}
+                {tab === 'active' && openBoostIds.has(request.id) && <AdminRequestViewBoost request={request} />}
               </div>
             ))}
           </div>

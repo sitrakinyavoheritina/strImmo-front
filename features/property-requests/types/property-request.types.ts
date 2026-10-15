@@ -53,6 +53,10 @@ export type PropertyRequest = PropertyRequestExtraCriteria & {
   phone?: string | null;
   isPublic: boolean;
   likesCount: number;
+  // Piloté UNIQUEMENT par le boost admin (voir RequestViewBoostConfig ci-dessous) — une demande
+  // n'a pas de vraie vue trackée, contrairement à une annonce (Property.viewCount + boostViews).
+  // Toujours présent, part de 0, défaut 0 côté backend.
+  viewCount: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -89,6 +93,26 @@ export type PublicPropertyRequestFilters = {
   communeId?: string;
 };
 
+// Config + progression du boost de vues d'une demande (voir PATCH
+// /property-requests/admin/:id/view-boost) — même forme que ViewBoostConfig (annonces, voir
+// features/search/types/listing.types.ts) MOINS tous les champs `like*` : une demande n'a pas de
+// boost des "j'aime", ses "j'aime" restent 100% réels.
+export type RequestViewBoostConfig = {
+  enabled: boolean;
+  dayStart: string;
+  dayEnd: string;
+  nightStart: string;
+  nightEnd: string;
+  dayTarget: number;
+  nightTarget: number;
+  dayAdded: number;
+  nightAdded: number;
+  dayEffectiveTarget: number;
+  nightEffectiveTarget: number;
+  nextBoostAt: string | null;
+  lastBoostAt: string | null;
+};
+
 // Miroir de AdminPropertyRequestRow (strImmo/src/property-requests/property-requests.service.ts)
 // — vue admin uniquement (GET /property-requests/admin/all) : toutes les demandes, publiques ou
 // non, avec les coordonnées de l'auteur pour modérer, jamais exposées sur le tableau public
@@ -112,4 +136,8 @@ export type AdminPropertyRequestRow = {
   // créé cette demande pour le compte de l'auteur, jamais exposé sur le tableau public.
   createdByAdminId?: string;
   createdByAdminName?: string;
+  // Même compteur que PropertyRequest.viewCount, toujours présent (0 par défaut).
+  viewCount: number;
+  // Absent = jamais configuré pour cette demande (voir toFormState côté AdminRequestViewBoost).
+  viewBoost?: RequestViewBoostConfig;
 };

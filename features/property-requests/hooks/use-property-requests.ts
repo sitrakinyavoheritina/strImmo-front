@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { trackEvent } from '@/lib/analytics/track';
 import { useRequestLikesStore } from '@/lib/state/use-request-likes-store';
-import { propertyRequestApi } from '../services/property-request-api';
+import { propertyRequestApi, type UpdateRequestViewBoostPayload } from '../services/property-request-api';
 import type {
   CreatePropertyRequestPayload,
   PropertyRequest,
@@ -151,6 +151,29 @@ export function useAdminDeletePropertyRequest() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => propertyRequestApi.removeAsAdmin(id),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ADMIN_KEY }),
+  });
+}
+
+// Boost des vues d'une demande (voir AdminRequestViewBoost) — même pattern que
+// useUpdateViewBoost/useResetViewBoost (annonces, features/search/hooks/use-update-view-boost.ts)
+// mais invalide ADMIN_KEY (liste admin) plutôt que `['property', id]` : ici c'est la vue admin en
+// liste qui doit se rafraîchir, il n'y a pas de fiche unique par demande.
+export function useUpdateRequestViewBoost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateRequestViewBoostPayload }) =>
+      propertyRequestApi.updateViewBoost(id, payload),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ADMIN_KEY }),
+  });
+}
+
+export function useResetRequestViewBoost() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => propertyRequestApi.resetViewBoost(id),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ADMIN_KEY }),
   });
 }
