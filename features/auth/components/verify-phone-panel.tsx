@@ -96,7 +96,7 @@ export function VerifyPhonePanel({ onVerified }: { onVerified: () => void }) {
           <Button
             type="button"
             className="w-full"
-            disabled={code.length !== 6 || isConfirming}
+            disabled={code.length !== 4 || isConfirming}
             onClick={() => {
               setError(null);
               void confirm(code);

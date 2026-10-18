@@ -84,7 +84,7 @@ export function EmailVerificationRow({ email }: { email: string }) {
             onChange={(event) => setCode(event.target.value)}
             placeholder={t.profile.verificationCodePlaceholder}
             inputMode="numeric"
-            maxLength={6}
+            maxLength={4}
             className="flex-1 min-w-0 px-2.5 py-1.5 bg-surface-app border border-stroke-default rounded-lg text-[0.85rem] text-content-main placeholder-content-muted outline-none focus:border-brand-primary transition tracking-widest"
           />
           <button

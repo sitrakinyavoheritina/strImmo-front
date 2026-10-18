@@ -2,9 +2,9 @@
 
 import { useRef } from 'react';
 
-const LENGTH = 6;
+const LENGTH = 4;
 
-/** Saisie d'un code à 6 chiffres en 6 cases : avance toute seule à la case suivante, Retour arrière
+/** Saisie d'un code à 4 chiffres en 4 cases : avance toute seule à la case suivante, Retour arrière
  *  revient en arrière, flèches gauche/droite, et le collage d'un code entier (ou l'auto-remplissage
  *  du SMS sur mobile, `autocomplete="one-time-code"`) remplit toutes les cases d'un coup. */
 export function OtpInput({

@@ -135,7 +135,7 @@ export default function VerificationTelephonePage() {
         )}
         <FormErrorBanner message={error} />
         {info && <p className="text-[0.85rem] text-brand-primary">{info}</p>}
-        <Button type="button" className="w-full" disabled={code.length !== 6 || isLoading} onClick={handleVerify}>
+        <Button type="button" className="w-full" disabled={code.length !== 4 || isLoading} onClick={handleVerify}>
           {isLoading ? t.auth.verifyPhoneSubmitting : t.auth.verifyPhoneSubmit}
         </Button>
         <div className="flex items-center justify-between">

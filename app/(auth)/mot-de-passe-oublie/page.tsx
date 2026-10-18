@@ -74,7 +74,7 @@ export default function MotDePasseOubliePage() {
 
   async function handleResetPassword(event: React.FormEvent) {
     event.preventDefault();
-    if (code.length !== 6) {
+    if (code.length !== 4) {
       setErrorMessage(t.forgotPasswordPage.codeRequired);
       return;
     }
