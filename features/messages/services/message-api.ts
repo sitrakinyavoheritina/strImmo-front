@@ -8,6 +8,7 @@ export type ApiConversation = {
   participantName: string;
   participantAvatarUrl: string | null;
   propertyId: string | null;
+  requestId: string | null;
   lastMessage: string | null;
   lastMessageAt: string | null;
   unreadCount: number;

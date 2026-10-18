@@ -11,6 +11,12 @@ export function toConversation(api: ApiConversation): Conversation {
     participantName: api.participantName,
     participantAvatarUrl: api.participantAvatarUrl ?? undefined,
     propertyId: api.propertyId ?? undefined,
+    // Bug corrigé : ce champ existe côté backend (voir ConversationSummary.requestId) et dans le
+    // type `Conversation` ci-dessus depuis l'ajout de l'encart "Demande de recherche"
+    // (app/messages/[id]/page.tsx), mais n'était jamais recopié ici — la carte ne s'affichait
+    // donc jamais en pratique, silencieusement (aucune erreur TypeScript : `api` ne déclarait pas
+    // non plus ce champ avant ce correctif).
+    requestId: api.requestId ?? undefined,
     lastMessage: api.lastMessage,
     lastMessageAt: api.lastMessageAt,
     unreadCount: api.unreadCount,

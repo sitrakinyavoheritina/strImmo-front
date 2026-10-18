@@ -141,3 +141,48 @@ export interface AdminSearchUser {
   role: UserRole;
   isAnonymous: boolean;
 }
+
+// Forme renvoyée par GET /conversations/admin/stats (voir MessagingService.getAdminStats).
+export interface AdminMessagingStats {
+  totalMessages: number;
+  totalConversations: number;
+  byMonth: { month: string; count: number }[];
+  topUsers: {
+    userId: string;
+    userName: string;
+    sentCount: number;
+    receivedCount: number;
+  }[];
+}
+
+// Forme renvoyée par GET /conversations/admin/stats/:userId (voir
+// MessagingService.getAdminUserStats).
+export interface AdminUserMessagingStats {
+  userId: string;
+  userName: string;
+  sentCount: number;
+  receivedCount: number;
+  conversationCount: number;
+  firstMessageAt: string | null;
+  lastMessageAt: string | null;
+}
+
+// Forme brute renvoyée par GET /conversations/admin/:id (voir
+// MessagingService.getConversationAsAdmin) — les deux participants, sans point de vue (ni "moi"
+// ni "l'autre", contrairement à Conversation côté features/messages), + tous les messages bruts
+// (mêmes champs qu'ApiMessage, mappés en Message via toMessage côté appelant).
+export interface AdminConversationDetail {
+  id: string;
+  userA: { id: string; name: string; avatarUrl?: string };
+  userB: { id: string; name: string; avatarUrl?: string };
+  createdAt: string;
+  messages: {
+    id: string;
+    conversationId: string;
+    senderId: string;
+    text: string | null;
+    imageUrl: string | null;
+    createdAt: string;
+    readAt: string | null;
+  }[];
+}

@@ -1,10 +1,14 @@
 import { apiClient } from '@/lib/api/client';
 import type { ApiProperty } from '@/features/search/services/property-api';
 import type { PropertyRequest } from '@/features/property-requests/types/property-request.types';
+import type { ApiConversation } from '@/features/messages/services/message-api';
 import type {
+  AdminConversationDetail,
+  AdminMessagingStats,
   AdminSearchUser,
   AdminUser,
   AdminUserDetail,
+  AdminUserMessagingStats,
   CreateUserAsAdminPayload,
   CreateUserAsAdminResponse,
   ErrorLogsParams,
@@ -50,4 +54,23 @@ export const adminApi = {
   // JSON, voir strImmo/src/property-requests/property-requests.controller.ts:createAsAdmin.
   createPropertyRequestAsAdmin: (payload: Record<string, unknown>) =>
     apiClient.post<PropertyRequest>('/property-requests/admin', payload).then((r) => r.data),
+
+  // Statistiques globales de la messagerie — voir strImmo/src/messaging/messaging.service.ts:getAdminStats.
+  getMessagingStats: () =>
+    apiClient.get<AdminMessagingStats>('/conversations/admin/stats').then((r) => r.data),
+
+  // Statistiques d'un utilisateur précis — voir
+  // strImmo/src/messaging/messaging.service.ts:getAdminUserStats.
+  getUserMessagingStats: (userId: string) =>
+    apiClient.get<AdminUserMessagingStats>(`/conversations/admin/stats/${userId}`).then((r) => r.data),
+
+  // Conversations d'un utilisateur précis (avec qui il discute) — même forme que
+  // GET /conversations (voir messageApi.listConversations), réutilisable avec toConversation.
+  getUserConversations: (userId: string) =>
+    apiClient.get<ApiConversation[]>(`/conversations/admin/user/${userId}`).then((r) => r.data),
+
+  // Contenu complet d'une conversation (modération) — voir
+  // strImmo/src/messaging/messaging.service.ts:getConversationAsAdmin.
+  getConversation: (id: string) =>
+    apiClient.get<AdminConversationDetail>(`/conversations/admin/${id}`).then((r) => r.data),
 };
