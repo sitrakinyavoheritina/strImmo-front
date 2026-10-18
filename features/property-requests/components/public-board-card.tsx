@@ -125,9 +125,10 @@ export function PublicBoardCard({ request, authorLabel }: { request: PropertyReq
             <a
               href={`tel:${request.phone}`}
               aria-label={t.propertyRequestsPage.call}
-              className="flex items-center px-2 py-1.5 rounded-full hover:bg-brand-primary/10 hover:text-brand-primary transition"
+              className="flex items-center gap-1 px-2 py-1.5 rounded-full hover:bg-brand-primary/10 hover:text-brand-primary transition"
             >
               <Phone size={20} />
+              <span className="text-[0.85rem] font-semibold">{request.phone}</span>
             </a>
           )}
         </div>
