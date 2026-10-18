@@ -941,6 +941,7 @@ const translations = {
       chatPlaceholder: 'Écrivez votre message…',
       chatClose: 'Fermer la discussion',
       chatAboutProperty: 'À propos de cette annonce',
+      chatAboutRequest: 'Demande de recherche',
       viewPhoto: 'Voir la photo',
     },
     listing: {
@@ -1992,6 +1993,7 @@ const translations = {
       chatPlaceholder: 'Soraty eto ny hafatrao…',
       chatClose: 'Hidio ny resaka',
       chatAboutProperty: 'Momba ity filazana ity',
+      chatAboutRequest: 'Fangatahana fikarohana',
       viewPhoto: 'Jereo ny sary',
     },
     listing: {

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useProperty } from '@/features/search/hooks/use-property';
 import { formatPrice } from '@/features/search/utils/format-price';
-import { ArrowLeft, Check, CheckCheck, ImagePlus, Send } from 'lucide-react';
+import { ArrowLeft, Check, CheckCheck, ClipboardList, ImagePlus, Send } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { useAuthStore } from '@/lib/state/use-auth-store';
 import { Avatar } from '@/components/ui/avatar';
@@ -19,6 +19,8 @@ import {
   useSendImageMessage,
   useSendMessage,
 } from '@/features/messages/hooks/use-messages';
+import { useRequestSummary } from '@/features/property-requests/hooks/use-property-requests';
+import { requestTitle } from '@/features/property-requests/utils/request-summary';
 import { getSocket } from '@/lib/realtime/socket-client';
 import { useMarkConversationNotificationsRead } from '@/features/notifications/hooks/use-notifications';
 import type { Message } from '@/features/messages/types/message.types';
@@ -70,7 +72,7 @@ function Bubble({ message, isMine }: { message: Message; isMine: boolean }) {
 }
 
 export default function ConversationPage() {
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
   const router = useRouter();
   const params = useParams<{ id: string }>();
   const id = params.id;
@@ -85,6 +87,11 @@ export default function ConversationPage() {
   const { data: conversations } = useConversations();
   const conversation = conversations?.find((item) => item.id === id);
   const { data: conversationProperty } = useProperty(conversation?.propertyId);
+  // Équivalent pour une conversation démarrée depuis une demande (bouton message de
+  // PublicBoardCard) — route publique, utilisable par les deux participants même si la demande a
+  // depuis été rendue privée. `propertyId` et `requestId` ne sont jamais présents en même temps
+  // (voir le contrat backend), mais les deux encarts ci-dessous restent écrits défensivement.
+  const { data: conversationRequest } = useRequestSummary(conversation?.requestId);
 
   const { data: messages, isLoading } = useConversation(id);
   const { mutateAsync: sendMessage, isPending } = useSendMessage(id);
@@ -235,6 +242,25 @@ export default function ConversationPage() {
             <p className="text-[12px] font-bold text-brand-secondary-text">{formatPrice(conversationProperty.price)}</p>
           </div>
         </Link>
+      )}
+
+      {/* Demande concernée par cette discussion (conversation ouverte depuis le tableau public des
+          demandes, voir PublicBoardCard) — pas de photo (une demande n'en a pas) ni de prix exact
+          (budget, potentiellement une fourchette), et pas de fiche détail publique vers laquelle
+          lier : un simple encart informatif, avec le libellé explicite "Demande de recherche" pour
+          qu'on sache qu'il s'agit d'une demande et non d'une annonce. */}
+      {conversationRequest && (
+        <div className="shrink-0 flex items-center gap-2.5 px-4 py-2 border-b border-stroke-default bg-surface-app">
+          <div className="w-10 h-10 shrink-0 rounded-lg bg-stroke-default flex items-center justify-center">
+            <ClipboardList size={20} className="text-content-muted" />
+          </div>
+          <div className="min-w-0">
+            <p className="text-[12px] text-content-muted">{t.propertyDetail.chatAboutRequest}</p>
+            <p className="text-[0.85rem] font-semibold text-content-main truncate">
+              {requestTitle(conversationRequest, locale)}
+            </p>
+          </div>
+        </div>
       )}
 
       {isLoading ? (

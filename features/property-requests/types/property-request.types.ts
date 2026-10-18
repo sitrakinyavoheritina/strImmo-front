@@ -93,6 +93,22 @@ export type PublicPropertyRequestFilters = {
   communeId?: string;
 };
 
+// Miroir du résultat de GET /property-requests/:id/summary (route PUBLIQUE, pas d'auth requise)
+// — volontairement accessible aux deux participants d'une conversation démarrée depuis une
+// demande (pas seulement l'auteur, contrairement à `getOne`/`useRequest` ci-dessous), et même si
+// la demande a depuis été rendue privée. Jamais de donnée sensible (pas d'userId, pas de
+// téléphone) : sert uniquement à afficher l'encart "Demande de recherche" en haut du fil (voir
+// app/messages/[id]/page.tsx).
+export type PropertyRequestSummary = {
+  id: string;
+  kind: ListingKind;
+  propertyType?: PropertyType;
+  communeName?: string;
+  fokontanyName?: string;
+  minBudget?: number;
+  maxBudget?: number;
+};
+
 // Config + progression du boost de vues d'une demande (voir PATCH
 // /property-requests/admin/:id/view-boost) — même forme que ViewBoostConfig (annonces, voir
 // features/search/types/listing.types.ts) MOINS tous les champs `like*` : une demande n'a pas de

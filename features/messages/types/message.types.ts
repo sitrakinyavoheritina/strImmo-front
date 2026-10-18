@@ -7,6 +7,11 @@ export type Conversation = {
   participantName: string;
   participantAvatarUrl?: string;
   propertyId?: string;
+  // Rempli uniquement quand la conversation a été démarrée depuis une demande (bouton message de
+  // PublicBoardCard) — jamais en même temps que `propertyId`. Permet d'afficher un encart
+  // "Demande de recherche" en haut du fil (voir app/messages/[id]/page.tsx), via
+  // GET /property-requests/:id/summary (route publique, pas celle réservée à l'auteur).
+  requestId?: string;
   lastMessage: string | null;
   lastMessageAt: string | null;
   unreadCount: number;

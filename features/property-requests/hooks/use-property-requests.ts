@@ -45,6 +45,19 @@ export function useRequest(id: string | undefined) {
   });
 }
 
+// Résumé public d'une demande (GET /property-requests/:id/summary) — utilisé pour afficher
+// l'encart "Demande de recherche" en haut d'une conversation démarrée depuis une demande (voir
+// app/messages/[id]/page.tsx). Clé distincte de `useRequest` ci-dessus (qui appelle
+// GET /property-requests/:id, réservé à l'auteur) : les deux coexistent dans le cache sans se
+// piétiner, et ce résumé reste utilisable par l'autre participant de la conversation.
+export function useRequestSummary(id: string | undefined) {
+  return useQuery({
+    queryKey: ['property-requests', id, 'summary'],
+    queryFn: () => propertyRequestApi.getSummary(id as string),
+    enabled: !!id,
+  });
+}
+
 function invalidateAll(queryClient: ReturnType<typeof useQueryClient>) {
   void queryClient.invalidateQueries({ queryKey: MINE_KEY });
   void queryClient.invalidateQueries({ queryKey: PUBLIC_KEY_PREFIX });

@@ -4,6 +4,7 @@ import type {
   CreatePropertyRequestPayload,
   PropertyRequest,
   PropertyRequestReportReason,
+  PropertyRequestSummary,
   PublicPropertyRequestFilters,
   RequestViewBoostConfig,
   UpdatePropertyRequestPayload,
@@ -30,6 +31,14 @@ export const propertyRequestApi = {
   // formulaire de modification (app/demandes/[id]/modifier), jamais à afficher une demande à un
   // tiers.
   getOne: (id: string) => apiClient.get<PropertyRequest>(`/property-requests/${id}`).then((r) => r.data),
+
+  // Route publique (pas d'auth requise), accessible aux deux participants d'une conversation
+  // démarrée depuis une demande — même si la demande a depuis été rendue privée. Ne renvoie
+  // aucune donnée sensible (pas d'userId, pas de téléphone), contrairement à `getOne` ci-dessus
+  // qui reste réservé à l'auteur. Voir useRequestSummary (use-property-requests.ts) et l'encart
+  // "Demande de recherche" de app/messages/[id]/page.tsx.
+  getSummary: (id: string) =>
+    apiClient.get<PropertyRequestSummary>(`/property-requests/${id}/summary`).then((r) => r.data),
 
   update: (id: string, payload: UpdatePropertyRequestPayload) =>
     apiClient.patch<PropertyRequest>(`/property-requests/${id}`, payload).then((r) => r.data),
