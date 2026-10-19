@@ -171,6 +171,33 @@ export interface AdminUserMessagingStats {
 // MessagingService.getConversationAsAdmin) — les deux participants, sans point de vue (ni "moi"
 // ni "l'autre", contrairement à Conversation côté features/messages), + tous les messages bruts
 // (mêmes champs qu'ApiMessage, mappés en Message via toMessage côté appelant).
+// Payload de POST /broadcast/sms — voir strImmo/src/broadcast/dto/send-bulk-sms.dto.ts.
+// `target: 'all'` vise tous les utilisateurs ayant un téléphone, `target: 'custom'` uniquement
+// les numéros listés dans `phones`.
+export interface SendBulkSmsPayload {
+  message: string;
+  target: 'all' | 'custom';
+  phones?: string[];
+}
+
+// Payload de POST /broadcast/email — voir strImmo/src/broadcast/dto/send-bulk-email.dto.ts.
+export interface SendBulkEmailPayload {
+  subject: string;
+  message: string;
+  target: 'all' | 'custom';
+  emails?: string[];
+}
+
+// Forme renvoyée par POST /broadcast/sms et POST /broadcast/email (voir
+// BroadcastService.sendBulkSms/sendBulkEmail) — envoi séquentiel, best-effort : `failedRecipients`
+// liste les destinataires à relancer à la main.
+export interface BroadcastResult {
+  total: number;
+  sent: number;
+  failed: number;
+  failedRecipients: string[];
+}
+
 export interface AdminConversationDetail {
   id: string;
   userA: { id: string; name: string; avatarUrl?: string };

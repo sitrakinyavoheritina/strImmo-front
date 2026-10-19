@@ -9,10 +9,13 @@ import type {
   AdminUser,
   AdminUserDetail,
   AdminUserMessagingStats,
+  BroadcastResult,
   CreateUserAsAdminPayload,
   CreateUserAsAdminResponse,
   ErrorLogsParams,
   ErrorLogsResponse,
+  SendBulkEmailPayload,
+  SendBulkSmsPayload,
 } from '../types';
 
 export const adminApi = {
@@ -73,4 +76,17 @@ export const adminApi = {
   // strImmo/src/messaging/messaging.service.ts:getConversationAsAdmin.
   getConversation: (id: string) =>
     apiClient.get<AdminConversationDetail>(`/conversations/admin/${id}`).then((r) => r.data),
+
+  // Aperçu du nombre de destinataires avant un envoi en masse — voir
+  // strImmo/src/broadcast/broadcast.service.ts:countRecipients.
+  getBroadcastRecipientsCount: (channel: 'sms' | 'email') =>
+    apiClient.get<{ count: number }>('/broadcast/recipients-count', { params: { channel } }).then((r) => r.data.count),
+
+  // Envoi en masse par SMS (admin/superadmin) — voir strImmo/src/broadcast/broadcast.service.ts:sendBulkSms.
+  sendBulkSms: (payload: SendBulkSmsPayload) =>
+    apiClient.post<BroadcastResult>('/broadcast/sms', payload).then((r) => r.data),
+
+  // Envoi en masse par email (admin/superadmin) — voir strImmo/src/broadcast/broadcast.service.ts:sendBulkEmail.
+  sendBulkEmail: (payload: SendBulkEmailPayload) =>
+    apiClient.post<BroadcastResult>('/broadcast/email', payload).then((r) => r.data),
 };
