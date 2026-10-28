@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { AuthPageShell } from '@/features/auth/components/auth-page-shell';
 import { authService } from '@/features/auth/services/auth-service';
+import { useAuthStore } from '@/lib/state/use-auth-store';
 import { getErrorMessage } from '@/lib/api/get-error-message';
 import { Button } from '@/components/ui/button';
 import { FormErrorBanner } from '@/components/ui/form-error-banner';
@@ -32,6 +33,7 @@ function identifierError(value: string, t: ReturnType<typeof useTranslation>['t'
 export default function MotDePasseOubliePage() {
   const { t } = useTranslation();
   const router = useRouter();
+  const setSession = useAuthStore((state) => state.setSession);
   const [step, setStep] = useState<Step>('request');
   const [identifier, setIdentifier] = useState('');
   const [code, setCode] = useState('');
@@ -85,8 +87,9 @@ export default function MotDePasseOubliePage() {
     setErrorMessage(null);
     setIsLoading(true);
     try {
-      await authService.resetPassword({ identifier: identifier.trim(), code, newPassword });
-      router.push('/connexion?reinitialise=1');
+      const { user, token } = await authService.resetPassword({ identifier: identifier.trim(), code, newPassword });
+      setSession(user, token);
+      router.push(user.role === 'admin' || user.role === 'superadmin' ? '/admin' : '/');
     } catch (error) {
       setErrorMessage(getErrorMessage(error, 'Code invalide ou expiré.'));
     } finally {

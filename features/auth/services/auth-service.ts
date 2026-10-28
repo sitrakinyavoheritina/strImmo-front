@@ -146,8 +146,10 @@ export const authService = {
 
   forgotPassword: (identifier: string) => authApi.forgotPassword(identifier),
 
-  resetPassword: (payload: { identifier: string; code: string; newPassword: string }) =>
-    authApi.resetPassword(payload),
+  resetPassword: async (payload: { identifier: string; code: string; newPassword: string }): Promise<{ user: User; token: string }> => {
+    const res = await authApi.resetPassword(payload);
+    return { user: toUser(res.user), token: res.access_token };
+  },
 
   requestAccountDeletion: (payload: { identifier: string; message?: string }) =>
     authApi.requestAccountDeletion(payload),

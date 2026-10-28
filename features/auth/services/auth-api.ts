@@ -119,8 +119,11 @@ export const authApi = {
   forgotPassword: (identifier: string) =>
     apiClient.post<{ message: string }>('/auth/forgot-password', { identifier }).then((r) => r.data),
 
+  // Connecte automatiquement en cas de succès (même enveloppe qu'une connexion normale, voir
+  // strImmo/src/auth/auth.service.ts:resetPassword) — plus besoin de retaper le nouveau mot de
+  // passe juste après l'avoir choisi.
   resetPassword: (payload: { identifier: string; code: string; newPassword: string }) =>
-    apiClient.post<{ success: boolean }>('/auth/reset-password', payload).then((r) => r.data),
+    apiClient.post<AuthenticatedResponse>('/auth/reset-password', payload).then((r) => r.data),
 
   // Formulaire public de /suppression-compte (exigence Google Play Console) — voir
   // strImmo/src/auth/auth.service.ts:requestAccountDeletion. N'efface rien automatiquement,
