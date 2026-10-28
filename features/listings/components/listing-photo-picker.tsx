@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useMemo, useRef, useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Camera, X } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import type { ListingPhotoItem } from '@/features/search/types/listing.types';
 
@@ -135,9 +135,9 @@ export function ListingPhotoPicker({ photos, onChange, min, max, showMinError = 
         {remaining > 0 && (
           <label
             htmlFor={inputId}
-            className="h-24 w-24 flex flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-stroke-default text-content-muted cursor-pointer hover:border-brand-primary transition"
+            className="h-24 w-24 flex flex-col items-center justify-center gap-1 rounded-xl border border-dashed border-upload-border text-content-muted cursor-pointer hover:border-brand-primary transition"
           >
-            <Plus size={20} />
+            <Camera size={20} />
             <span className="text-[10px]">{isProcessing ? '…' : t.listing.addPhoto}</span>
           </label>
         )}

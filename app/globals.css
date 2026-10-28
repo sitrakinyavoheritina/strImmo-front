@@ -29,6 +29,7 @@
 
   /* Bordures */
   --color-stroke-default: #e8dcc3;       /* Bordures communes */
+  --color-upload-border: #5b291b;        /* Bordure des zones d'ajout de photo (pointillés) */
 
   /* États */
   --color-danger: #ef4444;               /* Suppression / erreurs */
@@ -86,6 +87,7 @@
     --color-content-muted: #c9b499;
 
     --color-stroke-default: #3d3226;
+    --color-upload-border: #f2e7cb;
 
     --color-danger: #f87171;
     --color-danger-hover: #ef4444;
@@ -108,6 +110,7 @@
   --color-content-muted: #c9b499;
 
   --color-stroke-default: #3d3226;
+  --color-upload-border: #f2e7cb;
 
   --color-danger: #f87171;
   --color-danger-hover: #ef4444;

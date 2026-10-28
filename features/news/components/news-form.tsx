@@ -2,7 +2,7 @@
 
 import { useId, useState } from 'react';
 import Image from 'next/image';
-import { ImagePlus } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { useTranslation } from '@/lib/i18n/use-translation';
 import { FieldLabel, FormInput } from '@/components/ui/form-controls';
 import { Button } from '@/components/ui/button';
@@ -67,13 +67,13 @@ export function NewsForm({ initialValues, onSubmit, isSubmitting, submitLabel }:
         <FieldLabel>{t.adminNewsPage.coverLabel}</FieldLabel>
         <label
           htmlFor={coverInputId}
-          className="relative flex items-center justify-center w-full h-40 rounded-xl border border-dashed border-stroke-default bg-surface-app overflow-hidden cursor-pointer hover:border-brand-primary/60 transition"
+          className="relative flex items-center justify-center w-full h-40 rounded-xl border border-dashed border-upload-border bg-surface-app overflow-hidden cursor-pointer hover:border-brand-primary/60 transition"
         >
           {coverPreviewUrl ? (
             <Image src={coverPreviewUrl} alt="" fill className="object-cover" />
           ) : (
             <span className="flex flex-col items-center gap-1.5 text-content-muted text-[0.85rem] font-medium">
-              <ImagePlus size={22} />
+              <Camera size={22} />
               {t.adminNewsPage.coverPlaceholder}
             </span>
           )}
