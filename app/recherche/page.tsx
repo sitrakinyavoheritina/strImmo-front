@@ -49,7 +49,9 @@ function SearchResultsContent() {
   // Le texte libre (lieu) est retardé/filtré (voir use-debounced-search-filters.ts) : sans ça,
   // chaque lettre tapée dans la barre déclencherait sa propre requête réseau.
   const debouncedFilters = useDebouncedSearchFilters(filters);
-  const { data: properties, isLoading } = useProperties(debouncedFilters);
+  // Page réellement publique : seule ici (et sur l'accueil/widget "récentes"/aperçu du nombre de
+  // résultats), jamais sur Mes Biens/Favoris/l'admin, qui doivent toujours tout voir.
+  const { data: properties, isLoading } = useProperties({ ...debouncedFilters, respectWebVisibility: true });
 
   return (
     <div className="flex px-3 sm:px-6 lg:px-0">

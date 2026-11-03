@@ -91,6 +91,9 @@ export type PublicPropertyRequestFilters = {
   kind?: ListingKind;
   propertyType?: PropertyType;
   communeId?: string;
+  /** `true` uniquement sur le tableau public (app/demandes/page.tsx) — jamais sur "Mes
+   *  demandes"/l'admin (endpoints séparés de toute façon). Sans effet sur l'app mobile. */
+  respectWebVisibility?: boolean;
 };
 
 // Miroir du résultat de GET /property-requests/:id/summary (route PUBLIQUE, pas d'auth requise)
@@ -142,6 +145,9 @@ export type AdminPropertyRequestRow = {
   minBudget?: number;
   maxBudget?: number;
   isPublic: boolean;
+  // Réglable dans /admin/demandes (pas de bouton "Valider" pour cette entité) — n'affecte que le
+  // tableau public du site web, jamais l'app mobile.
+  visibleOnWeb: boolean;
   createdAt: string;
   deletedAt?: string;
   rawDescription?: string;

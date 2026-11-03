@@ -29,7 +29,7 @@ export function HomeClient({ initialProperties }: { initialProperties: Property[
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteProperties(
-    { ...debouncedFilters, sortBy: 'recent' },
+    { ...debouncedFilters, sortBy: 'recent', respectWebVisibility: true },
     // Filtres par défaut (aucun critère saisi) : on part de la première page rendue côté serveur.
     Object.values(debouncedFilters).every((value) => value === undefined || value === '') ? initialProperties : undefined
   );

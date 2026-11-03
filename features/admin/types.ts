@@ -198,6 +198,61 @@ export interface BroadcastResult {
   failedRecipients: string[];
 }
 
+// Même liste d'actions que `AnalyticsEvent` (lib/analytics/track.ts) côté web, et
+// `AnalyticsEvent`/USER_ACTIVITY_ACTIONS côté mobile/backend — voir
+// strImmo/src/user-activity/dto/record-activity.dto.ts. Alimenté exclusivement par l'app mobile
+// (voir POST /user-activity) : le web lui-même n'envoie rien à cet endpoint.
+export type UserActivityAction =
+  | 'view_property'
+  | 'search'
+  | 'filter_property'
+  | 'favorite_property'
+  | 'like_property_request'
+  | 'contact_owner'
+  | 'send_message'
+  | 'login'
+  | 'register'
+  | 'publish_property';
+
+export interface AdminActivityUser {
+  id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  role: string;
+  lastActiveAt: string | null;
+  actionCount: number;
+}
+
+export interface AdminActivityUsersResponse {
+  total: number;
+  page: number;
+  limit: number;
+  users: AdminActivityUser[];
+}
+
+export interface AdminUserActivityEntry {
+  id: string;
+  action: UserActivityAction;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+}
+
+export interface AdminUserActivityResponse {
+  user: {
+    id: string;
+    name: string;
+    phone: string | null;
+    email: string | null;
+    role: string;
+    lastActiveAt: string | null;
+  };
+  total: number;
+  page: number;
+  limit: number;
+  actions: AdminUserActivityEntry[];
+}
+
 export interface AdminConversationDetail {
   id: string;
   userA: { id: string; name: string; avatarUrl?: string };

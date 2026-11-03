@@ -111,10 +111,13 @@ export function AnnonceClient({ id, initialProperty }: { id: string; initialProp
   // faire pour un admin une fois l'annonce traitée, et ça enchaîne naturellement sur la suivante.
   function handleApprove() {
     setModerationError(null);
-    approve(id, {
-      onSuccess: () => router.push('/validation'),
-      onError: () => setModerationError(t.validationPage.approveError),
-    });
+    approve(
+      { id },
+      {
+        onSuccess: () => router.push('/validation'),
+        onError: () => setModerationError(t.validationPage.approveError),
+      }
+    );
   }
 
   function handleConfirmReject() {

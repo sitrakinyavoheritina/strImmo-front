@@ -24,7 +24,9 @@ export function FilterModal({ onClose, filters, onApply }: FilterModalProps) {
   const [isAdvancedOpen, setIsAdvancedOpen] = useState(hasActiveAdvancedFilters(filters));
   const [isCounted, setIsCounted] = useState(false);
 
-  const { refetch, data, isFetching } = useProperties(draft, { enabled: false });
+  // Aperçu du nombre de résultats pour une recherche publique — doit refléter ce que l'accueil/
+  // la recherche affichera réellement, pas le total brut toutes plateformes confondues.
+  const { refetch, data, isFetching } = useProperties({ ...draft, respectWebVisibility: true }, { enabled: false });
 
   function update<K extends keyof PropertyFilters>(key: K, value: PropertyFilters[K]) {
     setDraft((prev) => ({ ...prev, [key]: value }));

@@ -3,10 +3,12 @@ import type { ApiProperty } from '@/features/search/services/property-api';
 import type { PropertyRequest } from '@/features/property-requests/types/property-request.types';
 import type { ApiConversation } from '@/features/messages/services/message-api';
 import type {
+  AdminActivityUsersResponse,
   AdminConversationDetail,
   AdminMessagingStats,
   AdminSearchUser,
   AdminUser,
+  AdminUserActivityResponse,
   AdminUserDetail,
   AdminUserMessagingStats,
   BroadcastResult,
@@ -89,4 +91,19 @@ export const adminApi = {
   // Envoi en masse par email (admin/superadmin) — voir strImmo/src/broadcast/broadcast.service.ts:sendBulkEmail.
   sendBulkEmail: (payload: SendBulkEmailPayload) =>
     apiClient.post<BroadcastResult>('/broadcast/email', payload).then((r) => r.data),
+
+  // Activité des utilisateurs mobile, triée par dernière activité (jamais actif en premier) —
+  // voir strImmo/src/user-activity/user-activity.service.ts:listUsers. N'alimente rien côté web :
+  // seule l'app mobile envoie à POST /user-activity.
+  getActivityUsers: (page = 1) =>
+    apiClient
+      .get<AdminActivityUsersResponse>('/user-activity/admin/users', { params: { page } })
+      .then((r) => r.data),
+
+  // Historique détaillé des actions d'un utilisateur précis — voir
+  // strImmo/src/user-activity/user-activity.service.ts:getUserActivity.
+  getUserActivity: (userId: string, page = 1) =>
+    apiClient
+      .get<AdminUserActivityResponse>(`/user-activity/admin/users/${userId}`, { params: { page } })
+      .then((r) => r.data),
 };

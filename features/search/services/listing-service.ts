@@ -18,7 +18,8 @@ export const listingService = {
 
   remove: (id: string) => propertyApi.remove(id),
 
-  approve: (id: string) => propertyApi.approve(id).then(mapApiPropertyToProperty),
+  approve: (id: string, visibleOnWeb?: boolean) =>
+    propertyApi.approve(id, visibleOnWeb).then(mapApiPropertyToProperty),
 
   reject: (id: string, reason: string) => propertyApi.reject(id, reason).then(mapApiPropertyToProperty),
 

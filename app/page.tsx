@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 // liens. Le bloc de texte + liens sous le fil relie l'accueil aux catégories et aux communes.
 export default async function HomePage() {
   const [initialProperties, geoPages] = await Promise.all([
-    fetchProperties({ sortBy: 'recent', limit: 12, offset: 0 }),
+    fetchProperties({ sortBy: 'recent', limit: 12, offset: 0, respectWebVisibility: true }),
     getGeoPages(),
   ]);
 

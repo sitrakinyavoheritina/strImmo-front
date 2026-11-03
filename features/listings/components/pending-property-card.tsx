@@ -22,11 +22,15 @@ export function PendingPropertyCard({ property }: { property: Property }) {
   const [isRejectFormOpen, setIsRejectFormOpen] = useState(false);
   const [reason, setReason] = useState('');
   const [error, setError] = useState<string | null>(null);
+  // Choisi par l'admin à la validation (voir strImmo/src/properties/properties.service.ts:approve)
+  // — sans effet sur l'app mobile, qui affiche toujours l'annonce une fois approuvée. Permet par
+  // exemple à un testeur de publier sans que ça apparaisse sur le site public.
+  const [visibleOnWeb, setVisibleOnWeb] = useState(true);
   const cover = property.mainPhotoUrl;
 
   function handleApprove() {
     setError(null);
-    approve(property.id, { onError: () => setError(t.validationPage.approveError) });
+    approve({ id: property.id, visibleOnWeb }, { onError: () => setError(t.validationPage.approveError) });
   }
 
   function handleConfirmReject() {
@@ -90,15 +94,26 @@ export function PendingPropertyCard({ property }: { property: Property }) {
       >
         {cover && <Image src={cover} alt={property.title} fill className="object-cover" />}
       </Link>
-      <Link href={`/annonce/${property.id}`} className="flex-1 min-w-0">
-        <p className="text-sm font-semibold text-content-main truncate">{property.title}</p>
-        <p className="text-[0.85rem] text-content-muted truncate">{property.location}</p>
-        <p className="text-sm font-bold text-brand-secondary-text mt-0.5">
-          {formatPrice(property.price)}
-          {getPriceSuffix(property) && <span className="font-normal text-content-muted">{getPriceSuffix(property)}</span>}
-        </p>
+      <div className="flex-1 min-w-0">
+        <Link href={`/annonce/${property.id}`}>
+          <p className="text-sm font-semibold text-content-main truncate">{property.title}</p>
+          <p className="text-[0.85rem] text-content-muted truncate">{property.location}</p>
+          <p className="text-sm font-bold text-brand-secondary-text mt-0.5">
+            {formatPrice(property.price)}
+            {getPriceSuffix(property) && <span className="font-normal text-content-muted">{getPriceSuffix(property)}</span>}
+          </p>
+        </Link>
+        <label className="flex items-center gap-1.5 mt-1 text-[0.8rem] text-content-muted">
+          <input
+            type="checkbox"
+            checked={visibleOnWeb}
+            onChange={(event) => setVisibleOnWeb(event.target.checked)}
+            className="accent-brand-primary"
+          />
+          {t.validationPage.visibleOnWebLabel}
+        </label>
         {error && <p className="text-[0.85rem] text-danger mt-0.5">{error}</p>}
-      </Link>
+      </div>
       <div className="shrink-0 flex flex-col gap-1.5">
         <button
           type="button"

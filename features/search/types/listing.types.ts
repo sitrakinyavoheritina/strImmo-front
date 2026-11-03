@@ -189,6 +189,11 @@ export type PropertyFilters = {
   favoritesOf?: string;
   /** Statut de modération — sans ce filtre, seules les annonces approuvées sont retournées. */
   status?: 'pending' | 'approved' | 'rejected';
+  /** `true` UNIQUEMENT sur les pages réellement publiques (accueil, recherche) — jamais sur "Mes
+   *  Biens"/l'admin, qui doivent toujours tout voir quel que soit `visibleOnWeb`. Exclut les
+   *  annonces masquées du site public par l'admin à la validation (voir
+   *  strImmo/src/properties/properties.service.ts:findAll) — sans effet sur l'app mobile. */
+  respectWebVisibility?: boolean;
   sortBy?: 'recent' | 'price_asc' | 'price_desc' | 'popular';
   /** Scroll infini (accueil uniquement, voir use-infinite-properties.ts) — sans ces deux champs,
    *  le backend renvoie tous les résultats d'un coup (comportement historique, toujours utilisé

@@ -205,7 +205,8 @@ export const propertyApi = {
 
   // Réservé admin/superadmin (voir strImmo/src/properties/properties.controller.ts, `@Roles`) —
   // le backend renvoie 403 sinon.
-  approve: (id: string) => apiClient.patch<ApiProperty>(`/properties/${id}/approve`).then((r) => r.data),
+  approve: (id: string, visibleOnWeb?: boolean) =>
+    apiClient.patch<ApiProperty>(`/properties/${id}/approve`, { visibleOnWeb }).then((r) => r.data),
 
   reject: (id: string, reason: string) =>
     apiClient.patch<ApiProperty>(`/properties/${id}/reject`, { reason }).then((r) => r.data),

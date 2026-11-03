@@ -28,7 +28,12 @@ export default function PublicProfilePage() {
     if (currentUser?.id === id) router.replace('/profil');
   }, [currentUser, id, router]);
 
-  const { data: properties, isLoading } = useProperties({ ownerId: id, status: 'approved' }, { enabled: !!id });
+  // Profil PUBLIC vu par un étranger (redirigé vers /profil ci-dessus si c'est le sien) : une
+  // annonce masquée du web par l'admin ne doit pas réapparaître ici non plus.
+  const { data: properties, isLoading } = useProperties(
+    { ownerId: id, status: 'approved', respectWebVisibility: true },
+    { enabled: !!id }
+  );
   const author = properties?.[0];
 
   if (isLoading) {

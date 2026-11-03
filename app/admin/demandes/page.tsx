@@ -11,6 +11,7 @@ import {
   useAdminPropertyRequests,
   useAdminDeletedPropertyRequests,
   useAdminDeletePropertyRequest,
+  useSetPropertyRequestWebVisibility,
 } from '@/features/property-requests/hooks/use-property-requests';
 import { requestSentence, requestTitle } from '@/features/property-requests/utils/request-summary';
 import { AdminRequestViewBoost } from '@/features/property-requests/components/admin-request-view-boost';
@@ -65,6 +66,7 @@ export default function AdminDemandesPage() {
     isAdminUser && tab === 'deleted'
   );
   const { mutate: remove, isPending: isDeleting } = useAdminDeletePropertyRequest();
+  const { mutate: setWebVisibility } = useSetPropertyRequestWebVisibility();
 
   if (!isAdminUser) return null;
 
@@ -155,6 +157,20 @@ export default function AdminDemandesPage() {
                   <p className="text-[12px] text-danger mt-1">
                     {t.adminDemandesPage.deletedOn} {formatDate(request.deletedAt)}
                   </p>
+                )}
+
+                {tab === 'active' && (
+                  <label className="flex items-center gap-1.5 mt-2 text-[0.85rem] text-content-muted">
+                    <input
+                      type="checkbox"
+                      checked={request.visibleOnWeb}
+                      onChange={(event) =>
+                        setWebVisibility({ id: request.id, visibleOnWeb: event.target.checked })
+                      }
+                      className="accent-brand-primary"
+                    />
+                    {t.validationPage.visibleOnWebLabel}
+                  </label>
                 )}
 
                 {tab === 'active' && (

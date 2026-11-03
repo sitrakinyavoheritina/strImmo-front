@@ -9,7 +9,7 @@ import { propertyPath } from '@/lib/seo/slug';
 /** Mini-liste des annonces les plus récentes, en vignette. */
 export function RecentListingsWidget() {
   const { t } = useTranslation();
-  const { data: properties } = useProperties({ sortBy: 'recent' });
+  const { data: properties } = useProperties({ sortBy: 'recent', respectWebVisibility: true });
   const recent = properties?.slice(0, 2) ?? [];
 
   if (recent.length === 0) return null;

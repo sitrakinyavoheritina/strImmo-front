@@ -168,6 +168,18 @@ export function useAdminDeletePropertyRequest() {
   });
 }
 
+// Afficher/masquer une demande sur le tableau public du site web (voir app/admin/demandes/page.tsx)
+// — pas de file de modération séparée pour cette entité, ce bouton est le seul endroit où ce
+// réglage se change.
+export function useSetPropertyRequestWebVisibility() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, visibleOnWeb }: { id: string; visibleOnWeb: boolean }) =>
+      propertyRequestApi.setWebVisibility(id, visibleOnWeb),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ADMIN_KEY }),
+  });
+}
+
 // Boost des vues d'une demande (voir AdminRequestViewBoost) — même pattern que
 // useUpdateViewBoost/useResetViewBoost (annonces, features/search/hooks/use-update-view-boost.ts)
 // mais invalide ADMIN_KEY (liste admin) plutôt que `['property', id]` : ici c'est la vue admin en

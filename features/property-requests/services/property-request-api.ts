@@ -65,6 +65,11 @@ export const propertyRequestApi = {
 
   removeAsAdmin: (id: string) => apiClient.delete<void>(`/property-requests/admin/${id}`).then(() => undefined),
 
+  // Admin uniquement — n'affecte que le tableau public du site web, jamais l'app mobile ni
+  // `isPublic` (voir updateVisibility ci-dessus, réservé à l'auteur).
+  setWebVisibility: (id: string, visibleOnWeb: boolean) =>
+    apiClient.patch<void>(`/property-requests/admin/${id}/web-visibility`, { visibleOnWeb }).then(() => undefined),
+
   // Renvoie `void` (pas la demande mise à jour, contrairement à l'équivalent annonces) — il faut
   // invalider la query admin après succès plutôt que d'utiliser la réponse, voir
   // use-property-requests.ts.

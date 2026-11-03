@@ -11,10 +11,11 @@ export function useApproveProperty() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (id: string) => listingService.approve(id),
-    onSuccess: (_data, id) => {
+    mutationFn: ({ id, visibleOnWeb }: { id: string; visibleOnWeb?: boolean }) =>
+      listingService.approve(id, visibleOnWeb),
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ['properties'] });
-      queryClient.invalidateQueries({ queryKey: ['property', id] });
+      queryClient.invalidateQueries({ queryKey: ['property', variables.id] });
     },
   });
 }

@@ -39,7 +39,10 @@ export default function DemandesPage() {
   }, [hasHydrated, isAuthenticated, router]);
 
   const { data: myRequests, isLoading: isLoadingMine } = useMyPropertyRequests(isAuthenticated && tab === 'mine');
-  const { data: publicRequests, isLoading: isLoadingBoard } = usePublicPropertyRequests(boardFilters);
+  const { data: publicRequests, isLoading: isLoadingBoard } = usePublicPropertyRequests({
+    ...boardFilters,
+    respectWebVisibility: true,
+  });
   useCommunes(); // préchauffe le cache pour /demandes/nouvelle, ouvert juste après depuis ici
 
   // Distingue les auteurs du tableau public entre eux ("Membre anonyme", "Membre anonyme 2"...)
