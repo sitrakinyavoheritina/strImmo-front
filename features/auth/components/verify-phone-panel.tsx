@@ -45,7 +45,12 @@ export function VerifyPhonePanel({ onVerified }: { onVerified: () => void }) {
       }
       const result = await authService.requestPhoneConfirmation(phone);
       setSentTo(result.phone);
-      updateUser({ phone: result.phone });
+      // `isPhoneVerified: false` ici aussi : le backend vient de le repasser à `false` en base
+      // (voir AuthService.setPhoneAndSendVerificationCode), mais la valeur locale d'un compte
+      // Google (`true` par défaut, jamais prouvé) resterait sinon périmée à `true` — ce qui ferait
+      // disparaître ce panneau (voir la condition dans app/publier/page.tsx) avant même la saisie
+      // du code, sautant entièrement l'étape de vérification OTP.
+      updateUser({ phone: result.phone, isPhoneVerified: false });
       setIsCodeSent(true);
       resetResendCountdown();
     } catch (e) {

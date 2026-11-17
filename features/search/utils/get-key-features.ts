@@ -45,7 +45,11 @@ export function getKeyFeatures(property: Property): string[] {
   switch (property.propertyType) {
     case 'house': {
       const features: string[] = [];
-      features.push(`${property.bedrooms} chambre${property.bedrooms > 1 ? 's' : ''}`);
+      // `bedrooms` est facultatif à la création (0 si jamais renseigné) — omis dans ce cas
+      // plutôt que d'afficher "0 chambre".
+      if (property.bedrooms > 0) {
+        features.push(`${property.bedrooms} chambre${property.bedrooms > 1 ? 's' : ''}`);
+      }
       if (property.hasCarAccess) features.push('accès voiture');
       features.push(waterSourceLabel(property.waterSource));
       return features.slice(0, 2);

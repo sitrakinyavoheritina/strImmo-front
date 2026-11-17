@@ -44,7 +44,11 @@ export function getPropertyDetailStats(
   const amenities: Amenity[] = [];
 
   if (property.propertyType === 'house') {
-    stats.push({ icon: BedDouble, value: String(property.bedrooms), label: t.propertyDetail.bedroomsLabel });
+    // `bedrooms` est facultatif à la création (0 si jamais renseigné) — on n'affiche la
+    // statistique que si une valeur a réellement été choisie, jamais "0 chambre".
+    if (property.bedrooms > 0) {
+      stats.push({ icon: BedDouble, value: String(property.bedrooms), label: t.propertyDetail.bedroomsLabel });
+    }
     if (property.hasCarAccess) amenities.push({ icon: Car, text: t.search.carAccess });
     if (property.hasMotorbikeAccess) amenities.push({ icon: Bike, text: t.search.hasMotorbikeAccess });
     amenities.push({ icon: Droplet, text: t.search[WATER_SOURCE_LABEL_KEY[property.waterSource]] });

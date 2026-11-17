@@ -215,7 +215,9 @@ export function FeaturedStories({
           // (aucun champ numérique équivalent côté backend) — ligne simplement omise.
           const spec =
             property.propertyType === 'house'
-              ? `${property.bedrooms} ${t.property.bedrooms}`
+              ? property.bedrooms > 0
+                ? `${property.bedrooms} ${t.property.bedrooms}`
+                : null
               : property.propertyType === 'villa' || property.propertyType === 'apartment'
                 ? `${property.surfaceM2}m²`
                 : null;

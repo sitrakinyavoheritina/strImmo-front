@@ -49,19 +49,23 @@ function zoneLabel(request: RequestLike): string | undefined {
   return request.communeName ?? undefined;
 }
 
-/** Court intitulé ("Appartement à louer", "Terrain à acheter"...) affiché en gras au-dessus de la
- *  phrase complète (voir requestSentence) sur les cartes de demande — repère visuel rapide avant
- *  de lire le détail, demandé pour rendre la liste plus scannable. */
+/** Court intitulé ("Appartement à louer à Ivandry", "Terrain à acheter à Ambohipo"...) affiché en
+ *  gras au-dessus de la phrase complète (voir requestSentence) sur les cartes de demande — repère
+ *  visuel rapide avant de lire le détail, demandé pour rendre la liste plus scannable. Le lieu est
+ *  désormais inclus (demandé explicitement) — même zone que requestSentence (zoneLabel). */
 export function requestTitle(request: RequestLike, locale: Locale): string {
   const type = request.propertyType;
+  const place = zoneLabel(request);
   if (locale === 'mg') {
     const noun = type ? MG_TYPE_LABEL[type] : 'Fananana';
     const kind = request.kind === 'rent' ? 'hofaina' : 'hovidiana';
-    return `Mitady ${noun} ${kind}`;
+    const zone = place ? ` any ${place}` : '';
+    return `Mitady ${noun} ${kind}${zone}`;
   }
   const label = type ? FR_TYPE_LABEL[type] : 'Bien';
   const kind = request.kind === 'rent' ? 'à louer' : 'à acheter';
-  return `Cherche ${label} ${kind}`;
+  const zone = place ? ` à ${place}` : '';
+  return `Cherche ${label} ${kind}${zone}`;
 }
 
 /** Transforme les critères structurés (+ le texte libre éventuel, voir CreatePropertyRequestDto.
