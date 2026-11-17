@@ -265,14 +265,15 @@ export const PropertyForm = forwardRef<PropertyFormHandle, PropertyFormProps>(fu
     };
   }
 
-  // Le modal ne s'affiche qu'à partir du 4ᵉ clic infructueux sur "Suivant" à une même étape
-  // (demandé explicitement) — avant ça, les bordures rouges sous chaque champ (toujours affichées,
-  // voir `setErrors` dans chaque handler ci-dessous) suffisent. Une `ref` (pas un `useState`) :
-  // incrémentée sans provoquer de rendu, elle n'a besoin d'être lue qu'au moment du clic suivant.
+  // Le modal ne s'affiche qu'à partir du 2ᵉ clic infructueux sur "Suivant" à une même étape
+  // (revu explicitement, c'était le 4ᵉ avant) — avant ça, les bordures rouges sous chaque champ
+  // (toujours affichées, voir `setErrors` dans chaque handler ci-dessous) suffisent. Une `ref`
+  // (pas un `useState`) : incrémentée sans provoquer de rendu, elle n'a besoin d'être lue qu'au
+  // moment du clic suivant.
   const attemptCountsRef = useRef<Record<1 | 2 | 3, number>>({ 1: 0, 2: 0, 3: 0 });
   function shouldShowModal(formStep: 1 | 2 | 3): boolean {
     attemptCountsRef.current[formStep] += 1;
-    return attemptCountsRef.current[formStep] > 3;
+    return attemptCountsRef.current[formStep] > 1;
   }
 
   // Message unique et naturel quand les DEUX champs manquent à la fois (reformulé explicitement
